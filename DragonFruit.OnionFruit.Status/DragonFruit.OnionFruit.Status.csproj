@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>2019.10.22</Version>
+    <Authors>DragonFruit Network</Authors>
+    <Product>OnionFruit Status</Product>
+    <Description>Uses the Tor Metrics API to produce easy-to-integrate Tor Node Information.</Description>
+    <Copyright>Copyright 2019 DragonFruit Network.</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/dragonfruitnetwork/OnionFruit.Status</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dragonfruitnetwork/OnionFruit.Status</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>onionfruit, tor, nodes, dragonfruit network</PackageTags>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bia.Countries" Version="3.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+</Project>

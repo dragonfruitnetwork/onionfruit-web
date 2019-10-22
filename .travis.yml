@@ -1,0 +1,12 @@
+language: csharp
+mono: none
+dotnet: 3.0.100
+dist: xenial
+jobs:
+  include:
+  - stage: test
+    script:
+     - dotnet restore
+     - dotnet build
+     - cd "DragonFruit.OnionFruit.Status.Tests"
+     - dotnet run
