@@ -14,8 +14,6 @@ namespace DragonFruit.OnionFruit.Status.Tests
             Console.WriteLine("{0,-20} {1,10} {2,-30}\n", "Country", "Bandwidth", "Flags");
             foreach (var Relay in Info.Relays.OrderBy(x => x.Bandwidth))
                 Console.WriteLine($"{Relay.CountryName,-20} {new Bandwidth(Relay.Bandwidth).Megabits,10} {Relay.Flags.ToString(),-30}");
-
-            Console.ReadLine();
         }
     }
 }
