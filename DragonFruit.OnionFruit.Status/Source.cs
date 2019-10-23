@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Status.Converters;
@@ -27,10 +28,12 @@ namespace DragonFruit.OnionFruit.Status
 
         public static async Task<Source> GetSource(int limit = -1)
         {
-            string sourceString =
-                await new HttpClient().GetStringAsync($"{ENDPOINT}{(limit > 0 ? $"?limit={limit}" : string.Empty)}");
+            using HttpClient client = new HttpClient();
+            using Stream s = client.GetStreamAsync($"{ENDPOINT}{(limit > 0 ? $"?limit={limit}" : string.Empty)}").Result;
+            using StreamReader sr = new StreamReader(s);
+            using JsonReader reader = new JsonTextReader(sr);
 
-            return JsonConvert.DeserializeObject<Source>(sourceString, Json.SerializerSettings);
+            return new JsonSerializer().Deserialize<Source>(reader);
         }
     }
 }
