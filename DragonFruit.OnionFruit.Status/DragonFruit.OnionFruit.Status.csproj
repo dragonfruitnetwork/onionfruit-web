@@ -5,7 +5,7 @@
     <Version>2019.10.23</Version>
     <Authors>DragonFruit Network</Authors>
     <Product>OnionFruit Status</Product>
-    <Description>Uses the Tor Metrics API to produce easy-to-integrate Tor Node Information.</Description>
+    <Description>Use the Tor Metrics API to display easy-to-integrate Tor Node Information.</Description>
     <Copyright>Copyright 2019 DragonFruit Network.</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
