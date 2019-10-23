@@ -9,11 +9,11 @@ namespace DragonFruit.OnionFruit.Status.Tests
     {
         static async Task Main(string[] args)
         {
-            var Info = await Source.GetSource();
+            var info = await Task.Run(() => Source.GetSource());
 
             Console.WriteLine("{0,-20} {1,10} {2,-30}\n", "Country", "Bandwidth", "Flags");
-            foreach (var Relay in Info.Relays.OrderBy(x => x.Bandwidth))
-                Console.WriteLine($"{Relay.CountryName,-20} {new Bandwidth(Relay.Bandwidth).Megabits,10} {Relay.Flags.ToString(),-30}");
+            foreach (var relay in info.Relays.OrderBy(x => x.Bandwidth))
+                Console.WriteLine($"{relay.CountryName,-20} {new Bandwidth(relay.Bandwidth).Megabits,10} {relay.Flags.ToString(),-30}");
         }
     }
 }

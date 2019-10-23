@@ -26,7 +26,7 @@ namespace DragonFruit.OnionFruit.Status
 
         //leave out bridges for now - we are only interested in relays
 
-        public static async Task<Source> GetSource(int limit = -1)
+        public static Source GetSource(int limit = -1)
         {
             using HttpClient client = new HttpClient();
             using Stream s = client.GetStreamAsync($"{ENDPOINT}{(limit > 0 ? $"?limit={limit}" : string.Empty)}").Result;
