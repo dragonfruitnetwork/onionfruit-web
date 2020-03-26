@@ -1,4 +1,7 @@
-﻿using System;
+﻿// OnionFruit.Status Copyright 2020 DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under MIT. Please refer to the LICENSE file for more info
+
+using System;
 
 namespace DragonFruit.OnionFruit.Status.Converters
 {

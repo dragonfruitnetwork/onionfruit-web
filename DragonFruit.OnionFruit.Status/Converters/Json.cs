@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿// OnionFruit.Status Copyright 2020 DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under MIT. Please refer to the LICENSE file for more info
+
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Status.Converters

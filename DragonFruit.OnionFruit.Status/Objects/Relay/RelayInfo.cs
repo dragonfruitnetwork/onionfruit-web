@@ -1,7 +1,10 @@
-﻿using Bia.Countries.Iso3166;
+﻿// OnionFruit.Status Copyright 2020 DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under MIT. Please refer to the LICENSE file for more info
+
+using Bia.Countries.Iso3166;
 using Newtonsoft.Json;
 
-namespace DragonFruit.OnionFruit.Status.Structs
+namespace DragonFruit.OnionFruit.Status.Objects.Relay
 {
     public class RelayInfo
     {
@@ -14,9 +17,11 @@ namespace DragonFruit.OnionFruit.Status.Structs
         //[JsonProperty("running")]
         //public bool IsRunning { get; set; }
 
-        [JsonProperty("flags")] public NodeFlags Flags { get; set; }
+        [JsonProperty("flags")]
+        public NodeFlags Flags { get; set; }
 
-        [JsonProperty("country")] public string CountryCode { get; set; }
+        [JsonProperty("country")]
+        public string CountryCode { get; set; }
 
         public string CountryName
         {
@@ -39,7 +44,8 @@ namespace DragonFruit.OnionFruit.Status.Structs
         //[JsonProperty("as_name")]
         //public string ASName { get; set; }
 
-        [JsonProperty("observed_bandwidth")] public long Bandwidth { get; set; }
+        [JsonProperty("observed_bandwidth")]
+        public long Bandwidth { get; set; }
 
         //[JsonProperty("advertised_bandwidth")]
         //public long AdvertisedBandwidth { get; set; }

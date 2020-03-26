@@ -1,17 +1,25 @@
-﻿using System;
+﻿// OnionFruit.Status Copyright 2020 DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under MIT. Please refer to the LICENSE file for more info
+
+using System;
 using System.Linq;
-using System.Threading.Tasks;
+using DragonFruit.Common.Data;
 using DragonFruit.OnionFruit.Status.Converters;
 
 namespace DragonFruit.OnionFruit.Status.Tests
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static void Main(string[] args)
         {
-            var info = await Task.Run(() => Source.GetSource());
+            var client = new ApiClient
+            {
+                UserAgent = "OnionFruit"
+            };
 
-            Console.WriteLine("{0,-20} {1,10} {2,-30}\n", "Country", "Bandwidth", "Flags");
+            var info = client.GetServerInfo();
+
+            Console.WriteLine($"{"Country",-20} {"Bandwidth",10} {"Flags",-30}\n");
             foreach (var relay in info.Relays.OrderBy(x => x.Bandwidth))
                 Console.WriteLine($"{relay.CountryName,-20} {new Bandwidth(relay.Bandwidth).Megabits,10} {relay.Flags.ToString(),-30}");
         }

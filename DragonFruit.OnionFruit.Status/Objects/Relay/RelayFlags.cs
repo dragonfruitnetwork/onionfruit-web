@@ -1,8 +1,11 @@
-﻿using System;
+﻿// OnionFruit.Status Copyright 2020 DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under MIT. Please refer to the LICENSE file for more info
+
+using System;
 using DragonFruit.OnionFruit.Status.Converters;
 using Newtonsoft.Json;
 
-namespace DragonFruit.OnionFruit.Status.Structs
+namespace DragonFruit.OnionFruit.Status.Objects.Relay
 {
     [Flags]
     [JsonConverter(typeof(Flags))]
@@ -17,6 +20,6 @@ namespace DragonFruit.OnionFruit.Status.Structs
         Running = 1 << 6,
         Valid = 1 << 7,
         V2Dir = 1 << 8,
-        HSDir = 1 << 9
+        HsDir = 1 << 9
     }
 }
