@@ -12,11 +12,10 @@ namespace DragonFruit.OnionFruit.Status.Converters
 {
     public class Flags : JsonConverter
     {
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-                                        JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             NodeFlags currentFlags = NodeFlags.None;
-            List<string> rawFlags = JToken.Load(reader).ToObject<List<string>>();
+            var rawFlags = JToken.Load(reader).ToObject<List<string>>();
 
             //check for flags and set enum
             if (rawFlags.Contains("Fast")) currentFlags |= NodeFlags.Fast;
@@ -30,7 +29,7 @@ namespace DragonFruit.OnionFruit.Status.Converters
             if (rawFlags.Contains("V2Dir")) currentFlags |= NodeFlags.V2Dir;
 
             if (currentFlags > NodeFlags.None)
-                currentFlags = currentFlags ^ NodeFlags.None; //toggle none if there are others selected
+                currentFlags ^= NodeFlags.None; //toggle none if there are others selected
 
             return currentFlags;
         }
@@ -44,9 +43,6 @@ namespace DragonFruit.OnionFruit.Status.Converters
             writer.WriteRawValue($"[{string.Join(", ", flags)}]");
         }
 
-        public override bool CanConvert(Type objectType)
-        {
-            return true;
-        }
+        public override bool CanConvert(Type objectType) => true;
     }
 }
