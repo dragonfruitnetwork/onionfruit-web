@@ -1,5 +1,6 @@
 # OnionFruit.Status
-[![Build Status](https://travis-ci.com/dragonfruitnetwork/OnionFruit.Status.svg?branch=master)](https://travis-ci.com/dragonfruitnetwork/OnionFruit.Status)
+![CI](https://github.com/dragonfruitnetwork/OnionFruit.Status/workflows/Publish/badge.svg)
+
 The Tor Relay Information Lookup system to supersede the current version in OnionFruit™ Connect `5.1` (`2019.10x`)
 
 ## What does it do?
