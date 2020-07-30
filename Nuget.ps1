@@ -8,7 +8,7 @@ $WORKINGDIR = Get-Location
 
 Write-Output "Building OnionFruit.Status Version $VERSION"
 dotnet restore
-dotnet build -c Release /p:PackageVersion=$VERSION
+dotnet build -c Release /p:PackageVersion=$VERSION /p:Version=$VERSION
 
 #pack into nuget files with the suffix if we have one
 
