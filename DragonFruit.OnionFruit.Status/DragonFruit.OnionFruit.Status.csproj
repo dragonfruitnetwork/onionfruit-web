@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bia.Countries" Version="3.0.0" />
-    <PackageReference Include="DragonFruit.Common.Data" Version="2020.1228.27" />
+    <PackageReference Include="DragonFruit.Common.Data" Version="2021.203.30" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
