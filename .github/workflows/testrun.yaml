@@ -9,10 +9,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
+      - name: NuGet Restore
+        run: |
+          nuget locals all -clear
+          nuget restore
 
       - name: Build
         run: |
