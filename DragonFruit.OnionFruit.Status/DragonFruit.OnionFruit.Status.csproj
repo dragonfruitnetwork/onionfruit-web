@@ -1,24 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <LangVersion>latest</LangVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>DragonFruit Network</Authors>
-    <Product>OnionFruit Status</Product>
-    <Description>Use the Tor Metrics API to display easy-to-integrate Tor Node Information.</Description>
-    <Copyright>Copyright 2020 DragonFruit Network.</Copyright>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/dragonfruitnetwork/OnionFruit.Status</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/dragonfruitnetwork/OnionFruit.Status</RepositoryUrl>
-    <RepositoryType>Git</RepositoryType>
-    <PackageTags>onionfruit, tor, nodes, dragonfruit network</PackageTags>
     <NeutralLanguage>en-GB</NeutralLanguage>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Authors>DragonFruit Network</Authors>
+    <Product>OnionFruit Status API</Product>
+    <Copyright>Copyright 2021 DragonFruit Network.</Copyright>
+    <PackageTags>onionfruit, tor, nodes, dragonfruit network</PackageTags>
+    <Description>Use the Tor Metrics API to fetch Tor network statistics.</Description>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <RepositoryType>Git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/dragonfruitnetwork/OnionFruit.Status</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/dragonfruitnetwork/OnionFruit.Status</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Bia.Countries" Version="3.0.0" />
-    <PackageReference Include="DragonFruit.Common.Data" Version="2020.1201.21" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="DragonFruit.Common.Data" Version="2021.409.33" />
   </ItemGroup>
 
 </Project>
