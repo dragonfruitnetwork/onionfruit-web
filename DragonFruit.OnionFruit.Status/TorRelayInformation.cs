@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Status
 {
-    public class TorServerStatusResponse
+    public class TorRelayInformation
     {
         [JsonProperty("version")]
         public string Version { get; set; }
@@ -18,7 +18,7 @@ namespace DragonFruit.OnionFruit.Status
         public DateTimeOffset RelaysPublished { get; set; }
 
         [JsonProperty("relays")]
-        public RelayInfo[] Relays { get; set; }
+        public TorRelay[] Relays { get; set; }
 
         [JsonProperty("relays_truncated")]
         public long RelaysTruncated { get; set; }

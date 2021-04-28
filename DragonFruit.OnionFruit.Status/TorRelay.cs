@@ -10,7 +10,7 @@ namespace DragonFruit.OnionFruit.Status
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public class RelayInfo
+    public class TorRelay
     {
         private RelayFlags? _flags;
 

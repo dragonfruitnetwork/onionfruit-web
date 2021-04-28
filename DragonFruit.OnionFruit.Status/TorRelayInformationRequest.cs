@@ -6,18 +6,21 @@ using DragonFruit.Common.Data.Parameters;
 
 namespace DragonFruit.OnionFruit.Status
 {
-    public class TorServerStatusRequest : ApiRequest
+    public class TorRelayInformationRequest : ApiRequest
     {
         public override string Path => "https://onionoo.torproject.org/details";
 
-        public TorServerStatusRequest()
+        public TorRelayInformationRequest()
         {
         }
 
-        public TorServerStatusRequest(int? limit)
+        public TorRelayInformationRequest(int? limit)
         {
             Limit = limit;
         }
+
+        [QueryParameter("search")]
+        public string Query { get; set; }
 
         [QueryParameter("limit")]
         public int? Limit { get; set; }
