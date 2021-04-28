@@ -126,9 +126,9 @@ namespace DragonFruit.OnionFruit.Status
         public string[] OrAddresses { get; set; }
 
         [JsonProperty("flags")]
-        private IEnumerable<string> FlagsInternal { get; set; }
+        public IEnumerable<string> FlagsRaw { get; set; }
 
-        public RelayFlags Flags => _flags ??= FlagsInternal.Aggregate(RelayFlags.None, (current, flag) =>
+        public RelayFlags Flags => _flags ??= (FlagsRaw ?? Enumerable.Empty<string>()).Aggregate(RelayFlags.None, (current, flag) =>
         {
             // ReSharper disable once ConvertToLambdaExpression (the line is too long otherwise)
             return Enum.TryParse(flag, out RelayFlags parsedFlag) ? current | parsedFlag : current;
