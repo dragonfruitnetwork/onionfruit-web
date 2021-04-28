@@ -2,14 +2,11 @@
 // Licensed under MIT. Please refer to the LICENSE file for more info
 
 using System;
-using DragonFruit.OnionFruit.Status.Converters;
-using Newtonsoft.Json;
 
-namespace DragonFruit.OnionFruit.Status.Objects.Relay
+namespace DragonFruit.OnionFruit.Status
 {
     [Flags]
-    [JsonConverter(typeof(Flags))]
-    public enum NodeFlags
+    public enum RelayFlags
     {
         None = 1 << 0,
         Exit = 1 << 1,

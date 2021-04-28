@@ -3,7 +3,6 @@
 
 using System.Threading;
 using DragonFruit.Common.Data;
-using DragonFruit.OnionFruit.Status.Objects;
 
 namespace DragonFruit.OnionFruit.Status
 {

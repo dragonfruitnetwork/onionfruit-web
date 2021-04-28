@@ -2,27 +2,25 @@
 // Licensed under MIT. Please refer to the LICENSE file for more info
 
 using System;
-using System.Collections.Generic;
-using DragonFruit.OnionFruit.Status.Objects.Relay;
 using Newtonsoft.Json;
 
-namespace DragonFruit.OnionFruit.Status.Objects
+namespace DragonFruit.OnionFruit.Status
 {
     public class TorServerStatusResponse
     {
         [JsonProperty("version")]
-        public double Version { get; set; }
+        public string Version { get; set; }
 
         [JsonProperty("build_revision")]
-        public string BuildHash { get; set; }
+        public string BuildRevision { get; set; }
 
         [JsonProperty("relays_published")]
-        public DateTimeOffset PublishDate { get; set; }
+        public DateTimeOffset RelaysPublished { get; set; }
 
         [JsonProperty("relays")]
-        public IEnumerable<RelayInfo> Relays { get; set; }
+        public RelayInfo[] Relays { get; set; }
 
         [JsonProperty("relays_truncated")]
-        public int RelaysTruncated { get; set; }
+        public long RelaysTruncated { get; set; }
     }
 }

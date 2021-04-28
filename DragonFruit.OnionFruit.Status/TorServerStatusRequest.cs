@@ -4,7 +4,7 @@
 using DragonFruit.Common.Data;
 using DragonFruit.Common.Data.Parameters;
 
-namespace DragonFruit.OnionFruit.Status.Objects
+namespace DragonFruit.OnionFruit.Status
 {
     public class TorServerStatusRequest : ApiRequest
     {
