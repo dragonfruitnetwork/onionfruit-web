@@ -18,7 +18,7 @@ jobs:
 
       - name: Setup PowerShell Policy
         run: Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
-        
+
       - name: Download Publish Script
         run: powershell Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dragonfruitnetwork/publish-script/main/nuget.ps1" -OutFile ".\nuget.ps1"
 
@@ -29,3 +29,27 @@ jobs:
       - name: Nuget Build and Publish (Beta)
         run: .\nuget.ps1 -TargetName $env:name -TargetProject $env:project -ApiKey ${{ secrets.NUGET_KEY }} -Suffix "-beta"
         if: "github.event.release.prerelease"
+
+      - name: DockerHub Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push (Release)
+        uses: docker/build-push-action@v2
+        if: "!github.event.release.prerelease"
+        with:
+          push: true
+          context: .
+          tags: dragonfruitdotnet/onionfruit-country-engine:latest
+          file: ./DragonFruit.OnionFruit.Status.Generator/Dockerfile
+
+      - name: Build and push (Beta)
+        uses: docker/build-push-action@v2
+        if: "github.event.release.prerelease"
+        with:
+          push: true
+          context: .
+          tags: dragonfruitdotnet/onionfruit-country-engine:beta
+          file: ./DragonFruit.OnionFruit.Status.Generator/Dockerfile      
