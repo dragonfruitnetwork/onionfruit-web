@@ -19,6 +19,12 @@ jobs:
       - name: Setup PowerShell Policy
         run: Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Download Publish Script
         run: powershell Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dragonfruitnetwork/publish-script/main/nuget.ps1" -OutFile ".\nuget.ps1"
 
