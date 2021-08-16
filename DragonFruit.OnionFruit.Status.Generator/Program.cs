@@ -18,7 +18,7 @@ namespace DragonFruit.OnionFruit.Status.Generator
         {
             Console.WriteLine("Fetching data...");
             var nodes = Client.GetServerInfo().Relays;
-            var countries = nodes.GroupBy(x => x.CountryCode.ToUpper()).Where(x => Countries.GetCountryByAlpha2(x.Key) is not null).ToArray();
+            var countries = nodes.GroupBy(x => x.CountryCode?.ToUpper()).Where(x => Countries.GetCountryByAlpha2(x.Key) is not null).ToArray();
 
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"Downloaded {nodes.Length} relay metadata packets over {countries.Length} countries");
