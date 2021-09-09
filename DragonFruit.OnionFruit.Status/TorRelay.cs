@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Status
 {
     [Serializable]
+    [DataContract]
     [JsonObject(MemberSerialization.OptIn)]
     public class TorRelay
     {
@@ -17,115 +19,115 @@ namespace DragonFruit.OnionFruit.Status
         /// <summary>
         /// Server nickname
         /// </summary>
-        [JsonProperty("nickname")]
+        [DataMember(Name = "nickname")]
         public string Nickname { get; set; }
 
         /// <summary>
         /// Server fingerprint
         /// </summary>
-        [JsonProperty("fingerprint")]
+        [DataMember(Name = "fingerprint")]
         public string Fingerprint { get; set; }
 
-        [JsonProperty("first_seen")]
+        [DataMember(Name = "first_seen")]
         public DateTimeOffset FirstSeen { get; set; }
 
-        [JsonProperty("last_seen")]
+        [DataMember(Name = "last_seen")]
         public DateTimeOffset LastSeen { get; set; }
 
         /// <summary>
         /// Whether the server is currently online
         /// </summary>
-        [JsonProperty("running")]
+        [DataMember(Name = "running")]
         public bool Running { get; set; }
 
         /// <summary>
         /// ISO 3166-1 alpha-2 country code
         /// </summary>
-        [JsonProperty("country")]
+        [DataMember(Name = "country")]
         public string CountryCode { get; set; }
 
         /// <summary>
         /// The country name, in English
         /// </summary>
-        [JsonProperty("country_name")]
+        [DataMember(Name = "country_name")]
         public string CountryName { get; set; }
 
         /// <summary>
         /// The name of the region the server is located
         /// </summary>
-        [JsonProperty("region_name")]
+        [DataMember(Name = "region_name")]
         public string RegionName { get; set; }
 
         /// <summary>
         /// The name of the city the server is in
         /// </summary>
-        [JsonProperty("city_name")]
+        [DataMember(Name = "city_name")]
         public string CityName { get; set; }
 
         /// <summary>
         /// The latitude of the server
         /// </summary>
-        [JsonProperty("latitude")]
+        [DataMember(Name = "latitude")]
         public double Latitude { get; set; }
 
         /// <summary>
         /// The longitude of the server
         /// </summary>
-        [JsonProperty("longitude")]
+        [DataMember(Name = "longitude")]
         public double Longitude { get; set; }
 
         /// <summary>
         /// The ASN of the service provider
         /// </summary>
-        [JsonProperty("as")]
+        [DataMember(Name = "as")]
         public string AS { get; set; }
 
         /// <summary>
         /// The formatted ASN of the internet service provider (company name)
         /// </summary>
-        [JsonProperty("as_name")]
+        [DataMember(Name = "as_name")]
         public string ASName { get; set; }
 
         /// <summary>
         /// The bandwidth, in bytes, of the current server
         /// </summary>
-        [JsonProperty("observed_bandwidth")]
+        [DataMember(Name = "observed_bandwidth")]
         public long Bandwidth { get; set; }
 
         /// <summary>
         /// Contact information for the server owner
         /// </summary>
-        [JsonProperty("contact")]
+        [DataMember(Name = "contact")]
         public string Contact { get; set; }
 
         /// <summary>
         /// The operating system the tor software is running on
         /// </summary>
-        [JsonProperty("platform")]
+        [DataMember(Name = "platform")]
         public string Platform { get; set; }
 
         /// <summary>
         /// The software version
         /// </summary>
-        [JsonProperty("version")]
+        [DataMember(Name = "version")]
         public string Version { get; set; }
 
         /// <summary>
         /// Directory address
         /// </summary>
-        [JsonProperty("dir_address")]
+        [DataMember(Name = "dir_address")]
         public string DirAddress { get; set; }
 
         /// <summary>
         /// Collection of all exit IPs
         /// </summary>
-        [JsonProperty("exit_addresses")]
+        [DataMember(Name = "exit_addresses")]
         public string[] ExitAddresses { get; set; }
 
-        [JsonProperty("or_addresses")]
+        [DataMember(Name = "or_addresses")]
         public string[] OrAddresses { get; set; }
 
-        [JsonProperty("flags")]
+        [DataMember(Name = "flags")]
         public IEnumerable<string> FlagsRaw { get; set; }
 
         public RelayFlags Flags => _flags ??= (FlagsRaw ?? Enumerable.Empty<string>()).Aggregate(RelayFlags.None, (current, flag) =>

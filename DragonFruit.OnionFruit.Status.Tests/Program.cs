@@ -20,8 +20,11 @@ namespace DragonFruit.OnionFruit.Status.Tests
             var info = client.GetServerInfo();
 
             Console.WriteLine($"{"Country",-20} {"Bandwidth",10} {"Flags",-30}\n");
+
             foreach (var relay in info.Relays.OrderBy(x => x.Bandwidth))
-                Console.WriteLine($"{relay.CountryName,-20} {new Bandwidth(relay.Bandwidth).Megabits,10} {relay.Flags.ToString(),-30}");
+            {
+                Console.WriteLine($"{relay.CountryCode,-20} {new Bandwidth(relay.Bandwidth).Megabits,10:f2} {relay.Flags.ToString(),-30}");
+            }
         }
     }
 }

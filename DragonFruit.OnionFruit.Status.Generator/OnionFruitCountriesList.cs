@@ -1,18 +1,21 @@
 ﻿// OnionFruit.Status Copyright 2021 DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under MIT. Please refer to the LICENSE file for more info
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace DragonFruit.OnionFruit.Status.Generator
 {
+    [Serializable]
+    [DataContract]
     public class OnionFruitCountriesList
     {
-        [JsonProperty("in")]
+        [DataMember(Name = "in")]
         public string[] In { get; set; }
 
-        [JsonProperty("out")]
+        [DataMember(Name = "out")]
         public string[] Out { get; set; }
 
         private static IEnumerable<string> GetCountriesWithFlag(IEnumerable<IGrouping<string, TorRelay>> info, RelayFlags flag) =>

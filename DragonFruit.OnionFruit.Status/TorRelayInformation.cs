@@ -2,25 +2,29 @@
 // Licensed under MIT. Please refer to the LICENSE file for more info
 
 using System;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Status
 {
+    [Serializable]
+    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class TorRelayInformation
     {
-        [JsonProperty("version")]
+        [DataMember(Name = "version")]
         public string Version { get; set; }
 
-        [JsonProperty("build_revision")]
+        [DataMember(Name = "build_revision")]
         public string BuildRevision { get; set; }
 
-        [JsonProperty("relays_published")]
+        [DataMember(Name = "relays_published")]
         public DateTimeOffset RelaysPublished { get; set; }
 
-        [JsonProperty("relays")]
+        [DataMember(Name = "relays")]
         public TorRelay[] Relays { get; set; }
 
-        [JsonProperty("relays_truncated")]
+        [DataMember(Name = "relays_truncated")]
         public long RelaysTruncated { get; set; }
     }
 }
