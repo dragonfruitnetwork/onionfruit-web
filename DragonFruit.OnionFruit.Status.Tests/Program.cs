@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using DragonFruit.Common.Data;
-using DragonFruit.OnionFruit.Status.Converters;
+using DragonFruit.OnionFruit.Status.Helpers;
 
 namespace DragonFruit.OnionFruit.Status.Tests
 {

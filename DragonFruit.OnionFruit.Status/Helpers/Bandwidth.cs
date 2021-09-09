@@ -3,7 +3,7 @@
 
 using System;
 
-namespace DragonFruit.OnionFruit.Status.Converters
+namespace DragonFruit.OnionFruit.Status.Helpers
 {
     public class Bandwidth
     {
