@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bia.Countries" Version="3.0.0" />
-    <PackageReference Include="DragonFruit.Common.Data" Version="2021.908.44" />
+    <PackageReference Include="DragonFruit.Common.Data" Version="2021.910.47" />
   </ItemGroup>
 
 </Project>
