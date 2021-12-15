@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: Install .NET 6
+        run: choco install dotnet-sdk
 
       - name: Setup PowerShell Policy
         run: Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
@@ -30,8 +33,6 @@ jobs:
         run: .\nuget.ps1 -TargetName $env:name -TargetProject $env:project -ApiKey ${{ secrets.NUGET_KEY }} -Suffix "-beta"
         if: "github.event.release.prerelease"
 
-       
-          
   docker:
     runs-on: ubuntu-latest
     

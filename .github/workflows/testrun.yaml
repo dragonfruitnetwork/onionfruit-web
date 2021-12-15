@@ -8,16 +8,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: Install .NET 6
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
 
       - name: NuGet Restore
-        run: |
-          nuget locals all -clear
-          nuget restore
+        run: dotnet restore
 
       - name: Build
-        run: |
-          dotnet restore
-          dotnet build -c Release
+        run: dotnet build -c Release
           
       - name: Test
         run: |
