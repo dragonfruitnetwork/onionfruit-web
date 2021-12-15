@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Bia.Countries.Iso3166;
 using DragonFruit.Common.Data;
 using DragonFruit.Common.Data.Services;
@@ -14,10 +15,10 @@ namespace DragonFruit.OnionFruit.Status.Generator
     {
         private static readonly ApiClient Client = new();
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             Console.WriteLine("Fetching data...");
-            var nodes = Client.GetServerInfo().Relays;
+            var nodes = (await Client.GetServerInfoAsync()).Relays;
             var countries = nodes.GroupBy(x => x.CountryCode?.ToUpper()).Where(x => Countries.GetCountryByAlpha2(x.Key) is not null).ToArray();
 
             Console.ForegroundColor = ConsoleColor.Magenta;
