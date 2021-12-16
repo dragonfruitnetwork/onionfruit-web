@@ -6,14 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Bia.Countries.Iso3166;
-using DragonFruit.Common.Data;
-using DragonFruit.Common.Data.Services;
+using DragonFruit.Data;
+using DragonFruit.Data.Serializers.Newtonsoft;
 
 namespace DragonFruit.OnionFruit.Status.Generator
 {
     internal static class Program
     {
-        private static readonly ApiClient Client = new();
+        private static readonly ApiClient Client = new ApiClient<ApiJsonSerializer>();
 
         private static async Task Main(string[] args)
         {

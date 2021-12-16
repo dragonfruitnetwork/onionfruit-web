@@ -3,7 +3,8 @@
 
 using System;
 using System.Linq;
-using DragonFruit.Common.Data;
+using DragonFruit.Data;
+using DragonFruit.Data.Serializers.Newtonsoft;
 using DragonFruit.OnionFruit.Status.Helpers;
 
 namespace DragonFruit.OnionFruit.Status.Tests
@@ -12,7 +13,7 @@ namespace DragonFruit.OnionFruit.Status.Tests
     {
         private static void Main(string[] args)
         {
-            var client = new ApiClient
+            var client = new ApiClient<ApiJsonSerializer>
             {
                 UserAgent = "OnionFruit"
             };

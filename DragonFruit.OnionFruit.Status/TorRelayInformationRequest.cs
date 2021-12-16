@@ -1,8 +1,8 @@
 ﻿// OnionFruit.Status Copyright 2021 DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under MIT. Please refer to the LICENSE file for more info
 
-using DragonFruit.Common.Data;
-using DragonFruit.Common.Data.Parameters;
+using DragonFruit.Data;
+using DragonFruit.Data.Parameters;
 
 namespace DragonFruit.OnionFruit.Status
 {
