@@ -19,8 +19,8 @@ The OnionFruit™ API provides developers with an easy way to get access to metr
 using System.Threading.Tasks;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers.SystemJson;
-using DragonFruit.OnionFruit.Api.Status.Requests;
-using DragonFruit.OnionFruit.Api.Status.Extensions;
+using DragonFruit.OnionFruit.Api.Requests;
+using DragonFruit.OnionFruit.Api.Extensions;
 
 namespace OnionFruit.Demo;
 
