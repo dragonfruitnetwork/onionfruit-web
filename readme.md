@@ -40,7 +40,7 @@ public static async Task Main(string[] args)
         CountryCode = "US"
     };
     
-    // check the extesions for the response type
+    // check the extension methods' return types to determine the type to pass to the client
     var customResponse = await _client.PerformAsync<TorStatusResponse<TorNodeBandwidthHistory>>(customRequest);
 }
 ```
