@@ -1,6 +1,4 @@
-﻿using DragonFruit.Data;
-
-namespace DragonFruit.OnionFruit.Api.Status.Requests
+﻿namespace DragonFruit.OnionFruit.Api.Status.Requests
 {
     public class TorStatusSummaryRequest : TorStatusRequest
     {

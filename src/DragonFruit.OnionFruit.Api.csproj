@@ -9,8 +9,4 @@
       <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2021.1218.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Status\Extensions" />
-    </ItemGroup>
-
 </Project>

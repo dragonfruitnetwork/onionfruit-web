@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using DragonFruit.OnionFruit.Api.Converters;
 
 namespace DragonFruit.OnionFruit.Api.Status.Objects
 {
@@ -31,6 +32,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// Indicates how recent the relay objects in this document are.
         /// </remarks>
         [JsonPropertyName("relays_published")]
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime RelaysPublished { get; set; }
         
         /// <summary>
@@ -55,6 +57,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// Indicates how recent the relay objects in this document are.
         /// </remarks>
         [JsonPropertyName("bridges_published")]
+        [JsonConverter(typeof(DateTimeConverter))]
         public DateTime BridgesPublished { get; set; }
         
         /// <summary>
@@ -71,5 +74,10 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// </summary>
         [JsonPropertyName("bridges_truncated")]
         public int BridgesTruncated { get; set; }
+    }
+    
+    [Serializable]
+    public class TorStatusResponse<T> : TorStatusResponse<T, T>
+    {
     }
 }

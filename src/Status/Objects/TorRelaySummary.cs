@@ -21,11 +21,10 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         public string Fingerprint { get; set; }
         
         /// <summary>
-        /// Array of <see cref="IPAddress"/> that the relay accepts routing connections at
+        /// Array of IP addresses that the relay accepts routing connections at
         /// </summary>
         [JsonPropertyName("a")]
-        [JsonConverter(typeof(IPAddressConverter))]
-        public IPAddress[] Addresses { get; set; }
+        public string[] Addresses { get; set; }
         
         /// <summary>
         /// Whether the relay was running at the last consensus

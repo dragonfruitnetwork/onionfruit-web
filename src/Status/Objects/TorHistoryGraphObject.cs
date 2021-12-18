@@ -36,12 +36,12 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// The normalised values, as sent by the api
         /// </summary>
         [JsonPropertyName("values")]
-        public int[] NormalisedValues { get; set; }
+        public int?[] NormalisedValues { get; set; }
 
         /// <summary>
         /// The values, multiplied out by the <see cref="ScaleFactor"/>
         /// </summary>
         [JsonIgnore]
-        public IEnumerable<double> Values => NormalisedValues.Select(x => x * ScaleFactor);
+        public IEnumerable<double?> Values => NormalisedValues.Select(x => x * ScaleFactor);
     }
 }
