@@ -4,9 +4,9 @@
 using System.Collections.Generic;
 using DragonFruit.Data;
 using DragonFruit.Data.Parameters;
-using DragonFruit.OnionFruit.Api.Status.Enums;
+using DragonFruit.OnionFruit.Api.Enums;
 
-namespace DragonFruit.OnionFruit.Api.Status.Requests
+namespace DragonFruit.OnionFruit.Api.Requests
 {
     public abstract class TorStatusRequest : ApiRequest
     {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using DragonFruit.OnionFruit.Api.Converters;
 
-namespace DragonFruit.OnionFruit.Api.Status.Objects
+namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
     public class TorHistoryGraph

@@ -4,10 +4,10 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace DragonFruit.OnionFruit.Api.Status.Objects
+namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
-    public class TorRelaySummary
+    public class TorBridgeSummary
     {
         /// <summary>
         /// The relay nickname, represented as 1-19 chars
@@ -16,16 +16,10 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         public string Nickname { get; set; }
 
         /// <summary>
-        /// A 40 uppercase-hex identifier
+        /// SHA-1 hash of the bridge fingerprint
         /// </summary>
-        [JsonPropertyName("f")]
+        [JsonPropertyName("h")]
         public string Fingerprint { get; set; }
-
-        /// <summary>
-        /// Array of IP addresses that the relay accepts routing connections at
-        /// </summary>
-        [JsonPropertyName("a")]
-        public string[] Addresses { get; set; }
 
         /// <summary>
         /// Whether the relay was running at the last consensus

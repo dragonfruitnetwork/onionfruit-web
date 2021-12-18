@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace DragonFruit.OnionFruit.Api.Status.Objects
+namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
     public class TorClientConnectionHistory

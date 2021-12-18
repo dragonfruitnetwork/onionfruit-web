@@ -4,9 +4,9 @@
 using System;
 using System.Text.Json.Serialization;
 using DragonFruit.OnionFruit.Api.Converters;
-using DragonFruit.OnionFruit.Api.Status.Enums;
+using DragonFruit.OnionFruit.Api.Enums;
 
-namespace DragonFruit.OnionFruit.Api.Status.Objects
+namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
     public class TorRelayDetails

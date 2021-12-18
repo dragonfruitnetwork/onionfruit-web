@@ -3,7 +3,7 @@
 
 using System;
 
-namespace DragonFruit.OnionFruit.Api.Status.Enums
+namespace DragonFruit.OnionFruit.Api.Enums
 {
     [Flags]
     public enum TorNodeFlags

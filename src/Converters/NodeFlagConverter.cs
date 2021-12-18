@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonFruit.OnionFruit.Api.Status.Enums;
+using DragonFruit.OnionFruit.Api.Enums;
 
 namespace DragonFruit.OnionFruit.Api.Converters
 {

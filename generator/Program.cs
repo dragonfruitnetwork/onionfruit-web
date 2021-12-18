@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using Bia.Countries.Iso3166;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers.SystemJson;
-using DragonFruit.OnionFruit.Api.Status.Enums;
-using DragonFruit.OnionFruit.Api.Status.Extensions;
-using DragonFruit.OnionFruit.Api.Status.Objects;
+using DragonFruit.OnionFruit.Api.Enums;
+using DragonFruit.OnionFruit.Api.Extensions;
+using DragonFruit.OnionFruit.Api.Objects;
 
 namespace DragonFruit.OnionFruit.Tools.CountryList
 {

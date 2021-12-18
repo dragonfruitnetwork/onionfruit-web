@@ -3,11 +3,11 @@
 
 using System.Threading.Tasks;
 using DragonFruit.Data;
-using DragonFruit.OnionFruit.Api.Status.Enums;
-using DragonFruit.OnionFruit.Api.Status.Objects;
-using DragonFruit.OnionFruit.Api.Status.Requests;
+using DragonFruit.OnionFruit.Api.Enums;
+using DragonFruit.OnionFruit.Api.Objects;
+using DragonFruit.OnionFruit.Api.Requests;
 
-namespace DragonFruit.OnionFruit.Api.Status.Extensions
+namespace DragonFruit.OnionFruit.Api.Extensions
 {
     public static class TorStatusBandwidthExtensions
     {

@@ -2,8 +2,8 @@
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System.Threading.Tasks;
-using DragonFruit.OnionFruit.Api.Status.Enums;
-using DragonFruit.OnionFruit.Api.Status.Extensions;
+using DragonFruit.OnionFruit.Api.Enums;
+using DragonFruit.OnionFruit.Api.Extensions;
 using NUnit.Framework;
 
 namespace DragonFruit.OnionFruit.Api.Tests

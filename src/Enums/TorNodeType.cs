@@ -1,10 +1,11 @@
 ﻿// OnionFruit API/Tooling Copyright DragonFruit Network
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
-namespace DragonFruit.OnionFruit.Api.Status.Requests
+namespace DragonFruit.OnionFruit.Api.Enums
 {
-    public class TorStatusSummaryRequest : TorStatusRequest
+    public enum TorNodeType
     {
-        public override string Stub => "summary";
+        Relay,
+        Bridge
     }
 }
