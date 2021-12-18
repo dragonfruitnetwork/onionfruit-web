@@ -1,0 +1,37 @@
+name: Unit Tests
+
+on:
+  pull_request:
+    branches: master
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: false
+  
+  testproject: './DragonFruit.Common.Data.Tests/DragonFruit.Common.Data.Tests.csproj'
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - dotnet: '6.0.x'
+            dotnet-tfm: 'net6.0'
+            dotnet-test-tfm: 'net6.0'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+
+      - name: Build
+        run: dotnet build -c Debug
+
+      - name: Unit Tests
+        run: dotnet test -f ${{ matrix.dotnet-test-tfm }}

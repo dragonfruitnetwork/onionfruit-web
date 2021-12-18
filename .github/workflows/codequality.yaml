@@ -1,0 +1,41 @@
+name: Code Quality
+
+on:
+  pull_request:
+    branches: master
+  push:
+    branches: master
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+          
+        - name: Install .NET 3.1.x LTS
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: "3.1.x"
+
+        - name: Install .NET 5.0.x
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: "5.0.x"
+            
+        - name: Install .NET 6.0.x
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: "6.0.x"
+
+        - name: Restore Tools
+          run: dotnet tool restore
+
+        - name: Restore Packages
+          run: dotnet restore
+
+        - name: InspectCode
+          run: dotnet jb inspectcode ${{github.workspace}}/DragonFruit.Data.sln --output=${{github.workspace}}/inspectcodereport.xml --cachesDir=${{github.workspace}}/inspectcode --verbosity=WARN --no-build
+
+        - name: NVika
+          run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml"

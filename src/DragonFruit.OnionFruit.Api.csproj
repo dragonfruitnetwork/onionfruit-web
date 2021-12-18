@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DragonFruit.Data" Version="2021.1218.0" />
+      <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2021.1218.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Status\Extensions" />
+    </ItemGroup>
+
+</Project>

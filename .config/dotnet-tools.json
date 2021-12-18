@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "jetbrains.resharper.globaltools": {
+      "version": "2021.2.2",
+      "commands": [
+        "jb"
+      ]
+    },
+    "nvika": {
+      "version": "2.2.0",
+      "commands": [
+        "nvika"
+      ]
+    }
+  }
+}
