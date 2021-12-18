@@ -36,3 +36,42 @@ jobs:
         run: |
           cd $env:GITHUB_WORKSPACE
           dotnet nuget push "*.nupkg" -k ${{ secrets.NUGET_KEY }} --skip-duplicate -s https://api.nuget.org/v3/index.json 
+
+  docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: DockerHub Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push (Release)
+        uses: docker/build-push-action@v2
+        if: "!github.event.release.prerelease"
+        with:
+          push: true
+          context: .
+          platforms: linux/amd64,linux/arm64
+          tags: dragonfruitdotnet/onionfruit-country-engine:latest
+          file: ./generator/Dockerfile
+
+      - name: Build and push (Beta)
+        uses: docker/build-push-action@v2
+        if: "github.event.release.prerelease"
+        with:
+          push: true
+          context: .
+          platforms: linux/amd64,linux/arm64
+          tags: dragonfruitdotnet/onionfruit-country-engine:beta
+          file: ./generator/Dockerfile
