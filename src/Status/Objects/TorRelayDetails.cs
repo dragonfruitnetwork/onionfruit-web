@@ -48,7 +48,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         public TorNodeFlags Flags { get; set; }
 
         [JsonPropertyName("flags")]
-        private string[] RawFlags
+        public string[] RawFlags
         {
             get => NodeFlagConverter.ToString(Flags);
             set => Flags = NodeFlagConverter.Parse(value);
