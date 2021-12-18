@@ -13,7 +13,7 @@ using DragonFruit.OnionFruit.Api.Status.Enums;
 using DragonFruit.OnionFruit.Api.Status.Extensions;
 using DragonFruit.OnionFruit.Api.Status.Objects;
 
-namespace DragonFruit.OnionFruit.CountryListGenerator
+namespace DragonFruit.OnionFruit.Tools.CountryList
 {
     internal static class Program
     {
