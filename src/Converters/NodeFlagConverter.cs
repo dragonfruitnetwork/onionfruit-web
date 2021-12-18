@@ -1,4 +1,7 @@
-﻿using System;
+﻿// OnionFruit API/Tooling Copyright DragonFruit Network
+// Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DragonFruit.OnionFruit.Api.Status.Enums;
@@ -26,9 +29,9 @@ namespace DragonFruit.OnionFruit.Api.Converters
         public static string[] ToString(TorNodeFlags flags)
         {
             return Enum.GetValues(typeof(TorNodeFlags)).Cast<TorNodeFlags>()
-                .Where(x => (flags & x) == x)
-                .Select(x => x.ToString())
-                .ToArray();
+                       .Where(x => (flags & x) == x)
+                       .Select(x => x.ToString())
+                       .ToArray();
         }
     }
 }

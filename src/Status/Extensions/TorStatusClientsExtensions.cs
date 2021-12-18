@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿// OnionFruit API/Tooling Copyright DragonFruit Network
+// Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
+
+using System.Threading.Tasks;
 using DragonFruit.Data;
 using DragonFruit.OnionFruit.Api.Status.Objects;
 using DragonFruit.OnionFruit.Api.Status.Requests;
@@ -17,7 +20,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Extensions
 
             return client.Perform<TorStatusResponse<TorClientConnectionHistory>>(request);
         }
-        
+
         public static Task<TorStatusResponse<TorClientConnectionHistory>> GetTorBridgeConnectionMetricsAsync(this ApiClient client, int? limit = null, int? offset = null)
         {
             var request = new TorStatusClientsRequest

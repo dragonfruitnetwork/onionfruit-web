@@ -2,7 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Api", "src\DragonFruit.OnionFruit.Api.csproj", "{E04E524E-5B30-4968-9B6E-561E19AAD369}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Api.Tests", "DragonFruit.OnionFruit.Api.Tests\DragonFruit.OnionFruit.Api.Tests.csproj", "{EB3A45AB-1492-4CCF-A1DD-2921EBE57C10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Api.Tests", "tests\DragonFruit.OnionFruit.Api.Tests.csproj", "{F80EC12E-25D9-443B-9CD6-D5C46A8F3B8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Tools.CountryList", "generator\DragonFruit.OnionFruit.Tools.CountryList.csproj", "{435FE28A-6FAF-454A-A1DF-963EAACEDE3E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +16,13 @@ Global
 		{E04E524E-5B30-4968-9B6E-561E19AAD369}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E04E524E-5B30-4968-9B6E-561E19AAD369}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E04E524E-5B30-4968-9B6E-561E19AAD369}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB3A45AB-1492-4CCF-A1DD-2921EBE57C10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB3A45AB-1492-4CCF-A1DD-2921EBE57C10}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB3A45AB-1492-4CCF-A1DD-2921EBE57C10}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB3A45AB-1492-4CCF-A1DD-2921EBE57C10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F80EC12E-25D9-443B-9CD6-D5C46A8F3B8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F80EC12E-25D9-443B-9CD6-D5C46A8F3B8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F80EC12E-25D9-443B-9CD6-D5C46A8F3B8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F80EC12E-25D9-443B-9CD6-D5C46A8F3B8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{435FE28A-6FAF-454A-A1DF-963EAACEDE3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{435FE28A-6FAF-454A-A1DF-963EAACEDE3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{435FE28A-6FAF-454A-A1DF-963EAACEDE3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{435FE28A-6FAF-454A-A1DF-963EAACEDE3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

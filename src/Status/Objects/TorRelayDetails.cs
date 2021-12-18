@@ -1,5 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿// OnionFruit API/Tooling Copyright DragonFruit Network
+// Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
+
+using System;
 using System.Text.Json.Serialization;
 using DragonFruit.OnionFruit.Api.Converters;
 using DragonFruit.OnionFruit.Api.Status.Enums;
@@ -14,11 +16,11 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
 
         [JsonPropertyName("fingerprint")]
         public string Fingerprint { get; set; }
- 
+
         [JsonPropertyName("first_seen")]
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime FirstSeen { get; set; }
-        
+
         [JsonPropertyName("last_seen")]
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime LastSeen { get; set; }
@@ -26,7 +28,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         [JsonPropertyName("last_changed_address_or_port")]
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime LastChangedAddressOrPort { get; set; }
-        
+
         /// <summary>
         /// <see cref="DateTime"/> the server was last restarted
         /// </summary>
@@ -39,12 +41,12 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// </summary>
         [JsonPropertyName("running")]
         public bool Running { get; set; }
-        
+
         /// <summary>
         /// Features the tor node has
         /// </summary>
         public TorNodeFlags Flags { get; set; }
-        
+
         [JsonPropertyName("flags")]
         private string[] RawFlags
         {
@@ -56,7 +58,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// The country the server is located in
         /// </summary>
         [JsonPropertyName("country")]
-        public string Country { get; set; }
+        public string CountryCode { get; set; }
 
         /// <summary>
         /// The country name the server is located in
@@ -159,16 +161,16 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// </summary>
         [JsonPropertyName("dir_address")]
         public string DirAddress { get; set; }
-        
+
         [JsonPropertyName("or_addresses")]
         public string[] OrAddresses { get; set; }
-        
+
         [JsonPropertyName("exit_addresses")]
         public string[] ExitAddresses { get; set; }
 
         [JsonPropertyName("verified_host_names")]
         public string[] VerifiedHostNames { get; set; }
-        
+
         [JsonPropertyName("unverified_host_names")]
         public string[] UnverifiedHostNames { get; set; }
     }

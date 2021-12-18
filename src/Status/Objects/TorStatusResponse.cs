@@ -1,4 +1,7 @@
-﻿using System;
+﻿// OnionFruit API/Tooling Copyright DragonFruit Network
+// Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
+
+using System;
 using System.Text.Json.Serialization;
 using DragonFruit.OnionFruit.Api.Converters;
 
@@ -12,19 +15,19 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// </summary>
         [JsonPropertyName("version")]
         public string Version { get; set; }
-        
+
         /// <summary>
         /// When not-null, indicates when the next major version will be deployed
         /// </summary>
         [JsonPropertyName("next_major_version_scheduled")]
         public DateTime? NextVersionScheduled { get; set; }
-        
+
         /// <summary>
         /// Git revision of the software used to write this response. This is omitted if unknown.
         /// </summary>
         [JsonPropertyName("build_revision")]
         public string BuildRevision { get; set; }
-        
+
         /// <summary>
         /// <see cref="DateTime"/> when the last known relay network status consensus started being valid.
         /// </summary>
@@ -34,22 +37,22 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         [JsonPropertyName("relays_published")]
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime RelaysPublished { get; set; }
-        
+
         /// <summary>
         /// Numbers of relays skipped, if an offset was requested
         /// </summary>
         [JsonPropertyName("relays_skipped")]
         public int? RelaysSkipped { get; set; }
-        
+
         [JsonPropertyName("relays")]
         public TRelay[] Relays { get; set; }
-        
+
         /// <summary>
         /// Number of relays omitted due to user page limiting
         /// </summary>
         [JsonPropertyName("relays_truncated")]
         public int RelaysTruncated { get; set; }
-        
+
         /// <summary>
         /// <see cref="DateTime"/> when the last known relay network status consensus started being valid.
         /// </summary>
@@ -59,23 +62,23 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         [JsonPropertyName("bridges_published")]
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime BridgesPublished { get; set; }
-        
+
         /// <summary>
         /// Numbers of bridges skipped, if an offset was requested
         /// </summary>
         [JsonPropertyName("bridges_skipped")]
         public int? BridgesSkipped { get; set; }
-        
+
         [JsonPropertyName("bridges")]
         public TBridge[] Bridges { get; set; }
-        
+
         /// <summary>
         /// Number of bridges omitted due to user page limiting
         /// </summary>
         [JsonPropertyName("bridges_truncated")]
         public int BridgesTruncated { get; set; }
     }
-    
+
     [Serializable]
     public class TorStatusResponse<T> : TorStatusResponse<T, T>
     {

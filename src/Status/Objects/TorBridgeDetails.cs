@@ -1,4 +1,7 @@
-﻿using System;
+﻿// OnionFruit API/Tooling Copyright DragonFruit Network
+// Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
+
+using System;
 using System.Text.Json.Serialization;
 using DragonFruit.OnionFruit.Api.Converters;
 using DragonFruit.OnionFruit.Api.Status.Enums;
@@ -32,7 +35,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// Features the tor node has
         /// </summary>
         public TorNodeFlags Flags { get; set; }
-        
+
         [JsonPropertyName("flags")]
         private string[] RawFlags
         {
@@ -46,7 +49,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         [JsonPropertyName("last_restarted")]
         [JsonConverter(typeof(DateTimeConverter))]
         public DateTime? LastRestarted { get; set; }
-        
+
         /// <summary>
         /// Bandwidth, in bytes/sec, the server is capable of providing
         /// </summary>
@@ -76,11 +79,11 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         /// </summary>
         [JsonPropertyName("transports")]
         public string[] Transports { get; set; }
-        
+
         [JsonPropertyName("or_addresses")]
         public string[] OrAddresses { get; set; }
 
         [JsonPropertyName("bridgedb_distributor")]
-        public string BridgeDBDistributor { get; set; }
+        public string BridgeDbDistributor { get; set; }
     }
 }
