@@ -11,10 +11,10 @@ namespace DragonFruit.OnionFruit.Api.Status.Objects
         public string Fingerprint { get; set; }
         
         [JsonPropertyName("write_history")]
-        public IReadOnlyDictionary<string, TorHistoryGraphObject> WriteHistory { get; set; }
+        public IReadOnlyDictionary<string, TorHistoryGraph> WriteHistory { get; set; }
         
         [JsonPropertyName("read_history")]
-        public IReadOnlyDictionary<string, TorHistoryGraphObject> ReadHistory { get; set; }
+        public IReadOnlyDictionary<string, TorHistoryGraph> ReadHistory { get; set; }
         
         [JsonPropertyName("overload_ratelimits")]
         public TorNodeOverloadRateLimit OverloadRateLimits { get; set; }

@@ -35,5 +35,12 @@ namespace DragonFruit.OnionFruit.Api.Tests
             var history = await Client.GetBandwidthHistoryAsync(750);
             Assert.AreEqual(history.Relays.Length, 750);
         }
+
+        [Test]
+        public async Task TestBridgeConnectionMetrics()
+        {
+            var history = await Client.GetTorBridgeConnectionMetricsAsync(100);
+            Assert.AreEqual(history.Bridges.Length, 100);
+        }
     }
 }

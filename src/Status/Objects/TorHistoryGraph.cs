@@ -7,7 +7,7 @@ using DragonFruit.OnionFruit.Api.Converters;
 namespace DragonFruit.OnionFruit.Api.Status.Objects
 {
     [Serializable]
-    public class TorHistoryGraphObject
+    public class TorHistoryGraph
     {
         [JsonPropertyName("first")]
         [JsonConverter(typeof(DateTimeConverter))]

@@ -81,7 +81,7 @@ namespace DragonFruit.OnionFruit.Api.Status.Requests
         /// https://metrics.torproject.org/onionoo.html#parameters_type
         /// </remarks>
         [QueryParameter("type", EnumHandlingMode.StringLower)]
-        public TorNodeType? Type { get; set; }
+        public virtual TorNodeType? Type { get; set; }
 
         /// <summary>
         /// Reorder the response data (defaults to ascending order).
