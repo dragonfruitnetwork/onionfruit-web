@@ -12,7 +12,7 @@ The OnionFruit™ API provides developers with an easy way to get access to metr
 
 1. Install the NuGet package (see icons above)
 2. Create an `ApiClient` for the lifetime of the program
-3. Use one of the extension methods, or create your own request/response combo
+3. Use one of the [extension methods](/tree/master/src/Extensions), or create your own request/response combo
 > The response objects in this project are mapped to `System.Text.Json` serializers. These will be changed to `DataMember` in the future once the .NET team add support
 
 ```cs
