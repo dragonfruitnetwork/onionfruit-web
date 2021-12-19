@@ -13,18 +13,17 @@ The OnionFruit™ API provides developers with an easy way to get access to metr
 1. Install the NuGet package (see icons above)
 2. Create an `ApiClient` for the lifetime of the program
 3. Use one of the [extension methods](/src/Extensions), or create your own request/response combo
-> The response objects in this project are mapped to `System.Text.Json` serializers. These will be changed to `DataMember` in the future once the .NET team add support
 
 ```cs
 using System.Threading.Tasks;
 using DragonFruit.Data;
-using DragonFruit.Data.Serializers.SystemJson;
+using DragonFruit.Data.Serializers.Newtonsoft;
 using DragonFruit.OnionFruit.Api.Requests;
 using DragonFruit.OnionFruit.Api.Extensions;
 
 namespace OnionFruit.Demo;
 
-static readonly ApiClient _client = new ApiClient<ApiSystemTextJson>();
+static readonly ApiClient _client = new ApiClient<ApiJsonSerializer>();
 
 public static async Task Main(string[] args)
 {
