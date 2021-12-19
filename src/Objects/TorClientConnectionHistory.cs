@@ -3,17 +3,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
+    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class TorClientConnectionHistory
     {
-        [JsonPropertyName("fingerprint")]
+        [DataMember(Name = "fingerprint")]
         public string Fingerprint { get; set; }
 
-        [JsonPropertyName("average_clients")]
+        [DataMember(Name = "average_clients")]
         public IReadOnlyDictionary<string, TorHistoryGraph> Clients { get; set; }
     }
 }

@@ -2,33 +2,34 @@
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System;
-using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
 using DragonFruit.OnionFruit.Api.Converters;
 using DragonFruit.OnionFruit.Api.Enums;
+using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
+    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class TorBridgeDetails
     {
-        [JsonPropertyName("nickname")]
+        [DataMember(Name = "nickname")]
         public string Nickname { get; set; }
 
-        [JsonPropertyName("hashed_fingerprint")]
+        [DataMember(Name = "hashed_fingerprint")]
         public string HashedFingerprint { get; set; }
 
-        [JsonPropertyName("first_seen")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [DataMember(Name = "first_seen")]
         public DateTime FirstSeen { get; set; }
 
-        [JsonPropertyName("last_seen")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [DataMember(Name = "last_seen")]
         public DateTime LastSeen { get; set; }
 
         /// <summary>
         /// Whether the Bridge is currently online
         /// </summary>
-        [JsonPropertyName("running")]
+        [DataMember(Name = "running")]
         public bool Running { get; set; }
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace DragonFruit.OnionFruit.Api.Objects
         /// </summary>
         public TorNodeFlags Flags { get; set; }
 
-        [JsonPropertyName("flags")]
+        [DataMember(Name = "flags")]
         public string[] RawFlags
         {
             get => NodeFlagConverter.ToString(Flags);
@@ -46,44 +47,44 @@ namespace DragonFruit.OnionFruit.Api.Objects
         /// <summary>
         /// UTC DateTime the server was last restarted
         /// </summary>
-        [JsonPropertyName("last_restarted")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [DataMember(Name = "last_restarted")]
+
         public DateTime? LastRestarted { get; set; }
 
         /// <summary>
         /// Bandwidth, in bytes/sec, the server is capable of providing
         /// </summary>
-        [JsonPropertyName("advertised_bandwidth")]
+        [DataMember(Name = "advertised_bandwidth")]
         public long AdvertisedBandwidth { get; set; }
 
         /// <summary>
-        /// The Tor version and 
+        /// The Tor version and
         /// </summary>
-        [JsonPropertyName("platform")]
+        [DataMember(Name = "platform")]
         public string Platform { get; set; }
 
         /// <summary>
         /// The version of Tor the server is running
         /// </summary>
-        [JsonPropertyName("version")]
+        [DataMember(Name = "version")]
         public string Version { get; set; }
 
         /// <summary>
         /// Whether the bridge is running a recommended version of Tor
         /// </summary>
-        [JsonPropertyName("recommended_version")]
+        [DataMember(Name = "recommended_version")]
         public bool RecommendedVersion { get; set; }
 
         /// <summary>
         /// The pluggable transport types this bridge supports
         /// </summary>
-        [JsonPropertyName("transports")]
+        [DataMember(Name = "transports")]
         public string[] Transports { get; set; }
 
-        [JsonPropertyName("or_addresses")]
+        [DataMember(Name = "or_addresses")]
         public string[] OrAddresses { get; set; }
 
-        [JsonPropertyName("bridgedb_distributor")]
+        [DataMember(Name = "bridgedb_distributor")]
         public string BridgeDbDistributor { get; set; }
     }
 }

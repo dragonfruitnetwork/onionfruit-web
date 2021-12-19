@@ -2,23 +2,22 @@
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Api.Converters
 {
     internal class MillisecondEpochConverter : JsonConverter<DateTime>
     {
-        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var time = reader.GetInt64();
-            return new DateTime(1970, 1, 1).AddMilliseconds(time);
-        }
-
-        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)
         {
             var epoch = value.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-            writer.WriteNumberValue((int)epoch);
+            writer.WriteValue((int)epoch);
+        }
+
+        public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var time = reader.ReadAsString();
+            return new DateTime(1970, 1, 1).AddMilliseconds(long.Parse(time));
         }
     }
 }

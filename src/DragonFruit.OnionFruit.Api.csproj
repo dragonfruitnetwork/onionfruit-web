@@ -17,7 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="DragonFruit.Data" Version="2021.1218.0"/>
-        <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2021.1218.0"/>
+        <PackageReference Include="DragonFruit.Data.Serializers.Newtonsoft" Version="2021.1218.0"/>
     </ItemGroup>
 
     <ItemGroup>

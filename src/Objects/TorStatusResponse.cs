@@ -2,8 +2,7 @@
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System;
-using System.Text.Json.Serialization;
-using DragonFruit.OnionFruit.Api.Converters;
+using System.Runtime.Serialization;
 
 namespace DragonFruit.OnionFruit.Api.Objects
 {
@@ -13,19 +12,19 @@ namespace DragonFruit.OnionFruit.Api.Objects
         /// <summary>
         /// The current api protocol
         /// </summary>
-        [JsonPropertyName("version")]
+        [DataMember(Name = "version")]
         public string Version { get; set; }
 
         /// <summary>
         /// When not-null, indicates when the next major version will be deployed
         /// </summary>
-        [JsonPropertyName("next_major_version_scheduled")]
+        [DataMember(Name = "next_major_version_scheduled")]
         public DateTime? NextVersionScheduled { get; set; }
 
         /// <summary>
         /// Git revision of the software used to write this response. This is omitted if unknown.
         /// </summary>
-        [JsonPropertyName("build_revision")]
+        [DataMember(Name = "build_revision")]
         public string BuildRevision { get; set; }
 
         /// <summary>
@@ -34,23 +33,22 @@ namespace DragonFruit.OnionFruit.Api.Objects
         /// <remarks>
         /// Indicates how recent the relay objects in this document are.
         /// </remarks>
-        [JsonPropertyName("relays_published")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [DataMember(Name = "relays_published")]
         public DateTime RelaysPublished { get; set; }
 
         /// <summary>
         /// Numbers of relays skipped, if an offset was requested
         /// </summary>
-        [JsonPropertyName("relays_skipped")]
+        [DataMember(Name = "relays_skipped")]
         public int? RelaysSkipped { get; set; }
 
-        [JsonPropertyName("relays")]
+        [DataMember(Name = "relays")]
         public TRelay[] Relays { get; set; }
 
         /// <summary>
         /// Number of relays omitted due to user page limiting
         /// </summary>
-        [JsonPropertyName("relays_truncated")]
+        [DataMember(Name = "relays_truncated")]
         public int RelaysTruncated { get; set; }
 
         /// <summary>
@@ -59,27 +57,27 @@ namespace DragonFruit.OnionFruit.Api.Objects
         /// <remarks>
         /// Indicates how recent the relay objects in this document are.
         /// </remarks>
-        [JsonPropertyName("bridges_published")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [DataMember(Name = "bridges_published")]
         public DateTime BridgesPublished { get; set; }
 
         /// <summary>
         /// Numbers of bridges skipped, if an offset was requested
         /// </summary>
-        [JsonPropertyName("bridges_skipped")]
+        [DataMember(Name = "bridges_skipped")]
         public int? BridgesSkipped { get; set; }
 
-        [JsonPropertyName("bridges")]
+        [DataMember(Name = "bridges")]
         public TBridge[] Bridges { get; set; }
 
         /// <summary>
         /// Number of bridges omitted due to user page limiting
         /// </summary>
-        [JsonPropertyName("bridges_truncated")]
+        [DataMember(Name = "bridges_truncated")]
         public int BridgesTruncated { get; set; }
     }
 
     [Serializable]
+    [DataContract]
     public class TorStatusResponse<T> : TorStatusResponse<T, T>
     {
     }

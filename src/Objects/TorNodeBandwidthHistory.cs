@@ -3,23 +3,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
+    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class TorNodeBandwidthHistory
     {
-        [JsonPropertyName("fingerprint")]
+        [DataMember(Name = "fingerprint")]
         public string Fingerprint { get; set; }
 
-        [JsonPropertyName("write_history")]
+        [DataMember(Name = "write_history")]
         public IReadOnlyDictionary<string, TorHistoryGraph> WriteHistory { get; set; }
 
-        [JsonPropertyName("read_history")]
+        [DataMember(Name = "read_history")]
         public IReadOnlyDictionary<string, TorHistoryGraph> ReadHistory { get; set; }
 
-        [JsonPropertyName("overload_ratelimits")]
+        [DataMember(Name = "overload_ratelimits")]
         public TorNodeOverloadRateLimit OverloadRateLimits { get; set; }
     }
 }

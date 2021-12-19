@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bia.Countries.Iso3166;
 using DragonFruit.Data;
-using DragonFruit.Data.Serializers.SystemJson;
+using DragonFruit.Data.Serializers.Newtonsoft;
 using DragonFruit.OnionFruit.Api.Enums;
 using DragonFruit.OnionFruit.Api.Extensions;
 using DragonFruit.OnionFruit.Api.Objects;
@@ -17,7 +17,7 @@ namespace DragonFruit.OnionFruit.Tools.CountryList
 {
     internal static class Program
     {
-        private static readonly ApiClient Client = new ApiClient<ApiSystemTextJsonSerializer>();
+        private static readonly ApiClient Client = new ApiClient<ApiJsonSerializer>();
 
         private static async Task Main(string[] args)
         {

@@ -4,23 +4,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
-using DragonFruit.OnionFruit.Api.Converters;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Api.Objects
 {
     [Serializable]
+    [DataContract]
+    [JsonObject(MemberSerialization.OptIn)]
     public class TorHistoryGraph
     {
-        [JsonPropertyName("first")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [DataMember(Name = "first")]
         public DateTime Start { get; set; }
 
-        [JsonPropertyName("last")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [DataMember(Name = "last")]
         public DateTime End { get; set; }
 
-        [JsonPropertyName("interval")]
+        [DataMember(Name = "interval")]
         public int IntervalSeconds { get; set; }
 
         /// <summary>
@@ -32,13 +32,13 @@ namespace DragonFruit.OnionFruit.Api.Objects
         /// <summary>
         /// The scale factor each value needs to be multiplied by to get the original value
         /// </summary>
-        [JsonPropertyName("factor")]
+        [DataMember(Name = "factor")]
         public double ScaleFactor { get; set; }
 
         /// <summary>
         /// The normalised values, as sent by the api
         /// </summary>
-        [JsonPropertyName("values")]
+        [DataMember(Name = "values")]
         public int?[] NormalisedValues { get; set; }
 
         /// <summary>
