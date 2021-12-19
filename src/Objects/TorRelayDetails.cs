@@ -68,13 +68,13 @@ namespace DragonFruit.OnionFruit.Api.Objects
         /// The autonomous system identifier, as assigned to by IANA
         /// </summary>
         [DataMember(Name = "as")]
-        public string As { get; set; }
+        public string ASN { get; set; }
 
         /// <summary>
         /// The autonomous system name, as assigned to by IANA
         /// </summary>
         [DataMember(Name = "as_name")]
-        public string AsName { get; set; }
+        public string ASName { get; set; }
 
         /// <summary>
         /// Weight assigned to the relay that clients use in their path selection algorithm
