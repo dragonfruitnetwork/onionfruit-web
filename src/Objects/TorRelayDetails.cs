@@ -9,8 +9,7 @@ using Newtonsoft.Json;
 
 namespace DragonFruit.OnionFruit.Api.Objects
 {
-    [Serializable]
-    [DataContract]
+    [Serializable, DataContract]
     [JsonObject(MemberSerialization.OptIn)]
     public class TorRelayDetails
     {

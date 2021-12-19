@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 
 namespace DragonFruit.OnionFruit.Api.Objects
 {
-    [Serializable]
+    [Serializable, DataContract]
     public class TorStatusResponse<TRelay, TBridge>
     {
         /// <summary>
@@ -76,8 +76,7 @@ namespace DragonFruit.OnionFruit.Api.Objects
         public int BridgesTruncated { get; set; }
     }
 
-    [Serializable]
-    [DataContract]
+    [Serializable, DataContract]
     public class TorStatusResponse<T> : TorStatusResponse<T, T>
     {
     }
