@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DragonFruit.Data" Version="2021.1218.0"/>
+        <PackageReference Include="DragonFruit.Data" Version="2021.1225.0"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0"/>
         <PackageReference Include="NUnit" Version="3.13.2"/>
         <PackageReference Include="NUnit3TestAdapter" Version="4.1.0"/>
