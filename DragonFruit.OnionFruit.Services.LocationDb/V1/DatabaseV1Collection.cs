@@ -10,9 +10,7 @@ using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
-    internal abstract class DatabaseV1Collection<TSource, TOut> : IBinarySearchable<TOut>, IEnumerable<TSource>, IDisposable
-        where TOut : ISearchableItem
-        where TSource : struct
+    internal abstract class DatabaseV1Collection<TSource, TOut> : IEnumerable<TSource>, IDisposable where TSource : struct
     {
         protected readonly MemoryMappedViewAccessor View;
         protected readonly IStringPool Pool;
@@ -32,7 +30,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 
         public int Count { get; }
 
-        public unsafe TOut this[int index]
+        public TOut this[int index]
         {
             get
             {

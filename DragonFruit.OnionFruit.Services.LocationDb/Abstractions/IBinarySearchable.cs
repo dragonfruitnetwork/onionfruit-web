@@ -3,7 +3,7 @@
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
 {
-    public interface IBinarySearchable<out T> where T : ISearchableItem
+    public interface IBinarySearchable<out T, TKey> where T : ISearchableItem<TKey>
     {
         int Count { get; }
 
