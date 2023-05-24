@@ -12,6 +12,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 
         private readonly DatabaseV1StringPool _stringPool;
         private readonly DatabaseV1Countries _countries;
+        private readonly DatabaseV1AS _as;
 
         private readonly uint _vendorStringLoc, _descriptionStringLoc, _licenseStringLoc;
 
@@ -34,8 +35,11 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
             var stringPoolView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.pool_offset), BinaryUtils.EnsureEndianness(header.pool_length));
             _stringPool = new DatabaseV1StringPool(stringPoolView);
 
+            var asView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.as_offset), BinaryUtils.EnsureEndianness(header.as_length));
+            _as = new DatabaseV1AS(asView, _stringPool);
+
             var countryView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.countries_offset), BinaryUtils.EnsureEndianness(header.countries_length));
-            _countries = new DatabaseV1Countries(_stringPool, countryView);
+            _countries = new DatabaseV1Countries(countryView, _stringPool);
         }
 
         public int Version => 1;
@@ -46,6 +50,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 
         public string Description => _stringPool[_descriptionStringLoc];
 
+        public IASDatabase AS => _as;
         public ICountryDatabase Countries => _countries;
 
         public void Dispose()

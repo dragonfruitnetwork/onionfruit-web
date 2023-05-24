@@ -1,12 +1,12 @@
-﻿// OnionFruit Web Copyright DragonFruit Network
+// OnionFruit Web Copyright DragonFruit Network
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
 {
-    public interface IBinarySearchable<out T> where T : ISearchableItem
+    public interface IDatabaseAS
     {
-        int Count { get; }
+        uint Number { get; }
 
-        T this[int index] { get; }
+        string Name { get; }
     }
 }

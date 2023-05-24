@@ -1,14 +1,14 @@
-﻿// OnionFruit Web Copyright DragonFruit Network
+// OnionFruit Web Copyright DragonFruit Network
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System.Collections.Generic;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
 {
-    public interface ICountryDatabase : IEnumerable<IDatabaseCountry>
+    public interface IASDatabase : IEnumerable<IDatabaseAS>
     {
-        IDatabaseCountry this[int index] { get; }
+        IDatabaseAS this[int index] { get; }
 
-        IDatabaseCountry GetCountry(string code);
+        IDatabaseAS GetAS(uint number);
     }
 }

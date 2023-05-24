@@ -13,6 +13,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
         string License { get; }
         string Description { get; }
 
+        IASDatabase AS { get; }
         ICountryDatabase Countries { get; }
     }
 }
