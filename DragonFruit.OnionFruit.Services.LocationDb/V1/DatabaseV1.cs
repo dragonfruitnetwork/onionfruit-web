@@ -12,6 +12,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 
         private readonly DatabaseV1StringPool _stringPool;
         private readonly DatabaseV1Countries _countries;
+        private readonly DatabaseV1Networks _networks;
         private readonly DatabaseV1AS _as;
 
         private readonly uint _vendorStringLoc, _descriptionStringLoc, _licenseStringLoc;
@@ -19,9 +20,9 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
         internal unsafe DatabaseV1(MemoryMappedFile mmdb)
         {
             _mmdb = mmdb;
-            DatabaseV1SourceHeader header;
+            DatabaseV1Header header;
 
-            using (var headerView = mmdb.CreateViewAccessor(sizeof(GlobalDatabaseHeader), sizeof(DatabaseV1SourceHeader)))
+            using (var headerView = mmdb.CreateViewAccessor(sizeof(GlobalDatabaseHeader), sizeof(DatabaseV1Header)))
             {
                 headerView.Read(0, out header);
             }
@@ -38,6 +39,9 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
             var asView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.as_offset), BinaryUtils.EnsureEndianness(header.as_length));
             _as = new DatabaseV1AS(asView, _stringPool);
 
+            var networksView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.network_data_offset), BinaryUtils.EnsureEndianness(header.network_data_length));
+            _networks = new DatabaseV1Networks(networksView, _stringPool);
+
             var countryView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.countries_offset), BinaryUtils.EnsureEndianness(header.countries_length));
             _countries = new DatabaseV1Countries(countryView, _stringPool);
         }
@@ -51,6 +55,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
         public string Description => _stringPool[_descriptionStringLoc];
 
         public IASDatabase AS => _as;
+        public INetworkDatabase Networks => _networks;
         public ICountryDatabase Countries => _countries;
 
         public void Dispose()

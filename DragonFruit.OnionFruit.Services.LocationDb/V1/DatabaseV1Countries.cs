@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Text;
@@ -7,13 +6,7 @@ using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
-    [DebuggerDisplay("{Code} - {Name}")]
-    internal record DatabaseV1Country(string Code, string ContinentCode, string Name) : IDatabaseCountry, ISearchableItem<string>
-    {
-        string ISearchableItem<string>.Key => Code;
-    }
-
-    internal unsafe class DatabaseV1Countries : DatabaseV1Collection<DatabaseV1SourceCountry, DatabaseV1Country>, ICountryDatabase, IBinarySearchable<DatabaseV1Country, string>
+    internal unsafe class DatabaseV1Countries : DatabaseV1Collection<DatabaseSourceCountry, DatabaseCountry>, ICountryDatabase, IBinarySearchable<DatabaseCountry, string>
     {
         public DatabaseV1Countries(MemoryMappedViewAccessor view, IStringPool pool)
             : base(view, pool)
@@ -27,17 +20,17 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
             return BinaryUtils.BinarySearch(this, code);
         }
 
-        protected override DatabaseV1Country FromNative(DatabaseV1SourceCountry source)
+        protected override DatabaseCountry FromNative(DatabaseSourceCountry source)
         {
             var code = Encoding.ASCII.GetString(source.code, 2);
             var continent = Encoding.ASCII.GetString(source.continent_code, 2);
 
-            return new DatabaseV1Country(code, continent, Pool[source.name_poolid]);
+            return new DatabaseCountry(code, continent, Pool[source.name_poolid]);
         }
 
         public IEnumerator<IDatabaseCountry> GetEnumerator()
         {
-            return ((IEnumerable<DatabaseV1SourceCountry>)this).Select(FromNative).GetEnumerator();
+            return ((IEnumerable<DatabaseSourceCountry>)this).Select(FromNative).GetEnumerator();
         }
     }
 }

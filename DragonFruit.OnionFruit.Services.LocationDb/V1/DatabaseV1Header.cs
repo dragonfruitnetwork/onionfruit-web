@@ -10,7 +10,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
     /// Based on the format.h header file (https://git.ipfire.org/?p=location/libloc.git;a=blob;f=src/libloc/format.h;h=030394bc72e4003f7d1def2f8d50176cab4201b4;hb=HEAD)
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct DatabaseV1SourceHeader
+    internal unsafe struct DatabaseV1Header
     {
         private const int SignatureMaxLength = 2048;
 

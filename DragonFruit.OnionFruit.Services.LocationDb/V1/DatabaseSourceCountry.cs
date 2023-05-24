@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct DatabaseV1SourceCountry
+    internal unsafe struct DatabaseSourceCountry
     {
         public fixed byte code[2];
 

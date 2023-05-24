@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct DatabaseV1SourceAS
+    internal struct DatabaseSourceAS
     {
         // The AS number
         public readonly uint number;
