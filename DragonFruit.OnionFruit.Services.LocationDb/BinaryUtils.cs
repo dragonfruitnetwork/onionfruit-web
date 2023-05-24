@@ -13,12 +13,12 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
         public static uint EnsureEndianness(uint value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
 
         /// <summary>
-        /// Performs a binary search on the provided <see cref="IBinarySearchable{T}"/> source
+        /// Performs a binary search on the provided <see cref="IBinarySearchable{T, TKey}"/> source
         /// </summary>
         /// <remarks>
         /// Based on the .NET binary search function (https://source.dot.net/#System.Private.CoreLib/src/libraries/System.Private.CoreLib/src/System/Array.cs,b92d187c91d4c9a9)
         /// </remarks>
-        public static T BinarySearch<T>(IBinarySearchable<T> source, object target) where T : class, ISearchableItem
+        public static T BinarySearch<T, TKey>(IBinarySearchable<T, TKey> source, TKey target) where T : class, ISearchableItem<TKey>
         {
             var lo = 0;
             var hi = source.Count - 1;
@@ -30,7 +30,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
                 var i = lo + ((hi - lo) >> 1);
                 int c;
 
-                ISearchableItem item;
+                ISearchableItem<TKey> item;
 
                 try
                 {

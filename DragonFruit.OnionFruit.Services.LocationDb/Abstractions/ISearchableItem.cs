@@ -3,8 +3,8 @@
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
 {
-    public interface ISearchableItem
+    public interface ISearchableItem<out T>
     {
-        object Key { get; }
+        T Key { get; }
     }
 }

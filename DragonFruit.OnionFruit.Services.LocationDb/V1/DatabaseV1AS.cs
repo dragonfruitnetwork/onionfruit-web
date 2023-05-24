@@ -10,14 +10,14 @@ using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
     [DebuggerDisplay("AS{Number} - {Name}")]
-    internal record DatabaseV1ASEntry(uint Number, string Name) : IDatabaseAS, ISearchableItem
+    internal record DatabaseV1ASEntry(uint Number, string Name) : IDatabaseAS, ISearchableItem<uint>
     {
-        object ISearchableItem.Key => Number;
+        uint ISearchableItem<uint>.Key => Number;
 
         public override string ToString() => $"AS{Number}";
     }
 
-    internal class DatabaseV1AS : DatabaseV1Collection<DatabaseV1SourceAS, DatabaseV1ASEntry>, IASDatabase
+    internal class DatabaseV1AS : DatabaseV1Collection<DatabaseV1SourceAS, DatabaseV1ASEntry>, IASDatabase, IBinarySearchable<DatabaseV1ASEntry, uint>
     {
         public DatabaseV1AS(MemoryMappedViewAccessor view, IStringPool pool)
             : base(view, pool)
