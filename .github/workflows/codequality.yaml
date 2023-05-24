@@ -24,7 +24,7 @@ jobs:
           run: dotnet restore
 
         - name: InspectCode
-          run: dotnet jb inspectcode ${{github.workspace}}/DragonFruit.OnionFruit.Web.sln --output=${{github.workspace}}/inspectcodereport.xml --cachesDir=${{github.workspace}}/inspectcode --verbosity=WARN --no-build
+          run: jb inspectcode ${{github.workspace}}/DragonFruit.OnionFruit.Web.sln --output=${{github.workspace}}/inspectcodereport.xml --cachesDir=${{github.workspace}}/inspectcode --verbosity=WARN --no-build
 
         - name: NVika
-          run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml"
+          run: nvika parsereport "${{github.workspace}}/inspectcodereport.xml"
