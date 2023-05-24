@@ -9,19 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install .NET
-        uses: actions/setup-dotnet@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x' 
 
       - name: Restore
         run: dotnet restore
-
-      - name: Build
-        run: dotnet build -c Release -v normal -p:Version=${{ github.ref_name }}
 
       - name: Pack (Beta)
         run: dotnet pack -c Release --include-symbols --no-build -v normal -o . -p:PackageVersion=${{ github.ref_name }}-beta

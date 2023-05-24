@@ -1,25 +1,26 @@
-# OnionFruit™ API
-![CI Publish](https://github.com/dragonfruitnetwork/onionfruit-api/workflows/Publish/badge.svg)
-![CI Unit Tests](https://github.com/dragonfruitnetwork/onionfruit-api/workflows/Unit%20Tests/badge.svg)
+# OnionFruit™ Web
 [![Nuget](https://img.shields.io/nuget/v/DragonFruit.OnionFruit.Api)](https://nuget.org/packages/DragonFruit.OnionFruit.Api)
 ![Nuget Downloads](https://img.shields.io/nuget/dt/DragonFruit.OnionFruit.Api)
 [![DragonFruit Discord](https://img.shields.io/discord/482528405292843018?label=Discord&style=popout)](https://discord.gg/VA26u5Z)
 
 ## Overview
-The OnionFruit™ API provides developers with an easy way to get access to metrics from the Tor service, including graph data and network overviews.
+This repo contains a collection of libraries developed to work with the OnionFruit clients, more specifically to retrieve data used for country selection and IP filtering.
 
-### Usage
+### OnionFruit™ Onionoo API
+An easy way to access metrics from the Tor service, including graph data and network overviews.
 
-1. Install the NuGet package (see icons above)
+#### Usage
+
+1. Install the NuGet package
 2. Create an `ApiClient` for the lifetime of the program
-3. Use one of the [extension methods](/src/Extensions), or create your own request/response combo
+3. Use one of the [extension methods](/DragonFruit.OnionFruit.Web.Onionoo/TorWebExtensions.cs), or create your own request/response combo
 
 ```cs
 using System.Threading.Tasks;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers.Newtonsoft;
-using DragonFruit.OnionFruit.Api.Requests;
-using DragonFruit.OnionFruit.Api.Extensions;
+using DragonFruit.OnionFruit.Services.Onionoo;
+using DragonFruit.OnionFruit.Services.Onionoo.Requests;
 
 namespace OnionFruit.Demo;
 
@@ -46,5 +47,4 @@ public static async Task Main(string[] args)
 
 ### License
 
-These (the api and tooling) are open-source components of OnionFruit™. These are licensed under the MIT license.
-Refer to the license file for more info.
+These libraries and components are licensed under the MIT license. Refer to the license file for more info.
