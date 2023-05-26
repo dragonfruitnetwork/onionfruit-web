@@ -1,6 +1,7 @@
 ﻿// OnionFruit Web Copyright DragonFruit Network
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
+using System;
 using System.IO.MemoryMappedFiles;
 using System.Net;
 using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
@@ -69,8 +70,9 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
         {
             int depth = -1;
             uint nextNodeIndex = 0;
+
             byte[] mappedAddress = address.MapToIPv6().GetAddressBytes();
-            byte[] networkAddress = IPAddress.IPv6None.GetAddressBytes();
+            Span<byte> networkAddress = stackalloc byte[mappedAddress.Length];
 
             DatabaseSourceNetworkNode node;
 
@@ -92,14 +94,14 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
                 nextNodeIndex = BinaryUtils.EnsureEndianness(bit == 0 ? node.zero : node.one);
             } while (nextNodeIndex > 0);
 
-            // todo fix
-            var networkPrefixAddress = new IPAddress(networkAddress);
-            var prefix = networkPrefixAddress.IsIPv4MappedToIPv6
-                ? new NetworkPrefix(networkPrefixAddress.MapToIPv4(), depth - 96)
-                : new NetworkPrefix(networkPrefixAddress, depth);
-
             var networkIndex = BinaryUtils.EnsureEndianness(node.network);
-            return networkIndex == InvalidNetwork ? null : _networks.CreateWithPrefix(networkIndex, prefix);
+
+            if (networkIndex == InvalidNetwork)
+            {
+                return null;
+            }
+
+            return _networks.CreateWithPrefix(networkIndex, networkAddress, depth);
         }
 
         public void Dispose()
