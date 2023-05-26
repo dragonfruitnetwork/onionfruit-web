@@ -19,12 +19,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Collections
             _pool = pool;
         }
 
-        public DatabaseAS this[uint index] => FromSource(ElementAt(index));
-
-        public IDatabaseAS GetAS(uint number)
-        {
-            return BinaryUtils.BinarySearch(Count, x => FromSource(ElementAt(x)), number);
-        }
+        public IDatabaseAS this[uint asn] => BinaryUtils.BinarySearch(Count, x => FromSource(ElementAt(x)), asn);
 
         private DatabaseAS FromSource(DatabaseSourceAS source)
         {
@@ -36,7 +31,5 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Collections
         {
             return ((IEnumerable<DatabaseSourceAS>)this).Select(FromSource).GetEnumerator();
         }
-
-        IDatabaseAS IASDatabase.this[uint index] => this[index];
     }
 }

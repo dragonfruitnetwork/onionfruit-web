@@ -8,7 +8,5 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
     public interface IASDatabase : IEnumerable<IDatabaseAS>
     {
         IDatabaseAS this[uint index] { get; }
-
-        IDatabaseAS GetAS(uint number);
     }
 }

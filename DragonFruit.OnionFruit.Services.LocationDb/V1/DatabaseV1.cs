@@ -2,8 +2,11 @@
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Net;
+using System.Net.Sockets;
 using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 using DragonFruit.OnionFruit.Services.LocationDb.V1.Collections;
 using DragonFruit.OnionFruit.Services.LocationDb.V1.Source;
@@ -107,6 +110,26 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
             _countries.Dispose();
 
             _mmdb.Dispose();
+        }
+
+        public IEnumerator<IAddressLocatedNetwork> GetEnumerator(AddressFamily addressFamily)
+        {
+            if (addressFamily is not AddressFamily.InterNetwork and AddressFamily.InterNetworkV6)
+            {
+                throw new ArgumentException($"Only {nameof(AddressFamily.InterNetwork)} or {nameof(AddressFamily.InterNetworkV6)} can be used as a filter");
+            }
+
+            return new DatabaseV1NetworkTreeEnumerator(_networkTree, _networks, addressFamily);
+        }
+
+        public IEnumerator<IAddressLocatedNetwork> GetEnumerator()
+        {
+            return new DatabaseV1NetworkTreeEnumerator(_networkTree, _networks, null);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

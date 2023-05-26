@@ -19,5 +19,26 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
         {
             addressBytes[depth / 8] ^= (byte)((-value ^ addressBytes[depth / 8]) & (1 << (7 - (depth % 8))));
         }
+
+        public static bool IsIPv4(ReadOnlySpan<byte> addressBytes)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                if (addressBytes[i] > 0)
+                {
+                    return false;
+                }
+            }
+
+            for (int i = 10; i < 12; i++)
+            {
+                if (addressBytes[i] != 0xff)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
