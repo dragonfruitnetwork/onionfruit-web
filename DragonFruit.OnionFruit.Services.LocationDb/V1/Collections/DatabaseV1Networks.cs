@@ -7,8 +7,9 @@ using System.IO.MemoryMappedFiles;
 using System.Net;
 using System.Text;
 using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
+using DragonFruit.OnionFruit.Services.LocationDb.V1.Source;
 
-namespace DragonFruit.OnionFruit.Services.LocationDb.V1
+namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Collections
 {
     internal class DatabaseV1Networks : DatabaseV1Collection<DatabaseSourceNetwork>, INetworkDatabase
     {
@@ -20,6 +21,14 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
         public IDatabaseNetwork this[uint index] => FromSource(ElementAt(index), IPAddress.None, IPAddress.None, 0);
 
         internal DatabaseNetwork CreateWithPrefix(uint index, Span<byte> v6AddressBytes, int prefix)
+        {
+            var networkInfo = ElementAt(index);
+            var (firstAddress, lastAddress) = CalculateAddressRange(v6AddressBytes, prefix);
+
+            return FromSource(networkInfo, firstAddress, lastAddress, prefix);
+        }
+
+        internal static (IPAddress start, IPAddress end) CalculateAddressRange(ReadOnlySpan<byte> v6AddressBytes, int prefix)
         {
             Debug.Assert(v6AddressBytes.Length == 16);
 
@@ -41,11 +50,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
                 lastAddressBytes[i] = (byte)(v6AddressBytes[i] | ~bitmask[i]);
             }
 
-            var networkInfo = ElementAt(index);
-            var firstAddress = new IPAddress(firstAddressBytes);
-            var lastAddress = new IPAddress(lastAddressBytes);
-
-            return FromSource(networkInfo, firstAddress, lastAddress, prefix);
+            return (new IPAddress(firstAddressBytes), new IPAddress(lastAddressBytes));
         }
 
         private unsafe DatabaseNetwork FromSource(DatabaseSourceNetwork source, IPAddress firstAddress, IPAddress lastAddress, int prefixLength)

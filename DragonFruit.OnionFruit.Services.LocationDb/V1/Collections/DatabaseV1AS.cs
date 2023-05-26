@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
+using DragonFruit.OnionFruit.Services.LocationDb.V1.Source;
 
-namespace DragonFruit.OnionFruit.Services.LocationDb.V1
+namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Collections
 {
     internal class DatabaseV1AS : DatabaseV1Collection<DatabaseSourceAS>, IASDatabase
     {

@@ -3,7 +3,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace DragonFruit.OnionFruit.Services.LocationDb.V1
+namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Source
 {
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe struct DatabaseSourceNetwork

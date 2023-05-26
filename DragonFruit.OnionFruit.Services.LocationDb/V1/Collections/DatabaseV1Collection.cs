@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.CompilerServices;
 
-namespace DragonFruit.OnionFruit.Services.LocationDb.V1
+namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Collections
 {
     internal abstract class DatabaseV1Collection<T> : IEnumerable<T>, IDisposable where T : struct
     {

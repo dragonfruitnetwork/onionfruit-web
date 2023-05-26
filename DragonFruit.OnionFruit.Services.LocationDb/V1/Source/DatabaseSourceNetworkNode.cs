@@ -3,10 +3,10 @@
 
 using System.Runtime.InteropServices;
 
-namespace DragonFruit.OnionFruit.Services.LocationDb.V1
+namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Source
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct DatabaseSourceNetworkNode
+    internal readonly struct DatabaseSourceNetworkNode
     {
         // The node to checkout if the next bit in the series is zero
         public readonly uint zero;
@@ -15,5 +15,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
         public readonly uint one;
 
         public readonly uint network;
+
+        internal bool IsLeaf => network != 0xffffffff;
     }
 }

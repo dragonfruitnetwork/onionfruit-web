@@ -5,6 +5,8 @@ using System;
 using System.IO.MemoryMappedFiles;
 using System.Net;
 using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
+using DragonFruit.OnionFruit.Services.LocationDb.V1.Collections;
+using DragonFruit.OnionFruit.Services.LocationDb.V1.Source;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
@@ -19,8 +21,6 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
         private readonly DatabaseV1AS _as;
 
         private readonly uint _vendorStringLoc, _descriptionStringLoc, _licenseStringLoc;
-
-        private const uint InvalidNetwork = 0xffffffff;
 
         internal unsafe DatabaseV1(MemoryMappedFile mmdb)
         {
@@ -84,23 +84,20 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
                 }
 
                 // get the bit to perform next node indexing on
-                depth++;
-                var bit = ((mappedAddress[depth / 8] >> (7 - (depth % 8))) & 1);
+                var bit = AddressUtils.GetAddressBit(mappedAddress, ++depth);
 
-                // set the bit in the network address - this can be used to determine the size of the network
-                networkAddress[depth / 8] ^= (byte)((-bit ^ networkAddress[depth / 8]) & (1 << (7 - (depth % 8))));
+                AddressUtils.SetAddressBit(networkAddress, depth, bit);
 
                 node = _networkTree.ElementAt(nextNodeIndex);
                 nextNodeIndex = BinaryUtils.EnsureEndianness(bit == 0 ? node.zero : node.one);
             } while (nextNodeIndex > 0);
 
-            var networkIndex = BinaryUtils.EnsureEndianness(node.network);
-
-            if (networkIndex == InvalidNetwork)
+            if (!node.IsLeaf)
             {
                 return null;
             }
 
+            var networkIndex = BinaryUtils.EnsureEndianness(node.network);
             return _networks.CreateWithPrefix(networkIndex, networkAddress, depth);
         }
 

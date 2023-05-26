@@ -6,7 +6,7 @@ using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 
-namespace DragonFruit.OnionFruit.Services.LocationDb.V1
+namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Collections
 {
     internal class DatabaseV1StringPool : IStringPool, IDisposable
     {

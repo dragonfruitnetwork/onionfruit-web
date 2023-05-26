@@ -3,8 +3,9 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Text;
 using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
+using DragonFruit.OnionFruit.Services.LocationDb.V1.Source;
 
-namespace DragonFruit.OnionFruit.Services.LocationDb.V1
+namespace DragonFruit.OnionFruit.Services.LocationDb.V1.Collections
 {
     internal unsafe class DatabaseV1Countries : DatabaseV1Collection<DatabaseSourceCountry>, ICountryDatabase
     {
