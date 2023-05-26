@@ -62,7 +62,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
                 }
 
                 // check if network is the right family
-                if (!AddressUtils.IsIPv4(_networkAddress) && _family == AddressFamily.InterNetwork)
+                if (AddressUtils.GetAddressFamily(_networkAddress) != _family)
                 {
                     continue;
                 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb
@@ -20,13 +21,13 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
             addressBytes[depth / 8] ^= (byte)((-value ^ addressBytes[depth / 8]) & (1 << (7 - (depth % 8))));
         }
 
-        public static bool IsIPv4(ReadOnlySpan<byte> addressBytes)
+        public static AddressFamily GetAddressFamily(ReadOnlySpan<byte> addressBytes)
         {
             for (int i = 0; i < 10; i++)
             {
                 if (addressBytes[i] > 0)
                 {
-                    return false;
+                    return AddressFamily.InterNetworkV6;
                 }
             }
 
@@ -34,11 +35,11 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
             {
                 if (addressBytes[i] != 0xff)
                 {
-                    return false;
+                    return AddressFamily.InterNetworkV6;
                 }
             }
 
-            return true;
+            return AddressFamily.InterNetwork;
         }
     }
 }
