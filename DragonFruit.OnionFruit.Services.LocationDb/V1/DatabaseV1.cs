@@ -114,7 +114,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 
         public IEnumerator<IAddressLocatedNetwork> GetEnumerator(AddressFamily addressFamily)
         {
-            if (addressFamily is not AddressFamily.InterNetwork and AddressFamily.InterNetworkV6)
+            if (addressFamily is not AddressFamily.InterNetwork and not AddressFamily.InterNetworkV6)
             {
                 throw new ArgumentException($"Only {nameof(AddressFamily.InterNetwork)} or {nameof(AddressFamily.InterNetworkV6)} can be used as a filter");
             }
