@@ -20,6 +20,6 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
         public readonly ushort flags;
 
         // Reserved
-        private fixed char padding[2];
+        private fixed byte padding[2];
     }
 }

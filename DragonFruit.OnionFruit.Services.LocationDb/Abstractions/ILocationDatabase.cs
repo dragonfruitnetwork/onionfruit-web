@@ -2,6 +2,7 @@
 // Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
 
 using System;
+using System.Net;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
 {
@@ -14,6 +15,9 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
         string Description { get; }
 
         IASDatabase AS { get; }
+        INetworkDatabase Networks { get; }
         ICountryDatabase Countries { get; }
+
+        IAddressLocatedNetwork ResolveAddress(IPAddress address);
     }
 }

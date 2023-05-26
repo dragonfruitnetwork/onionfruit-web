@@ -8,29 +8,34 @@ using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
-    internal class DatabaseV1AS : DatabaseV1Collection<DatabaseSourceAS, DatabaseAS>, IASDatabase, IBinarySearchable<DatabaseAS, uint>
+    internal class DatabaseV1AS : DatabaseV1Collection<DatabaseSourceAS>, IASDatabase
     {
+        private readonly IStringPool _pool;
+
         public DatabaseV1AS(MemoryMappedViewAccessor view, IStringPool pool)
-            : base(view, pool)
+            : base(view)
         {
+            _pool = pool;
         }
 
-        IDatabaseAS IASDatabase.this[int index] => this[index];
+        public DatabaseAS this[uint index] => FromSource(ElementAt(index));
 
         public IDatabaseAS GetAS(uint number)
         {
-            return BinaryUtils.BinarySearch(this, number);
+            return BinaryUtils.BinarySearch(Count, x => FromSource(ElementAt(x)), number);
         }
 
-        protected override DatabaseAS FromNative(DatabaseSourceAS source)
+        private DatabaseAS FromSource(DatabaseSourceAS source)
         {
             var asn = BinaryUtils.EnsureEndianness(source.number);
-            return new DatabaseAS(asn, Pool[source.name_poolid]);
+            return new DatabaseAS(asn, _pool[source.name_poolid]);
         }
 
         public IEnumerator<IDatabaseAS> GetEnumerator()
         {
-            return ((IEnumerable<DatabaseSourceAS>)this).Select(FromNative).GetEnumerator();
+            return ((IEnumerable<DatabaseSourceAS>)this).Select(FromSource).GetEnumerator();
         }
+
+        IDatabaseAS IASDatabase.this[uint index] => this[index];
     }
 }

@@ -7,7 +7,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.Abstractions
 {
     public interface ICountryDatabase : IEnumerable<IDatabaseCountry>
     {
-        IDatabaseCountry this[int index] { get; }
+        IDatabaseCountry this[uint index] { get; }
 
         IDatabaseCountry GetCountry(string code);
     }

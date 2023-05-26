@@ -7,20 +7,27 @@ using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
-    internal unsafe class DatabaseV1Networks : DatabaseV1Collection<DatabaseSourceNetwork, IDatabaseNetwork>, INetworkDatabase
+    internal class DatabaseV1Networks : DatabaseV1Collection<DatabaseSourceNetwork>, INetworkDatabase
     {
-        public DatabaseV1Networks(MemoryMappedViewAccessor view, IStringPool pool)
-            : base(view, pool)
+        public DatabaseV1Networks(MemoryMappedViewAccessor view)
+            : base(view)
         {
         }
 
-        protected override DatabaseNetwork FromNative(DatabaseSourceNetwork source)
+        public IDatabaseNetwork this[uint index] => CreateWithPrefix(index, null);
+
+        internal DatabaseNetwork CreateWithPrefix(uint index, NetworkPrefix prefix)
+        {
+            return FromSource(ElementAt(index), prefix);
+        }
+
+        private unsafe DatabaseNetwork FromSource(DatabaseSourceNetwork source, NetworkPrefix prefix)
         {
             var correctedAsn = BinaryUtils.EnsureEndianness(source.asn);
             var correctedFlags = BinaryUtils.EnsureEndianness(source.flags);
             var countryCode = Encoding.ASCII.GetString(source.country_code, 2);
 
-            return new DatabaseNetwork(countryCode, correctedAsn, (NetworkFlags)correctedFlags);
+            return new DatabaseNetwork(prefix, countryCode, correctedAsn, (NetworkFlags)correctedFlags);
         }
     }
 }

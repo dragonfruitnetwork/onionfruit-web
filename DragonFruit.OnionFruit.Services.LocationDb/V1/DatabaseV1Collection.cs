@@ -6,47 +6,39 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.CompilerServices;
-using DragonFruit.OnionFruit.Services.LocationDb.Abstractions;
 
 namespace DragonFruit.OnionFruit.Services.LocationDb.V1
 {
-    internal abstract class DatabaseV1Collection<TSource, TOut> : IEnumerable<TSource>, IDisposable where TSource : struct
+    internal abstract class DatabaseV1Collection<T> : IEnumerable<T>, IDisposable where T : struct
     {
         protected readonly MemoryMappedViewAccessor View;
-        protected readonly IStringPool Pool;
 
         private readonly int _entitySize;
 
-        protected DatabaseV1Collection(MemoryMappedViewAccessor view, IStringPool pool)
+        protected DatabaseV1Collection(MemoryMappedViewAccessor view)
         {
-            _entitySize = Unsafe.SizeOf<TSource>();
+            _entitySize = Unsafe.SizeOf<T>();
 
             View = view;
-            Pool = pool;
             Count = (int)View.Capacity / _entitySize;
         }
 
-        protected abstract TOut FromNative(TSource source);
-
         public int Count { get; }
 
-        public TOut this[int index]
+        protected internal T ElementAt(uint index)
         {
-            get
-            {
-                View.Read(index * _entitySize, out TSource data);
-                return FromNative(data);
-            }
+            View.Read(index * _entitySize, out T data);
+            return data;
         }
 
-        IEnumerator<TSource> IEnumerable<TSource>.GetEnumerator()
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            return new ViewEnumerator<TSource>(View);
+            return new ViewEnumerator<T>(View);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<TSource>)this).GetEnumerator();
+            return ((IEnumerable<T>)this).GetEnumerator();
         }
 
         public virtual void Dispose()

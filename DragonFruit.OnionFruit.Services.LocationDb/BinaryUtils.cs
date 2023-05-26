@@ -10,6 +10,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
 {
     internal static class BinaryUtils
     {
+        public static int EnsureEndianness(int value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
         public static uint EnsureEndianness(uint value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
         public static ushort EnsureEndianness(ushort value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
 
@@ -19,10 +20,10 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
         /// <remarks>
         /// Based on the .NET binary search function (https://source.dot.net/#System.Private.CoreLib/src/libraries/System.Private.CoreLib/src/System/Array.cs,b92d187c91d4c9a9)
         /// </remarks>
-        public static T BinarySearch<T, TKey>(IBinarySearchable<T, TKey> source, TKey target) where T : class, ISearchableItem<TKey>
+        public static T BinarySearch<T, TKey>(int count, Func<uint, T> accessor, TKey target) where T : class, ISearchableItem<TKey>
         {
             var lo = 0;
-            var hi = source.Count - 1;
+            var hi = count - 1;
             var comparer = Comparer.DefaultInvariant;
 
             while (lo <= hi)
@@ -35,7 +36,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
 
                 try
                 {
-                    item = source[i];
+                    item = accessor.Invoke((uint)i);
                     c = comparer.Compare(item.Key, target);
                 }
                 catch (Exception e)
