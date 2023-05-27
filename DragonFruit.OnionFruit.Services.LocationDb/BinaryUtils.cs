@@ -10,12 +10,11 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
 {
     internal static class BinaryUtils
     {
-        public static int EnsureEndianness(int value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
         public static uint EnsureEndianness(uint value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
         public static ushort EnsureEndianness(ushort value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
 
         /// <summary>
-        /// Performs a binary search on the provided <see cref="IBinarySearchable{T, TKey}"/> source
+        /// Performs a binary search using the provided <see cref="accessor"/>
         /// </summary>
         /// <remarks>
         /// Based on the .NET binary search function (https://source.dot.net/#System.Private.CoreLib/src/libraries/System.Private.CoreLib/src/System/Array.cs,b92d187c91d4c9a9)
