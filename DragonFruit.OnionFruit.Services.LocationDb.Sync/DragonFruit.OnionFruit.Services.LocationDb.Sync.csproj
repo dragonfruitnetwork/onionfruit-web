@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DragonFruit.Data" Version="2023.210.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+      <PackageReference Include="SharpCompress" Version="0.33.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DragonFruit.OnionFruit.Services.LocationDb\DragonFruit.OnionFruit.Services.LocationDb.csproj" />
+    </ItemGroup>
+
+</Project>

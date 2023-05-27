@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Serv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Services.LocationDb", "DragonFruit.OnionFruit.Services.LocationDb\DragonFruit.OnionFruit.Services.LocationDb.csproj", "{A2FD9040-8C62-4EB1-AF7A-095130F06435}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Services.LocationDb.Sync", "DragonFruit.OnionFruit.Services.LocationDb.Sync\DragonFruit.OnionFruit.Services.LocationDb.Sync.csproj", "{B047147D-D90F-476E-92CB-72BE973BA2DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{A2FD9040-8C62-4EB1-AF7A-095130F06435}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2FD9040-8C62-4EB1-AF7A-095130F06435}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2FD9040-8C62-4EB1-AF7A-095130F06435}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B047147D-D90F-476E-92CB-72BE973BA2DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B047147D-D90F-476E-92CB-72BE973BA2DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B047147D-D90F-476E-92CB-72BE973BA2DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B047147D-D90F-476E-92CB-72BE973BA2DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
