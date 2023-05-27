@@ -30,7 +30,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
             _mmdb = mmdb;
             DatabaseV1Header header;
 
-            using (var headerView = mmdb.CreateViewAccessor(sizeof(GlobalDatabaseHeader), sizeof(DatabaseV1Header)))
+            using (var headerView = mmdb.CreateViewAccessor(sizeof(GlobalDatabaseHeader), sizeof(DatabaseV1Header), MemoryMappedFileAccess.Read))
             {
                 headerView.Read(0, out header);
             }
@@ -41,19 +41,19 @@ namespace DragonFruit.OnionFruit.Services.LocationDb.V1
             _descriptionStringLoc = header.description;
 
             // create object views
-            var networkTreeView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.network_tree_offset), BinaryUtils.EnsureEndianness(header.network_tree_length));
+            var networkTreeView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.network_tree_offset), BinaryUtils.EnsureEndianness(header.network_tree_length), MemoryMappedFileAccess.Read);
             _networkTree = new DatabaseV1NetworkTree(networkTreeView);
 
-            var stringPoolView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.pool_offset), BinaryUtils.EnsureEndianness(header.pool_length));
+            var stringPoolView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.pool_offset), BinaryUtils.EnsureEndianness(header.pool_length), MemoryMappedFileAccess.Read);
             _stringPool = new DatabaseV1StringPool(stringPoolView);
 
-            var asView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.as_offset), BinaryUtils.EnsureEndianness(header.as_length));
+            var asView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.as_offset), BinaryUtils.EnsureEndianness(header.as_length), MemoryMappedFileAccess.Read);
             _as = new DatabaseV1AS(asView, _stringPool);
 
-            var networksView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.network_data_offset), BinaryUtils.EnsureEndianness(header.network_data_length));
+            var networksView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.network_data_offset), BinaryUtils.EnsureEndianness(header.network_data_length), MemoryMappedFileAccess.Read);
             _networks = new DatabaseV1Networks(networksView);
 
-            var countryView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.countries_offset), BinaryUtils.EnsureEndianness(header.countries_length));
+            var countryView = mmdb.CreateViewAccessor(BinaryUtils.EnsureEndianness(header.countries_offset), BinaryUtils.EnsureEndianness(header.countries_length), MemoryMappedFileAccess.Read);
             _countries = new DatabaseV1Countries(countryView, _stringPool);
         }
 

@@ -16,13 +16,14 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
 
         public static unsafe ILocationDatabase LoadFromFile(string path)
         {
-            var file = MemoryMappedFile.CreateFromFile(path, FileMode.Open);
+            var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 0x1000, FileOptions.RandomAccess);
+            var file = MemoryMappedFile.CreateFromFile(fileStream, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, false);
 
             try
             {
                 GlobalDatabaseHeader magicValue;
 
-                using (var headerView = file.CreateViewAccessor(0, sizeof(GlobalDatabaseHeader)))
+                using (var headerView = file.CreateViewAccessor(0, sizeof(GlobalDatabaseHeader), MemoryMappedFileAccess.Read))
                 {
                     headerView.Read(0, out magicValue);
                 }
