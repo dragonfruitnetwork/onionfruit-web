@@ -11,6 +11,7 @@ namespace DragonFruit.OnionFruit.Services.LocationDb
     internal static class BinaryUtils
     {
         public static uint EnsureEndianness(uint value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
+        public static ulong EnsureEndianness(ulong value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
         public static ushort EnsureEndianness(ushort value) => BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness(value) : value;
 
         /// <summary>
