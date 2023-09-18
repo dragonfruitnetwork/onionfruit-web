@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+        
+  worker:
+    image: dragonfruitnetwork/onionfruit-web:worker
+    
+  server:
+    image: dragonfruitnetwork/onionfruit-web:server
