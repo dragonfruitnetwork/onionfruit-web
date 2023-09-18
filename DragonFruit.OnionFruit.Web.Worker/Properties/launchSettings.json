@@ -4,7 +4,9 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development",
+        "REDIS_CREATE_INDEXES": "true",
+        "REDIS_REGEN_INDEXES": "true"
       }
     }
   }
