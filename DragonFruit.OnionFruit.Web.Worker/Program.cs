@@ -53,7 +53,12 @@ public static class Program
         var createNewIndexes = config["REDIS_CREATE_INDEXES"]?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? true;
         var regenExistingIndexes = config["REDIS_REGEN_INDEXES"]?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
 
-        foreach (var type in Assembly.GetExecutingAssembly().ExportedTypes.Where(x => x.GetCustomAttribute<DocumentAttribute>() != null))
+        var documentSourceAssemblies = new[]
+        {
+            Assembly.GetExecutingAssembly()
+        };
+
+        foreach (var type in documentSourceAssemblies.SelectMany(x => x.ExportedTypes).Where(x => x.GetCustomAttribute<DocumentAttribute>() != null))
         {
             // drop index if regenerating
             if (regenExistingIndexes)
