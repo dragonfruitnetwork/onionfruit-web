@@ -1,13 +1,12 @@
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers.SystemJson;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients
+namespace DragonFruit.OnionFruit.Web.Worker.Clients;
+
+public class WorkerApiClient : ApiClient<ApiSystemTextJsonSerializer>
 {
-    public class WorkerApiClient : ApiClient<ApiSystemTextJsonSerializer>
+    public WorkerApiClient()
     {
-        public WorkerApiClient()
-        {
-            UserAgent = $"OnionFruit-Web-Worker/{GetType().Assembly.GetName().Version?.ToString(3)}";
-        }
+        UserAgent = $"OnionFruit-Web-Worker/{GetType().Assembly.GetName().Version?.ToString(3)}";
     }
 }
