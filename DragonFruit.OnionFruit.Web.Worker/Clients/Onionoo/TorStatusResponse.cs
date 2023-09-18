@@ -45,7 +45,8 @@ public class TorStatusResponse<TRelay, TBridge>
     [JsonPropertyName("relays_skipped")]
     public int? RelaysSkipped { get; set; }
 
-    [JsonPropertyName("relays")] public TRelay[] Relays { get; set; }
+    [JsonPropertyName("relays")]
+    public TRelay[] Relays { get; set; }
 
     /// <summary>
     /// Number of relays omitted due to user page limiting
@@ -68,7 +69,8 @@ public class TorStatusResponse<TRelay, TBridge>
     [JsonPropertyName("bridges_skipped")]
     public int? BridgesSkipped { get; set; }
 
-    [JsonPropertyName("bridges")] public TBridge[] Bridges { get; set; }
+    [JsonPropertyName("bridges")]
+    public TBridge[] Bridges { get; set; }
 
     /// <summary>
     /// Number of bridges omitted due to user page limiting
