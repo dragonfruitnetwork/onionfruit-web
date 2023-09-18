@@ -27,7 +27,7 @@ namespace DragonFruit.OnionFruit.Web.Worker
             services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
             
             // api
-            services.AddSingleton<ApiClient, WorkerClient>();
+            services.AddSingleton<ApiClient, WorkerApiClient>();
 
             // timed service
             services.AddHostedService<Worker>();

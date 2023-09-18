@@ -3,9 +3,9 @@ using DragonFruit.Data.Serializers.SystemJson;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Clients
 {
-    public class WorkerClient : ApiClient<ApiSystemTextJsonSerializer>
+    public class WorkerApiClient : ApiClient<ApiSystemTextJsonSerializer>
     {
-        public WorkerClient()
+        public WorkerApiClient()
         {
             UserAgent = $"OnionFruit-Web-Worker/{GetType().Assembly.GetName().Version?.ToString(3)}";
         }
