@@ -1,26 +1,116 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DragonFruit.OnionFruit.Web.Worker.Sources;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace DragonFruit.OnionFruit.Web.Worker;
 
-public class Worker : BackgroundService
+public class Worker : IHostedService
 {
+    private record GeneratorDescriptor(Type OutputFormat, IReadOnlyList<Type> SourceTypes);
+    
     private readonly ILogger<Worker> _logger;
+    private readonly IServiceScopeFactory _ssf;
+    private readonly IReadOnlyCollection<GeneratorDescriptor> _descriptors;
 
-    public Worker(ILogger<Worker> logger)
+    private Timer _workerTimer;
+
+    public Worker(IServiceScopeFactory ssf, ILogger<Worker> logger)
     {
+        _ssf = ssf;
         _logger = logger;
+        _descriptors = GetDescriptors();
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    private async Task PerformUpdate()
     {
-        while (!stoppingToken.IsCancellationRequested)
+        using var scope = _ssf.CreateScope();
+
+        var sourceInstances = new Dictionary<Type, IDataSource>();
+        var sourcesTypesToUse = new HashSet<Type>();
+
+        // populate list with the sources that have been updated since last check
+        foreach (var sourceType in _descriptors.SelectMany(x => x.SourceTypes).Distinct())
         {
-            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            await Task.Delay(1000, stoppingToken);
+            var source = (IDataSource)ActivatorUtilities.CreateInstance(scope.ServiceProvider, sourceType);
+
+            if (await source.HasDataChanged(DateTime.MinValue).ConfigureAwait(false))
+            {
+                sourcesTypesToUse.Add(sourceType);
+            }
+
+            sourceInstances[sourceType] = source;
         }
+        
+        // add any source from full list if a generator that needs an updated source also needs one of the old sources
+        var generatorsToUse = _descriptors.Where(x => sourcesTypesToUse.Overlaps(x.SourceTypes)).ToList();
+        
+        foreach (var sourceType in generatorsToUse.SelectMany(x => x.SourceTypes))
+        {
+            // hashset doesn't have addrange...
+            sourcesTypesToUse.Add(sourceType);
+        }
+        
+        // fetch all sources needed
+        await Task.WhenAll(sourcesTypesToUse.Select(x => sourceInstances[x].CollectData())).ConfigureAwait(false);
+
+        foreach (var generator in generatorsToUse)
+        {
+            try
+            {
+                var instanceSources = generator.SourceTypes.Select(x => (object)sourceInstances[x]).ToArray();
+                var generatorInstance = (IDatabaseGenerator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, generator.OutputFormat, instanceSources);
+
+                await generatorInstance.GenerateDatabase().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Database Generator {x} has failed: {err}", generator.OutputFormat.Name, e.Message);
+            }
+        }
+    }
+
+    private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
+    {
+        var listing = new List<GeneratorDescriptor>();
+        
+        // get all file generators, determine what generators need what types
+        foreach (var fileGeneratorType in GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo(typeof(IDatabaseGenerator))))
+        {
+            var ctor = fileGeneratorType.GetConstructors().SingleOrDefault();
+
+            if (ctor == null)
+            {
+                // IDatabaseGenerators must have a single constructor. if they don't, ignore it.
+                continue;
+            }
+
+            var paramTypes = ctor.GetParameters()
+                .Where(x => x.ParameterType is { IsAbstract: false, IsInterface: false } && x.ParameterType.IsAssignableTo(typeof(IDataSource)))
+                .Select(x => x.ParameterType);
+            
+            listing.Add(new GeneratorDescriptor(fileGeneratorType, paramTypes.ToList()));
+        }
+
+        return listing;
+    }
+    
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        _workerTimer?.Dispose();
+        _workerTimer = new Timer(_ => PerformUpdate(), null, TimeSpan.Zero, TimeSpan.FromHours(6));
+
+        return Task.CompletedTask;
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        _workerTimer?.Dispose();
+        return Task.CompletedTask;
     }
 }
