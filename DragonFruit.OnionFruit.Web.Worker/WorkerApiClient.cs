@@ -1,8 +1,8 @@
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers.SystemJson;
-using DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Converters;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients;
+namespace DragonFruit.OnionFruit.Web.Worker;
 
 public class WorkerApiClient : ApiClient<ApiSystemTextJsonSerializer>
 {

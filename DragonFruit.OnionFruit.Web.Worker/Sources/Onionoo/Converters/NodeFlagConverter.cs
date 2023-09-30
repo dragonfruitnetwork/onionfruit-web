@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Enums;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Converters;
+namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 
 internal static class NodeFlagConverter
 {

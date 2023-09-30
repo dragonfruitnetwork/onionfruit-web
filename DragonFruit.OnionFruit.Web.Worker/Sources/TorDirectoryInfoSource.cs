@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using DragonFruit.Data;
 using DragonFruit.Data.Extensions;
 using DragonFruit.Data.Serializers;
-using DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo;
 using DragonFruit.OnionFruit.Web.Worker.Database;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources;
 

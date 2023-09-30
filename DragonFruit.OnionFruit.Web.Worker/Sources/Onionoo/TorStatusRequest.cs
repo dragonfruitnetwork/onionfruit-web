@@ -4,9 +4,9 @@
 using System.Collections.Generic;
 using DragonFruit.Data;
 using DragonFruit.Data.Parameters;
-using DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Enums;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo;
+namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 public class TorStatusSummaryRequest : TorStatusRequest
 {

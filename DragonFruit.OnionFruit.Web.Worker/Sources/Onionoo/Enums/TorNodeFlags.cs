@@ -3,7 +3,7 @@
 
 using System;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Enums;
+namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 
 [Flags]
 public enum TorNodeFlags

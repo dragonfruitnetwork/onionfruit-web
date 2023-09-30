@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Database;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
@@ -18,7 +19,7 @@ public class OnionFruitRedisNodeDatabaseGenerator : IDatabaseGenerator
         _torDirectory = torDirectory;
     }
 
-    public async Task GenerateDatabase()
+    public async Task GenerateDatabase(Lazy<IDatabaseFileSink> fileSink)
     {
         var table = _redis.RedisCollection<OnionFruitNodeInfo>();
         var dbVersion = (long)_torDirectory.DataLastModified.Subtract(DateTime.UnixEpoch).TotalSeconds;

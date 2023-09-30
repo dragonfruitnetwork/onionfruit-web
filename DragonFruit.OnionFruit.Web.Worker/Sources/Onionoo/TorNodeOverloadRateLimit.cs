@@ -3,9 +3,9 @@
 
 using System;
 using System.Text.Json.Serialization;
-using DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Converters;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo;
+namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 public class TorNodeOverloadRateLimit
 {

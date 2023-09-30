@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo;
+namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 public class TorHistoryGraph
 {

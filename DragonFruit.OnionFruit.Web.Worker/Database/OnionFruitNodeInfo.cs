@@ -1,4 +1,4 @@
-using DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Enums;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 using Redis.OM.Modeling;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Database;

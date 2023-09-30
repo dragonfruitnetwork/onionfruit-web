@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Clients.Onionoo.Converters;
+namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 
 public class DateTimeConverter : JsonConverter<DateTime>
 {
