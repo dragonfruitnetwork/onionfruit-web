@@ -20,6 +20,7 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var host = Host.CreateDefaultBuilder(args)
+            .ConfigureLogging(ConfigureLogging)
             .ConfigureServices(ConfigureServices)
             .Build();
 
@@ -31,10 +32,21 @@ public static class Program
         await host.RunAsync().ConfigureAwait(false);
     }
 
+    private static void ConfigureLogging(HostBuilderContext host, ILoggingBuilder logging)
+    {
+#if WINDOWS
+        logging.AddEventLog(o =>
+        {
+            o.Filter = (_, level) => level >= LogLevel.Information;
+            o.SourceName = $"OnionFruit-Web-Worker/v{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}";
+        });
+#endif
+    }
+
     private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
     {
         // redis + redis.om
-        services.AddSingleton<IConnectionMultiplexer>(RedisClientConfigurator.CreateConnectionMultiplexer(context.Configuration, true));
+        services.AddSingleton(RedisClientConfigurator.CreateConnectionMultiplexer(context.Configuration, true));
         services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
             
         // api
