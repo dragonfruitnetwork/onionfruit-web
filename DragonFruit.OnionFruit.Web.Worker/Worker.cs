@@ -57,8 +57,16 @@ public class Worker : IHostedService
             sourcesTypesToUse.Add(sourceType);
         }
         
-        // fetch all sources needed
-        await Task.WhenAll(sourcesTypesToUse.Select(x => sourceInstances[x].CollectData())).ConfigureAwait(false);
+        try
+        {
+            // fetch all sources needed
+            await Task.WhenAll(sourcesTypesToUse.Select(x => sourceInstances[x].CollectData())).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to collect data for one or more sources: {message}", e.Message);
+            return;
+        }
 
         foreach (var generator in generatorsToUse)
         {
@@ -74,6 +82,8 @@ public class Worker : IHostedService
                 _logger.LogError(e, "Database Generator {x} has failed: {err}", generator.OutputFormat.Name, e.Message);
             }
         }
+        
+        _logger.LogInformation("Database update completed");
     }
 
     private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
