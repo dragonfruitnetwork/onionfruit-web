@@ -74,8 +74,13 @@ public class Worker : IHostedService
             {
                 var instanceSources = generator.SourceTypes.Select(x => (object)sourceInstances[x]).ToArray();
                 var generatorInstance = (IDatabaseGenerator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, generator.OutputFormat, instanceSources);
-
+                
                 await generatorInstance.GenerateDatabase().ConfigureAwait(false);
+
+                if (generatorInstance is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
             }
             catch (Exception e)
             {
@@ -84,6 +89,11 @@ public class Worker : IHostedService
         }
         
         _logger.LogInformation("Database update completed");
+
+        foreach (var item in sourceInstances.Values.OfType<IDisposable>())
+        {
+            item.Dispose();
+        }
     }
 
     private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
