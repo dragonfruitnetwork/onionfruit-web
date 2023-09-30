@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DragonFruit.Data;
 using DragonFruit.OnionFruit.Web.Worker.Generators;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -20,6 +23,8 @@ public class Worker : IHostedService
     private readonly IReadOnlyCollection<GeneratorDescriptor> _descriptors;
 
     private Timer _workerTimer;
+
+    private const string DatabaseSinkFileName = "onionfruit-data-{0}.zip";
 
     public Worker(IServiceScopeFactory ssf, ILogger<Worker> logger)
     {
@@ -68,6 +73,9 @@ public class Worker : IHostedService
             return;
         }
 
+        // file sink used to store static-generated assets for uploading to s3/remote storage using a presigned url.
+        var fileSink = new Lazy<IDatabaseFileSink>(() => new DatabaseFileSink());
+
         foreach (var generator in generatorsToUse)
         {
             try
@@ -75,7 +83,7 @@ public class Worker : IHostedService
                 var instanceSources = generator.SourceTypes.Select(x => (object)sourceInstances[x]).ToArray();
                 var generatorInstance = (IDatabaseGenerator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, generator.OutputFormat, instanceSources);
                 
-                await generatorInstance.GenerateDatabase().ConfigureAwait(false);
+                await generatorInstance.GenerateDatabase(fileSink).ConfigureAwait(false);
 
                 if (generatorInstance is IDisposable disposable)
                 {
@@ -88,11 +96,25 @@ public class Worker : IHostedService
             }
         }
         
-        _logger.LogInformation("Database update completed");
-
+        _logger.LogInformation("Database processing completed");
         foreach (var item in sourceInstances.Values.OfType<IDisposable>())
         {
             item.Dispose();
+        }
+        
+        // upload files
+        if (fileSink.IsValueCreated)
+        {
+            await using var archiveStream = ((DatabaseFileSink)fileSink.Value).GetArchive();
+
+            var fileName = string.Format(DatabaseSinkFileName, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            var uploadUrl = scope.ServiceProvider.GetRequiredService<IConfiguration>()["Storage:UploadUrl"];
+
+            // todo add retry policy to client
+            var request = new GenericBlobUploadRequest(uploadUrl, fileName, archiveStream);
+            using var response = await scope.ServiceProvider.GetRequiredService<ApiClient>().PerformAsync(request).ConfigureAwait(false);
+            
+            _logger.LogInformation("{file} uploaded with status code {code}", fileName, response.StatusCode);
         }
     }
 
