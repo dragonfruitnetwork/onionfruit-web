@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Sources;
+namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
 public interface IDatabaseGenerator
 {

@@ -2,9 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Database;
+using DragonFruit.OnionFruit.Web.Worker.Sources;
 using Redis.OM.Contracts;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Sources;
+namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
 public class OnionFruitRedisNodeDatabaseGenerator : IDatabaseGenerator
 {
