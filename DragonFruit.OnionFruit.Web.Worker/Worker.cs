@@ -17,7 +17,7 @@ namespace DragonFruit.OnionFruit.Web.Worker;
 public class Worker : IHostedService
 {
     private record GeneratorDescriptor(Type OutputFormat, IReadOnlyList<Type> SourceTypes);
-    
+
     private readonly ILogger<Worker> _logger;
     private readonly IServiceScopeFactory _ssf;
     private readonly IReadOnlyCollection<GeneratorDescriptor> _descriptors;
@@ -82,7 +82,7 @@ public class Worker : IHostedService
             {
                 var instanceSources = generator.SourceTypes.Select(x => (object)sourceInstances[x]).ToArray();
                 var generatorInstance = (IDatabaseGenerator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, generator.OutputFormat, instanceSources);
-                
+
                 await generatorInstance.GenerateDatabase(fileSink).ConfigureAwait(false);
 
                 if (generatorInstance is IDisposable disposable)
@@ -113,7 +113,7 @@ public class Worker : IHostedService
             // todo add retry policy to client
             var request = new GenericBlobUploadRequest(uploadUrl, fileName, archiveStream);
             using var response = await scope.ServiceProvider.GetRequiredService<ApiClient>().PerformAsync(request).ConfigureAwait(false);
-            
+
             _logger.LogInformation("{file} uploaded with status code {code}", fileName, response.StatusCode);
         }
     }
@@ -136,13 +136,13 @@ public class Worker : IHostedService
             var paramTypes = ctor.GetParameters()
                 .Where(x => x.ParameterType is { IsAbstract: false, IsInterface: false } && x.ParameterType.IsAssignableTo(typeof(IDataSource)))
                 .Select(x => x.ParameterType);
-            
+
             listing.Add(new GeneratorDescriptor(fileGeneratorType, paramTypes.ToList()));
         }
 
         return listing;
     }
-    
+
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         _workerTimer?.Dispose();

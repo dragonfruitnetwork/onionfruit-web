@@ -5,9 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DragonFruit.Data;
-using DragonFruit.Data.Extensions;
 using DragonFruit.Data.Serializers;
-using DragonFruit.OnionFruit.Web.Worker.Database;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources;
@@ -20,17 +18,17 @@ public class TorDirectoryInfoSource : IDataSource
     {
         _client = client;
     }
-    
+
     public DateTime DataLastModified { get; private set; }
 
     public IReadOnlyList<TorRelayDetails> Relays { get; private set; }
-    
+
     public IReadOnlyCollection<IGrouping<string, TorRelayDetails>> Countries { get; private set; }
-    
+
     public async Task<bool> HasDataChanged(DateTime lastVersionDate)
-    { 
+    {
         var request = new TorStatusDetailsRequest().Build(_client);
-        
+
         // change to head (so the body isn't sent)
         request.Method = HttpMethod.Head;
         request.Headers.IfModifiedSince = lastVersionDate;
@@ -47,7 +45,7 @@ public class TorDirectoryInfoSource : IDataSource
             {
                 // todo handle failure
             }
-            
+
             var serializer = _client.Serializer.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
 
             var networkStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -56,7 +54,7 @@ public class TorDirectoryInfoSource : IDataSource
             Relays = data.Relays;
             DataLastModified = response.Content.Headers.LastModified?.UtcDateTime ?? DateTime.UtcNow;
         }
-        
+
         // get country info
         Countries = Relays.AsParallel().Where(x => !string.IsNullOrEmpty(x.CountryCode)).GroupBy(x => x.CountryCode).ToList();
     }
