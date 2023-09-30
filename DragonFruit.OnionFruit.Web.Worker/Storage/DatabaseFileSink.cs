@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Threading.Tasks;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Storage;
 
 public interface IDatabaseFileSink
 {
-    Task WriteFile(string pathName, Stream stream);
+    ZipArchiveEntry CreateFile(string pathName);
 }
 
 public class DatabaseFileSink : IDatabaseFileSink, IDisposable
@@ -23,19 +22,14 @@ public class DatabaseFileSink : IDatabaseFileSink, IDisposable
         _sink = new ZipArchive(_sinkStream, ZipArchiveMode.Create, true);
     }
 
-    public async Task WriteFile(string pathName, Stream stream)
+    public ZipArchiveEntry CreateFile(string pathName)
     {
         if (_archiveProcessed)
         {
             throw new InvalidOperationException("Archive has already been processed. Additional files cannot be added.");
         }
-        
-        var entry = _sink.CreateEntry(pathName);
-        
-        await using var fileStream = entry.Open();
-        await stream.CopyToAsync(fileStream).ConfigureAwait(false);
-        
-        fileStream.SetLength(fileStream.Position);
+
+        return _sink.CreateEntry(pathName);
     }
 
     public Stream GetArchive()
@@ -45,7 +39,7 @@ public class DatabaseFileSink : IDatabaseFileSink, IDisposable
             _sink.Dispose();
             _archiveProcessed = true;
         }
-        
+
         return _sinkStream;
     }
 

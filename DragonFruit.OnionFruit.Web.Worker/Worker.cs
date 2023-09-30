@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace DragonFruit.OnionFruit.Web.Worker;
 
@@ -25,6 +26,7 @@ public class Worker : IHostedService
     private Timer _workerTimer;
 
     private const string DatabaseSinkFileName = "onionfruit-data-{0}.zip";
+    private const string LastDatabaseVersionKey = "onionfruit-web-worker:dbversion";
 
     public Worker(IServiceScopeFactory ssf, ILogger<Worker> logger)
     {
@@ -40,28 +42,39 @@ public class Worker : IHostedService
         var sourceInstances = new Dictionary<Type, IDataSource>();
         var sourcesTypesToUse = new HashSet<Type>();
 
+        var redis = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase();
+        var nextVersion = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+#if !DEBUG
+        var lastUpdatedValue = await redis.StringGetAsync(LastDatabaseVersionKey).ConfigureAwait(false);
+        var lastVersion = DateTimeOffset.FromUnixTimeSeconds(lastUpdatedValue.HasValue && long.TryParse(lastUpdatedValue.ToString(), out var val) ? val : 0);
+#else
+        // in debug mode, use minvalue to always perform fetch.
+        var lastVersion = DateTimeOffset.MinValue;
+#endif
+
         // populate list with the sources that have been updated since last check
         foreach (var sourceType in _descriptors.SelectMany(x => x.SourceTypes).Distinct())
         {
             var source = (IDataSource)ActivatorUtilities.CreateInstance(scope.ServiceProvider, sourceType);
 
-            if (await source.HasDataChanged(DateTime.MinValue).ConfigureAwait(false))
+            if (await source.HasDataChanged(lastVersion).ConfigureAwait(false))
             {
                 sourcesTypesToUse.Add(sourceType);
             }
 
             sourceInstances[sourceType] = source;
         }
-        
+
         // add any source from full list if a generator that needs an updated source also needs one of the old sources
         var generatorsToUse = _descriptors.Where(x => sourcesTypesToUse.Overlaps(x.SourceTypes)).ToList();
-        
+
         foreach (var sourceType in generatorsToUse.SelectMany(x => x.SourceTypes))
         {
             // hashset doesn't have addrange...
             sourcesTypesToUse.Add(sourceType);
         }
-        
+
         try
         {
             // fetch all sources needed
@@ -95,13 +108,14 @@ public class Worker : IHostedService
                 _logger.LogError(e, "Database Generator {x} has failed: {err}", generator.OutputFormat.Name, e.Message);
             }
         }
-        
+
         _logger.LogInformation("Database processing completed");
+
         foreach (var item in sourceInstances.Values.OfType<IDisposable>())
         {
             item.Dispose();
         }
-        
+
         // upload files
         if (fileSink.IsValueCreated)
         {
@@ -110,18 +124,29 @@ public class Worker : IHostedService
             var fileName = string.Format(DatabaseSinkFileName, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
             var uploadUrl = scope.ServiceProvider.GetRequiredService<IConfiguration>()["Storage:UploadUrl"];
 
-            // todo add retry policy to client
-            var request = new GenericBlobUploadRequest(uploadUrl, fileName, archiveStream);
-            using var response = await scope.ServiceProvider.GetRequiredService<ApiClient>().PerformAsync(request).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(uploadUrl))
+            {
+                _logger.LogWarning("No UploadUrl provided for static files.");
+            }
+            else
+            {
+                _logger.LogInformation("Uploading {name} ({x} bytes)", fileName, archiveStream.Length);
 
-            _logger.LogInformation("{file} uploaded with status code {code}", fileName, response.StatusCode);
+                // todo add retry policy to client
+                var request = new GenericBlobUploadRequest(uploadUrl, fileName, archiveStream);
+                using var response = await scope.ServiceProvider.GetRequiredService<ApiClient>().PerformAsync(request).ConfigureAwait(false);
+
+                _logger.LogInformation("{file} uploaded with status code {code}", fileName, response.StatusCode);
+            }
         }
+
+        await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion).ConfigureAwait(false);
     }
 
     private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
     {
         var listing = new List<GeneratorDescriptor>();
-        
+
         // get all file generators, determine what generators need what types
         foreach (var fileGeneratorType in GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo(typeof(IDatabaseGenerator))))
         {
@@ -134,8 +159,8 @@ public class Worker : IHostedService
             }
 
             var paramTypes = ctor.GetParameters()
-                .Where(x => x.ParameterType is { IsAbstract: false, IsInterface: false } && x.ParameterType.IsAssignableTo(typeof(IDataSource)))
-                .Select(x => x.ParameterType);
+                                 .Where(x => x.ParameterType is { IsAbstract: false, IsInterface: false } && x.ParameterType.IsAssignableTo(typeof(IDataSource)))
+                                 .Select(x => x.ParameterType);
 
             listing.Add(new GeneratorDescriptor(fileGeneratorType, paramTypes.ToList()));
         }

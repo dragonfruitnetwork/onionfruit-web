@@ -25,7 +25,7 @@ public class TorDirectoryInfoSource : IDataSource
 
     public IReadOnlyCollection<IGrouping<string, TorRelayDetails>> Countries { get; private set; }
 
-    public async Task<bool> HasDataChanged(DateTime lastVersionDate)
+    public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
         var request = new TorStatusDetailsRequest().Build(_client);
 
