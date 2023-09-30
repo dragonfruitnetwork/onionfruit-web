@@ -140,7 +140,7 @@ public class Worker : IHostedService
             }
         }
 
-        await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion).ConfigureAwait(false);
+        await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
 
     private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
