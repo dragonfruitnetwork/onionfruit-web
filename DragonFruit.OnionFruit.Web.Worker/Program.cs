@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Microsoft.Extensions.Configuration;
@@ -50,6 +51,7 @@ public static class Program
         services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
             
         // api
+        services.AddSingleton<ILookupClient, LookupClient>();
         services.AddSingleton<ApiClient, WorkerApiClient>();
 
         // timed service
