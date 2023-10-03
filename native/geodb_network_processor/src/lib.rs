@@ -3,10 +3,11 @@ mod netblock_ops;
 
 use ipnetwork::Ipv6Network;
 use rangemap::RangeInclusiveMap;
-use interop_format::{LocationDbNetworkRange, InteropSortResult};
+use interop_format::{InteropNetworkEntry, InteropNetworkRange, InteropSortResult};
 
 use std::{slice, mem};
 use std::net::Ipv6Addr;
+use std::os::raw::c_void;
 
 /// Represents a block of network addresses
 /// For simplicity, all addresses are treated as IPv6
@@ -23,9 +24,11 @@ struct NetworkInfo {
 }
 
 #[no_mangle]
-pub extern "cdecl" fn perform_network_sort(ptr: *const interop_format::LocationDbNetwork, length: usize) -> InteropSortResult {
+pub extern "cdecl" fn perform_network_sort(ptr: *const c_void, length: usize) -> InteropSortResult {
     let mut data = Vec::<NetBlock>::with_capacity(length);
-    for entry in unsafe { slice::from_raw_parts(ptr, length) } {
+    let slice = unsafe { slice::from_raw_parts(ptr as *const InteropNetworkEntry, length) };
+
+    for entry in slice {
         let result = Ipv6Network::new(Ipv6Addr::from(entry.network), entry.cidr);
 
         if let Ok(network) = result {
@@ -53,10 +56,10 @@ pub extern "cdecl" fn perform_network_sort(ptr: *const interop_format::LocationD
     }
 
     // collect results and expose entries to caller
-    let mut result_listing = Vec::<LocationDbNetworkRange>::with_capacity(map.iter().count());
+    let mut result_listing = Vec::<InteropNetworkRange>::with_capacity(map.iter().count());
     
     for (range, info) in map.iter() {
-        let info = LocationDbNetworkRange {
+        let info = InteropNetworkRange {
             start: *range.start(),
             end: *range.end(),
             cc: info.cc
