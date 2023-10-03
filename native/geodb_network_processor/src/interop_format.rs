@@ -15,6 +15,6 @@ pub struct InteropNetworkRange {
 
 #[repr(C)]
 pub struct InteropSortResult {
-    pub networks: *const InteropNetworkRange,
-    pub count: usize
+    pub count: usize,
+    pub networks: *const InteropNetworkRange
 }
