@@ -29,7 +29,7 @@ pub extern "cdecl" fn perform_network_sort(ptr: *const c_void, length: usize) ->
     let slice = unsafe { slice::from_raw_parts(ptr as *const InteropNetworkEntry, length) };
 
     for entry in slice {
-        let result = Ipv6Network::new(Ipv6Addr::from(entry.network), entry.cidr);
+        let result = Ipv6Network::new(Ipv6Addr::from(u128::from_be_bytes(entry.network)), entry.cidr);
 
         if let Ok(network) = result {
             data.push(NetBlock {
