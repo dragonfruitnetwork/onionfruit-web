@@ -1,7 +1,9 @@
+use std::ffi::CString;
+
 #[repr(C)]
 pub struct InteropNetworkEntry  {
-    pub country_code: [u8; 2],
-    pub network: u128,
+    pub country_code: CString,
+    pub network: [u8; 16],
     pub cidr: u8
 }
 
@@ -10,7 +12,7 @@ pub struct InteropNetworkRange {
     pub start: u128,
     pub end: u128,
 
-    pub cc: [u8; 2]
+    pub cc: CString
 }
 
 #[repr(C)]
