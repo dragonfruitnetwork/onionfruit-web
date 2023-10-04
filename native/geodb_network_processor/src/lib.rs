@@ -24,7 +24,7 @@ struct NetworkInfo {
 }
 
 #[no_mangle]
-pub extern "cdecl" fn perform_network_sort(ptr: *const c_void, length: usize, range_length: *mut usize, range_capacity: *mut usize) -> *mut InteropNetworkRange {
+pub extern "cdecl" fn sort_network_entries(ptr: *const c_void, length: usize, range_length: *mut usize, range_capacity: *mut usize) -> *mut InteropNetworkRange {
     let mut data = Vec::<NetBlock>::with_capacity(length);
     let slice = unsafe { slice::from_raw_parts(ptr as *const InteropNetworkEntry, length) };
 
@@ -80,7 +80,7 @@ pub extern "cdecl" fn perform_network_sort(ptr: *const c_void, length: usize, ra
 }
 
 #[no_mangle]
-pub extern "cdecl" fn free_vec(ptr: *mut c_void, length: usize, capacity: usize) {
+pub extern "cdecl" fn free_network_entries(ptr: *mut c_void, length: usize, capacity: usize) {
     let slice = unsafe { Vec::<InteropNetworkRange>::from_raw_parts(ptr as *mut InteropNetworkRange, length, capacity) };
     drop(slice);
 }
