@@ -3,7 +3,7 @@ mod netblock_ops;
 
 use ipnetwork::Ipv6Network;
 use rangemap::RangeInclusiveMap;
-use interop_format::{InteropNetworkEntry, InteropNetworkRange, InteropSortResult};
+use interop_format::{InteropNetworkEntry, InteropNetworkRange};
 
 use std::{slice, mem};
 use std::net::Ipv6Addr;
@@ -24,7 +24,7 @@ struct NetworkInfo {
 }
 
 #[no_mangle]
-pub extern "cdecl" fn perform_network_sort(ptr: *const c_void, length: usize) -> InteropSortResult {
+pub extern "cdecl" fn perform_network_sort(ptr: *const c_void, length: usize, range_length: *mut usize, range_capacity: *mut usize) -> *mut InteropNetworkRange {
     let mut data = Vec::<NetBlock>::with_capacity(length);
     let slice = unsafe { slice::from_raw_parts(ptr as *const InteropNetworkEntry, length) };
 
@@ -68,14 +68,19 @@ pub extern "cdecl" fn perform_network_sort(ptr: *const c_void, length: usize) ->
         result_listing.push(info);
     }
 
-    // get a slice of the vector that includes all elements, passing a pointer back to the caller
-    let mut result_listing_slice = result_listing.into_boxed_slice();
-    let result = InteropSortResult { 
-        networks: result_listing_slice.as_mut_ptr(),
-        count: result_listing_slice.len()
-    };
+    unsafe {
+        *range_length = result_listing.len();
+        *range_capacity = result_listing.capacity();
 
-    // prevent the slice from being destroyed
-    mem::forget(result_listing_slice);
-    return result;
+        let bytes = result_listing.as_mut_ptr();
+        mem::forget(result_listing);
+    
+        return bytes;
+    }
+}
+
+#[no_mangle]
+pub extern "cdecl" fn free_vec(ptr: *mut c_void, length: usize, capacity: usize) {
+    let slice = unsafe { Vec::<InteropNetworkRange>::from_raw_parts(ptr as *mut InteropNetworkRange, length, capacity) };
+    drop(slice);
 }

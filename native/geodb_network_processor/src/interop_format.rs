@@ -12,9 +12,3 @@ pub struct InteropNetworkRange {
 
     pub cc: [u8; 2]
 }
-
-#[repr(C)]
-pub struct InteropSortResult {
-    pub count: usize,
-    pub networks: *const InteropNetworkRange
-}
