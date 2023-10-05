@@ -1,18 +1,20 @@
-#[repr(C)]
+#[repr(C, packed(1))]
 pub struct InteropNetworkEntry  {
-    pub country_code: [u8; 2],
     pub network: [u8; 16],
-    pub cidr: u8
-}
+    pub cidr: u8,
 
-#[repr(C)]
-pub struct InteropNetworkRange<T> {
-    pub start: T,
-    pub end: T,
     pub country_code: [u8; 2]
 }
 
-#[repr(C)]
+#[repr(C, packed(1))]
+pub struct InteropNetworkRange<T> {
+    pub start: T,
+    pub end: T,
+
+    pub country_code: [u8; 2]
+}
+
+#[repr(C, packed(1))]
 #[derive(Clone, Copy)]
 pub struct InteropNetworkSortResult {
     pub v4entries: *mut InteropNetworkRange<u32>,
