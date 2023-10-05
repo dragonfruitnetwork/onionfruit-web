@@ -6,9 +6,18 @@ pub struct InteropNetworkEntry  {
 }
 
 #[repr(C)]
-pub struct InteropNetworkRange {
-    pub start: u128,
-    pub end: u128,
+pub struct InteropNetworkRange<T> {
+    pub start: T,
+    pub end: T,
+    pub country_code: [u8; 2]
+}
 
-    pub cc: [u8; 2]
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct InteropNetworkSortResult {
+    pub v4entries: *mut InteropNetworkRange<u32>,
+    pub v4count: usize,
+
+    pub v6entries: *mut InteropNetworkRange<u128>,
+    pub v6count: usize
 }

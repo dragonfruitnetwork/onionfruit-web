@@ -12,12 +12,12 @@ dependencies = [
 
 [[package]]
 name = "ipnetwork"
-version = "0.17.0"
+version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02c3eaab3ac0ede60ffa41add21970a7df7d91772c03383aac6c2c3d53cc716b"
+checksum = "bf466541e9d546596ee94f9f69590f89473455f88372423e0008fc1a7daf100e"
 
 [[package]]
 name = "rangemap"
-version = "0.1.14"
+version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3929836cb64d09ee7deee59635c3d9bffbc1c0373e247efff6272abd62a11baa"
+checksum = "977b1e897f9d764566891689e642653e5ed90c6895106acd005eb4c1d0203991"

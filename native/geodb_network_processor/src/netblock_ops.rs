@@ -1,10 +1,10 @@
 /// sort first from largest to smallest, then by address.
 impl Ord for super::NetBlock {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.net
+        self.network
             .prefix()
-            .cmp(&other.net.prefix())
-            .then_with(|| self.net.network().cmp(&other.net.network()))
+            .cmp(&other.network.prefix())
+            .then_with(|| self.network.network().cmp(&other.network.network()))
     }
 }
 
@@ -16,7 +16,7 @@ impl PartialOrd for super::NetBlock {
 
 impl PartialEq for super::NetBlock {
     fn eq(&self, other: &Self) -> bool {
-        self.net == other.net
+        self.network == other.network
     }
 }
 
