@@ -26,7 +26,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: macos
-          path: native/src/target/universal-release/onionfruit_worker_native.dylib
+          path: native/src/target/universal-release/*.dylib
 
   build-windows:
     name: Build (Windows ${{ matrix.arch }})
@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: windows-${{ matrix.arch }}
-          path: native\src\target\release\onionfruit_worker_native.dll
+          path: native/src/target/release/*.dll
           
   build-linux:
     name: Build (Linux ${{ matrix.arch }})
@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: linux-${{ matrix.arch }}
-          path: native\src\target\release\onionfruit_worker_native.so
+          path: native/src/target/release/*.so
           
   publish-package:
     name: Publish Package

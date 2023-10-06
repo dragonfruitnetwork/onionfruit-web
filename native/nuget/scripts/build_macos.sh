@@ -22,5 +22,5 @@ done
 
 lipo -create \
   -output target/universal-release \
-  target/aarch64-apple-darwin/release/onionfruit_worker_native.dylib \
-  target/x86_64-apple-darwin/release/onionfruit_worker_native.dylib
+  target/aarch64-apple-darwin/release/libonionfruit_worker_native.dylib \
+  target/x86_64-apple-darwin/release/libonionfruit_worker_native.dylib
