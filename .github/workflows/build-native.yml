@@ -54,7 +54,7 @@ jobs:
           
   build-linux:
     name: Build (glibc Linux)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
@@ -64,11 +64,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Prepare Build Target
-        run: rustup target add ${{ matrix.arch }}-unknown-linux-gnu
+      - name: Install Cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
 
       - name: Build
-        run: cd native/src && cargo build --release --target ${{ matrix.arch }}-unknown-linux-gnu
+        run: cd native/src && cross build --release --target ${{ matrix.arch }}-unknown-linux-gnu
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
