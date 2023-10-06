@@ -20,6 +20,8 @@ for target in $targets; do
     cargo build --release "--target=$target"
 done
 
+mkdir target/universal-release
+
 lipo -create \
   -output target/universal-release/libonionfruit_worker_native.dylib \
   target/aarch64-apple-darwin/release/libonionfruit_worker_native.dylib \
