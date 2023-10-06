@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: windows-${{ matrix.arch }}
-          path: native\src\release\onionfruit_worker_native.dll
+          path: native\src\target\release\onionfruit_worker_native.dll
           
   build-linux:
     name: Build (glibc Linux)
@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: linux-${{ matrix.arch }}
-          path: native\src\release\onionfruit_worker_native.so
+          path: native\src\target\release\onionfruit_worker_native.so
           
   publish-package:
     name: Publish Package
