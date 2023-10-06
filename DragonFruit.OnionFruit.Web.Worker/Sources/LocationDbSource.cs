@@ -66,7 +66,7 @@ public class LocationDbSource : IDataSource, IDisposable
 
         // start with a relatively large buffer to pass all entries into
         var networkList = new List<NetworkEntry>(1500000);
-        var asciiCache = new Dictionary<string, byte[]>();
+        var asciiCache = new Dictionary<string, byte[]>(Database.Countries.Count);
 
         try
         {
