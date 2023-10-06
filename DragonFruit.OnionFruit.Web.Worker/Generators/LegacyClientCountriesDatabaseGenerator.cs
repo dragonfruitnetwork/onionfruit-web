@@ -33,7 +33,7 @@ public class LegacyClientCountriesDatabaseGenerator : IDatabaseGenerator
 
         var file = fileSink.Value.CreateFile("legacy/countries.json");
 
-        using var writeStream = file.Open();
+        await using var writeStream = file.Open();
         await writeStream.WriteAsync(JsonSerializer.SerializeToUtf8Bytes(clientData)).ConfigureAwait(false);
     }
 
