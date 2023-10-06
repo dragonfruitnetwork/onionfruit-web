@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup Label="Project">
+        <OutputType>Library</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <AssemblyName>DragonFruit.OnionFruit.Web.Worker.Native</AssemblyName>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <Title>OnionFruit Worker NativeLibs</Title>
+        <PackageId>DragonFruit.OnionFruit.Web.Worker.Native</PackageId>
+        <Description>Native libraries for OnionFruit Web Worker</Description>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="runtimes\**\native\*">
+            <Pack>true</Pack>
+            <PackagePath>runtimes</PackagePath>
+        </None>
+        <None Include="_._">
+            <!-- https://docs.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128#scenario-2 -->
+            <Pack>true</Pack>
+            <PackagePath>lib\$(TargetFramework)</PackagePath>
+        </None>
+    </ItemGroup>
+</Project>
