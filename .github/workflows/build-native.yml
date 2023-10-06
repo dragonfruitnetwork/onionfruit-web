@@ -8,8 +8,9 @@ on:
         required: true
         description: Version number (package)
         
-permissions: 
-  contents: write
+permissions:
+  packages: write
+  contents: read
 
 jobs:
   build-macos:
