@@ -2,14 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <UserSecretsId>dotnet-DragonFruit.OnionFruit.Web.Worker-BD252C6A-8620-41FE-9813-5D673EEAB300</UserSecretsId>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="DnsClient" Version="1.7.0" />
         <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2023.727.0" />
         <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.1.0" />
-        <PackageReference Include="libloc.Access" Version="2023.1001.0" />
+        <PackageReference Include="IPAddressRange" Version="6.0.0" />
+        <PackageReference Include="libloc.Access" Version="2023.1003.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
         <PackageReference Include="Redis.OM" Version="0.5.3" />
     </ItemGroup>
