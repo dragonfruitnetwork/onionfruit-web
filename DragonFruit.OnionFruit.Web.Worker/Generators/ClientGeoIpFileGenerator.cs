@@ -33,8 +33,10 @@ public class ClientGeoIpFileGenerator : IDatabaseGenerator
                     continue;
                 }
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 var startAddr = (uint)IPAddress.HostToNetworkOrder((int)entry.Network.Begin.Address);
                 var endAddr = (uint)IPAddress.HostToNetworkOrder((int)entry.Network.End.Address);
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 await ip4FileStream.WriteLineAsync($"{startAddr},{endAddr},{entry.CountryCode}").ConfigureAwait(false);
             }
