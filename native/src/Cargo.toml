@@ -1,11 +1,15 @@
 [package]
-name = "geodb_processor"
+name = "onionfruit_worker_native"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "geodb_processor"
+name = "onionfruit_worker_native"
 crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
+strip = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
