@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Web.Worker", "DragonFruit.OnionFruit.Web.Worker\DragonFruit.OnionFruit.Web.Worker.csproj", "{6D33CF16-8331-43F4-86FB-CD80A9B57C3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit.OnionFruit.Web.Worker.Native", "native\nuget\DragonFruit.OnionFruit.Web.Worker.Native.csproj", "{F693BDB3-2599-4052-9E78-20A515214F5E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,9 +12,5 @@ Global
 		{6D33CF16-8331-43F4-86FB-CD80A9B57C3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D33CF16-8331-43F4-86FB-CD80A9B57C3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D33CF16-8331-43F4-86FB-CD80A9B57C3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F693BDB3-2599-4052-9E78-20A515214F5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F693BDB3-2599-4052-9E78-20A515214F5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F693BDB3-2599-4052-9E78-20A515214F5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F693BDB3-2599-4052-9E78-20A515214F5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
