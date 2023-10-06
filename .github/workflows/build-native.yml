@@ -116,7 +116,7 @@ jobs:
           path: native/nuget/runtimes/linux-arm64/native
           
       - name: Build Package
-        run: dotnet pack -c Release -p:Version=${{ github.ref_name }} -o ./packages native/nuget
+        run: dotnet pack -c Release -p:Version=${{ github.event.inputs.version }} -o ./packages native/nuget
 
       - name: Publish Package
         run: dotnet nuget push -s https://nuget.pkg.github.com/dragonfruitnetwork/index.json -k ${{ github.token }} ./packages/*.nupkg
