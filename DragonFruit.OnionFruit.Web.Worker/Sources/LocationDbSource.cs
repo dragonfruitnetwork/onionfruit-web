@@ -1,20 +1,25 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using DnsClient;
+using DnsClient.Protocol;
 using DragonFruit.Data;
+using DragonFruit.OnionFruit.Web.Worker.Native;
 using libloc;
 using libloc.Abstractions;
 using libloc.Access;
+using NetTools;
 using SharpCompress.Compressors.Xz;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources;
+
+public record NetworkAddressRangeInfo(IPAddressRange Network, string CountryCode);
 
 public class LocationDbSource : IDataSource, IDisposable
 {
@@ -30,12 +35,15 @@ public class LocationDbSource : IDataSource, IDisposable
     }
 
     public ILocationDatabase Database { get; private set; }
+    
+    public IReadOnlyList<NetworkAddressRangeInfo> IPv4AddressRanges { get; private set; }
+    public IReadOnlyList<NetworkAddressRangeInfo> IPv6AddressRanges { get; private set; }
 
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
         var records = await _dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT).ConfigureAwait(false);
-        var date = records.Answers.SingleOrDefault()?.ToString();
-
+        var date = records.Answers.OfType<TxtRecord>().SingleOrDefault()?.Text.First();
+        
         if (string.IsNullOrEmpty(date))
         {
             return true;
@@ -56,110 +64,117 @@ public class LocationDbSource : IDataSource, IDisposable
 
         Database = DatabaseLoader.LoadFromStream(dbFileStream);
 
-        var addressRanges = Database
-            .AsParallel()
-            .OrderBy(x => x.Network.Cidr)
-            .Select(dbEntry =>
-            {
-                // addresses pulled from the database are always ipv4-mapped-to-ipv6
-                var startValue = dbEntry.Network.FirstUsable.GetAddressBytes();
-                var endValue = dbEntry.Network.LastUsable.GetAddressBytes();
+        // start with a relatively large buffer to pass all entries into
+        var networkList = new List<NetworkEntry>(1500000);
+        var asciiCache = new Dictionary<string, byte[]>();
 
-                // addresses are big-endian (i.e. if little endian, the order needs switching)
-                if (BitConverter.IsLittleEndian)
+        try
+        {
+            foreach (var network in Database)
+            {
+                var entry = new NetworkEntry
                 {
-                    Array.Reverse(startValue);
-                    Array.Reverse(endValue);
+                    network = network.Network.Network.GetAddressBytes(),
+                    cidr = network.Network.Cidr
+                };
+
+                // use asciiCache to prevent loads of pointless array allocations
+                if (!asciiCache.TryGetValue(network.CountryCode, out var asciiBuffer))
+                {
+                    var buffer = ArrayPool<byte>.Shared.Rent(2);
+                    Encoding.ASCII.GetBytes(network.CountryCode, 0, 2, buffer, 0);
+
+                    asciiCache[network.CountryCode] = buffer;
+                    asciiBuffer = buffer;
                 }
 
-                // no UInt128 method exists in BitConverter (for now)
-                var startValueStruct = Unsafe.ReadUnaligned<UInt128>(ref MemoryMarshal.GetReference(startValue.AsSpan()));
-                var endValueStruct = Unsafe.ReadUnaligned<UInt128>(ref MemoryMarshal.GetReference(endValue.AsSpan()));
+                entry.country_code = asciiBuffer;
+                networkList.Add(entry);
+            }
 
-                return new NumericalNetworkEntry(new NumericalRange<UInt128>(startValueStruct, endValueStruct), dbEntry);
-            })
-            .GroupBy(x => x.Entry.Network.Network.IsIPv4MappedToIPv6)
-            .Select(x =>
+            NativeMethods.PerformNetworkSort(networkList.ToArray(), networkList.Count, out var networkSortResult);
+
+            try
             {
-                // create a copy as it'll be mutated
-                var items = x.ToList();
-                var rangeBuffer = new List<NumericalRange<UInt128>>(2);
+                IPv4AddressRanges = GetIPv4AddressRanges(networkSortResult.v4Entries, networkSortResult.v4Count);
+                IPv6AddressRanges = GetIPv6AddressRanges(networkSortResult.v6Entries, networkSortResult.v6Count);
+            }
+            finally
+            {
+                // ensure unmanaged memory is cleared regardless of success/failure
+                NativeMethods.ClearSortResult(ref networkSortResult);
+            }
+        }
+        finally
+        {
+            // return all used buffers
+            foreach (var arr in asciiCache.Values)
+            {
+                ArrayPool<byte>.Shared.Return(arr);
+            }
+        
+            asciiCache.Clear();
+            networkList.Clear();
+        }
+    }
 
-                // The range consolation uses the algorithm from https://softwareengineering.stackexchange.com/a/241386
-                // as it would have been counterproductive to re-implement the RangeInclusiveMap from the rust crate
-                // and it's better than building a native library to handle the logic + interop, etc.
+    private unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr start, nint length)
+    {
+        var v4NetworkRanges = new NetworkAddressRangeInfo[length];
+        Span<byte> v4AddressBytes = stackalloc byte[4];
+        
+        // collect all data and process into something useful
+        for (var i = 0; i < length; i++)
+        {
+            var entry = *(IPv4NetworkRange*)(start + sizeof(IPv4NetworkRange) * i);
 
-                var i = 0;
-                while (i < items.Count)
-                {
-                    foreach (var superior in items.Skip(i + 1))
-                    {
-                        superior.Range.SubtractFrom(items[i].Range, rangeBuffer);
+            var startAddress = ParseAddress(v4AddressBytes, entry.start_address);
+            var endAddress = ParseAddress(v4AddressBytes, entry.end_address);
+            
+            v4NetworkRanges[i] = new NetworkAddressRangeInfo(new IPAddressRange(startAddress, endAddress), Encoding.ASCII.GetString(entry.country_code, 2));
+        }
 
-                        // If span is completely covered, remove from list and compensate for the removal.
-                        if (!rangeBuffer.Any())
-                        {
-                            items.RemoveAt(i);
-                            i--;
+        return v4NetworkRanges;
+    }
 
-                            break;
-                        }
-                        
-                        // update range with first value
-                        items[i] = items[i] with { Range = rangeBuffer.First() };
-                        
-                        // if there was a second value, insert a new one with the new range
-                        if (rangeBuffer.Count > 1)
-                        {
-                            items.Insert(i + 1, items[i] with { Range = rangeBuffer.Last() });
-                        }
-                    }
+    private unsafe NetworkAddressRangeInfo[] GetIPv6AddressRanges(IntPtr start, nint length)
+    {
+        var v6NetworkRanges = new NetworkAddressRangeInfo[length];
+        Span<byte> v6AddressBytes = stackalloc byte[16];
+        
+        for (var i = 0; i < length; i++)
+        {
+            var entry = *(IPv6NetworkRange*)(start + sizeof(IPv6NetworkRange) * i);
 
-                    i++;
-                }
+            var startAddress = ParseAddress(v6AddressBytes, entry.start_address);
+            var endAddress = ParseAddress(v6AddressBytes, entry.end_address);
+            
+            v6NetworkRanges[i] = new NetworkAddressRangeInfo(new IPAddressRange(startAddress, endAddress), Encoding.ASCII.GetString(entry.country_code, 2));
+        }
 
-                return items;
-            })
-            .ToList();
+        return v6NetworkRanges;
+    }
+
+    /// <summary>
+    /// Converts a byte* to a <see cref="IPAddress"/>, using the <see cref="buffer"/> size as the size of the <see cref="addressPtr"/>
+    /// </summary>
+    private unsafe IPAddress ParseAddress(Span<byte> buffer, byte* addressPtr)
+    {
+        fixed (byte* bufferPtr = buffer)
+        {
+            Buffer.MemoryCopy(addressPtr, bufferPtr, buffer.Length, buffer.Length);
+        }
+
+        if (BitConverter.IsLittleEndian)
+        {
+            buffer.Reverse();
+        }
+
+        return new IPAddress(buffer);
     }
 
     public void Dispose()
     {
         Database?.Dispose();
-    }
-}
-
-internal record NumericalNetworkEntry(NumericalRange<UInt128> Range, IAddressLocatedNetwork Entry);
-
-internal readonly struct NumericalRange<T> where T : INumber<T>
-{
-    public NumericalRange(T start, T end)
-    {
-        Start = start;
-        End = end;
-    }
-
-    public T Start { get; }
-    public T End { get; }
-
-    public void SubtractFrom(NumericalRange<T> other, List<NumericalRange<T>> outputBuffer)
-    {
-        outputBuffer.Clear();
-
-        if (Start > other.End || other.Start > End)
-        {
-            outputBuffer.Add(other);
-            return;
-        }
-
-        if (Start > other.Start)
-        {
-            outputBuffer.Add(new NumericalRange<T>(other.Start, Start));
-        }
-
-        if (End < other.End)
-        {
-            outputBuffer.Add(new NumericalRange<T>(End, other.End));
-        }
     }
 }
