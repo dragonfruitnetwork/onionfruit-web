@@ -7,7 +7,7 @@ on:
         type: string
         required: true
         description: Version number (package)
-        
+
 permissions:
   packages: write
   contents: read
@@ -33,9 +33,9 @@ jobs:
     name: Build (Windows ${{ matrix.arch }})
     runs-on: windows-latest
 
-    strategy: 
+    strategy:
       fail-fast: false
-      matrix: 
+      matrix:
         arch: [x86_64, aarch64]
     
     steps:
@@ -43,7 +43,7 @@ jobs:
 
       - name: Prepare Build Target
         run: rustup target add ${{ matrix.arch }}-pc-windows-msvc
-        
+
       - name: Build
         run: cargo build --release --target ${{ matrix.arch }}-pc-windows-msvc
         working-directory: native/src
@@ -53,9 +53,9 @@ jobs:
         with:
           name: windows-${{ matrix.arch }}
           path: native/src/target/${{ matrix.arch }}-pc-windows-msvc/release/*.dll
-          
+  
   build-linux:
-    name: Build (${{ matrix.vendor }} Linux ${{ matrix.arch }})
+    name: Build (${{ matrix.vendor }}/Linux ${{ matrix.arch }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -63,23 +63,36 @@ jobs:
       matrix:
         arch: [ x86_64, aarch64 ]
         vendor: [ gnu, musl ]
-        
+    
+    env:
+      RUST_TARGET: ${{ matrix.arch }}-unknown-linux-${{ matrix.vendor }}
+    
     steps:
       - uses: actions/checkout@v3
 
+      # cross-rs is needed if the arch being built isn't the same as the host (linux only)
       - name: Install Cross
+        if: matrix.arch != 'x86_64'
         run: cargo install cross --git https://github.com/cross-rs/cross
+      
+      # also need to ensure the target is installed otherwise musl will fail.  
+      - name: Install Build Target (Non-GNU)
+        if: matrix.arch == 'x86_64' && matrix.vendor != 'gnu'
+        run: rustup target install $RUST_TARGET
 
       - name: Build
-        run: cross build --release --target ${{ matrix.arch }}-unknown-linux-${{ matrix.vendor }}
+        run: ${{ matrix.arch == 'x86_64' && 'cargo' || 'cross' }} build --release --target $RUST_TARGET
         working-directory: native/src
+        env:
+          # musl-specific workaround to get files to build - see https://github.com/rust-lang/cargo/issues/7154#issuecomment-561947609
+          RUSTFLAGS: ${{ matrix.vendor == 'musl' && '-C target-feature=-crt-static' || '' }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: linux-${{ matrix.vendor }}-${{ matrix.arch }}
-          path: native/src/target/${{ matrix.arch }}-unknown-linux-${{ matrix.vendor }}/release/*.so
-          
+          path: native/src/target/${{ env.RUST_TARGET }}/release/*.so
+  
   publish-package:
     name: Publish Package
     runs-on: ubuntu-latest
@@ -91,22 +104,22 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-        
+
       - uses: actions/download-artifact@v3
         with:
           name: macos
           path: native/nuget/runtimes/osx/native
-  
+
       - uses: actions/download-artifact@v3
         with:
           name: windows-x86_64
           path: native/nuget/runtimes/win-x64/native
-      
+
       - uses: actions/download-artifact@v3
         with:
           name: windows-aarch64
           path: native/nuget/runtimes/win-arm64/native
-      
+
       - uses: actions/download-artifact@v3
         with:
           name: linux-musl-x86_64
@@ -126,7 +139,7 @@ jobs:
         with:
           name: linux-gnu-aarch64
           path: native/nuget/runtimes/linux-arm64/native
-          
+
       - name: Build Package
         run: dotnet pack -c Release -p:Version=${{ github.event.inputs.version }} -o ./packages native/nuget
 
