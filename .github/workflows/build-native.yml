@@ -55,13 +55,14 @@ jobs:
           path: native/src/target/${{ matrix.arch }}-pc-windows-msvc/release/*.dll
           
   build-linux:
-    name: Build (Linux ${{ matrix.arch }})
+    name: Build (${{ matrix.vendor }} Linux ${{ matrix.arch }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         arch: [ x86_64, aarch64 ]
+        vendor: [ gnu, musl ]
         
     steps:
       - uses: actions/checkout@v3
@@ -70,14 +71,14 @@ jobs:
         run: cargo install cross --git https://github.com/cross-rs/cross
 
       - name: Build
-        run: cross build --release --target ${{ matrix.arch }}-unknown-linux-gnu
+        run: cross build --release --target ${{ matrix.arch }}-unknown-linux-${{ matrix.vendor }}
         working-directory: native/src
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: linux-${{ matrix.arch }}
-          path: native/src/target/${{ matrix.arch }}-unknown-linux-gnu/release/*.so
+          name: linux-${{ matrix.vendor }}-${{ matrix.arch }}
+          path: native/src/target/${{ matrix.arch }}-unknown-linux-${{ matrix.vendor }}/release/*.so
           
   publish-package:
     name: Publish Package
@@ -108,12 +109,22 @@ jobs:
       
       - uses: actions/download-artifact@v3
         with:
-          name: linux-x86_64
+          name: linux-musl-x86_64
+          path: native/nuget/runtimes/linux-musl-x64/native
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux-musl-aarch64
+          path: native/nuget/runtimes/linux-musl-arm64/native
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux-gnu-x86_64
           path: native/nuget/runtimes/linux-x64/native
 
       - uses: actions/download-artifact@v3
         with:
-          name: linux-aarch64
+          name: linux-gnu-aarch64
           path: native/nuget/runtimes/linux-arm64/native
           
       - name: Build Package
