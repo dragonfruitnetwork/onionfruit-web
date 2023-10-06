@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+﻿#!/bin/env sh
 
 # Most of the content of this script is derived from the sources below:
 # - https://github.com/walles/riff/blob/82f77c82e7306dd69d343640670bdf9d31cc0b0b/release.sh#L132-L136
@@ -21,6 +21,6 @@ for target in $targets; do
 done
 
 lipo -create \
-  -output target/universal-release \
+  -output target/universal-release/libonionfruit_worker_native.dylib \
   target/aarch64-apple-darwin/release/libonionfruit_worker_native.dylib \
   target/x86_64-apple-darwin/release/libonionfruit_worker_native.dylib

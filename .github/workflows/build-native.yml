@@ -44,13 +44,14 @@ jobs:
         run: rustup target add ${{ matrix.arch }}-pc-windows-msvc
         
       - name: Build
-        run: cd native\src; cargo build --release --target ${{ matrix.arch }}-pc-windows-msvc
-        
+        run: cargo build --release --target ${{ matrix.arch }}-pc-windows-msvc
+        working-directory: native/src
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: windows-${{ matrix.arch }}
-          path: native/src/target/release/*.dll
+          path: native/src/target/${{ matrix.arch }}-pc-windows-msvc/release/*.dll
           
   build-linux:
     name: Build (Linux ${{ matrix.arch }})
@@ -68,13 +69,14 @@ jobs:
         run: cargo install cross --git https://github.com/cross-rs/cross
 
       - name: Build
-        run: cd native/src && cross build --release --target ${{ matrix.arch }}-unknown-linux-gnu
+        run: cross build --release --target ${{ matrix.arch }}-unknown-linux-gnu
+        working-directory: native/src
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: linux-${{ matrix.arch }}
-          path: native/src/target/release/*.so
+          path: native/src/target/${{ matrix.arch }}-unknown-linux-gnu/release/*.so
           
   publish-package:
     name: Publish Package
