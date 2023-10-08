@@ -15,6 +15,7 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="IPAddressRange" Version="6.0.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
         <PackageReference Include="libloc.Access" Version="2023.1006.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
         <PackageReference Include="Redis.OM" Version="0.5.3" />
