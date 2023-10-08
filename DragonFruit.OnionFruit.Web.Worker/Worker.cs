@@ -66,6 +66,12 @@ public class Worker : IHostedService
             sourceInstances[sourceType] = source;
         }
 
+        if (!sourcesTypesToUse.Any())
+        {
+            _logger.LogInformation("No sources have been updated. Generator execution skipped.");
+            return;
+        }
+
         // add any source from full list if a generator that needs an updated source also needs one of the old sources
         var generatorsToUse = _descriptors.Where(x => sourcesTypesToUse.Overlaps(x.SourceTypes)).ToList();
 
@@ -77,7 +83,7 @@ public class Worker : IHostedService
 
         try
         {
-            // fetch all sources needed
+            _logger.LogInformation("Collecting data for {sources}", string.Join(", ", sourcesTypesToUse.Select(x => x.Name)));
             await Task.WhenAll(sourcesTypesToUse.Select(x => sourceInstances[x].CollectData())).ConfigureAwait(false);
         }
         catch (Exception e)
@@ -91,26 +97,31 @@ public class Worker : IHostedService
 
         foreach (var generator in generatorsToUse)
         {
+            IDisposable disposableGeneratorInstance = null;
+            
             try
             {
+                _logger.LogInformation("Running generator for {name}...", generator.OutputFormat.Name);
+
                 var instanceSources = generator.SourceTypes.Select(x => (object)sourceInstances[x]).ToArray();
                 var generatorInstance = (IDatabaseGenerator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, generator.OutputFormat, instanceSources);
 
+                disposableGeneratorInstance = generatorInstance as IDisposable;
+                
                 await generatorInstance.GenerateDatabase(fileSink).ConfigureAwait(false);
-
-                if (generatorInstance is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
+                _logger.LogInformation("Generator finished successfully");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Database Generator {x} has failed: {err}", generator.OutputFormat.Name, e.Message);
             }
+            finally
+            {
+                disposableGeneratorInstance?.Dispose();
+            }
         }
 
         _logger.LogInformation("Database processing completed");
-
         foreach (var item in sourceInstances.Values.OfType<IDisposable>())
         {
             item.Dispose();
