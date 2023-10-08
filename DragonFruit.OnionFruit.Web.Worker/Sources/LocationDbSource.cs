@@ -102,8 +102,8 @@ public class LocationDbSource : IDataSource, IDisposable
                 IPv4AddressRanges = GetIPv4AddressRanges(networkSortResult.v4Entries, networkSortResult.v4Count);
                 IPv6AddressRanges = GetIPv6AddressRanges(networkSortResult.v6Entries, networkSortResult.v6Count);
 
-                IPv4CountryAddressRanges = IPv4AddressRanges.ToLookup(x => x.CountryCode, x => x.Network);
-                IPv6CountryAddressRanges = IPv6AddressRanges.ToLookup(x => x.CountryCode, x => x.Network);
+                IPv4CountryAddressRanges = IPv4AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);
+                IPv6CountryAddressRanges = IPv6AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);
             }
             finally
             {
