@@ -4,8 +4,8 @@ message OnionDb {
     bytes magic_bytes = 1; // always 0xDB
     uint32 db_format_version = 2;
 
-    uint64 db_version = 3;
-    uint64 tor_dir_version = 4;
+    int64 db_version = 3;
+    int64 tor_dir_version = 4;
     optional int64 geo_dir_version = 5; // if not provided, all v4/v6Ranges will be empty.
 
     optional string tor_license = 6;
