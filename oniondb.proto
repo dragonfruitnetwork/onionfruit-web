@@ -22,9 +22,11 @@ message OnionDbCountry {
     uint32 total_node_count = 4;
     uint32 entry_node_count = 5;
     uint32 exit_node_count = 6;
+    uint32 fast_node_count = 7;
+    uint32 online_node_count = 8;
 
-    repeated IPV4Range v4_ranges = 7;
-    repeated IPV6Range v6_ranges = 8;
+    repeated IPV4Range v4_ranges = 9;
+    repeated IPV6Range v6_ranges = 10;
 }
 
 message IPV4Range {
@@ -33,7 +35,6 @@ message IPV4Range {
 }
 
 message IPV6Range {
-    // ipv6 is 128-bits, c# doesn't support UInt128
     string start = 1;
     string end = 2;
 }
