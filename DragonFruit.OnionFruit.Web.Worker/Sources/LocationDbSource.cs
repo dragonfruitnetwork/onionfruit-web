@@ -39,6 +39,9 @@ public class LocationDbSource : IDataSource, IDisposable
     public IReadOnlyList<NetworkAddressRangeInfo> IPv4AddressRanges { get; private set; }
     public IReadOnlyList<NetworkAddressRangeInfo> IPv6AddressRanges { get; private set; }
 
+    public ILookup<string, IPAddressRange> IPv4CountryAddressRanges { get; private set; }
+    public ILookup<string, IPAddressRange> IPv6CountryAddressRanges { get; private set; }
+    
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
         var records = await _dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT).ConfigureAwait(false);
@@ -98,6 +101,9 @@ public class LocationDbSource : IDataSource, IDisposable
             {
                 IPv4AddressRanges = GetIPv4AddressRanges(networkSortResult.v4Entries, networkSortResult.v4Count);
                 IPv6AddressRanges = GetIPv6AddressRanges(networkSortResult.v6Entries, networkSortResult.v6Count);
+
+                IPv4CountryAddressRanges = IPv4AddressRanges.ToLookup(x => x.CountryCode, x => x.Network);
+                IPv6CountryAddressRanges = IPv6AddressRanges.ToLookup(x => x.CountryCode, x => x.Network);
             }
             finally
             {
