@@ -19,7 +19,7 @@ public class OnionooDataSource : IDataSource
         _client = client;
     }
 
-    public DateTime DataLastModified { get; private set; }
+    public DateTimeOffset DataLastModified { get; private set; }
 
     public IReadOnlyList<TorRelayDetails> Relays { get; private set; }
 
