@@ -13,11 +13,11 @@ using DragonFruit.OnionFruit.Web.Worker.Storage;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
-public class LegacyClientCountriesDatabaseGenerator : IDatabaseGenerator
+public class ClientCountriesDatabaseGenerator : IDatabaseGenerator
 {
-    private readonly TorDirectoryInfoSource _torInfo;
+    private readonly OnionooDataSource _torInfo;
 
-    public LegacyClientCountriesDatabaseGenerator(TorDirectoryInfoSource torInfo)
+    public ClientCountriesDatabaseGenerator(OnionooDataSource torInfo)
     {
         _torInfo = torInfo;
     }

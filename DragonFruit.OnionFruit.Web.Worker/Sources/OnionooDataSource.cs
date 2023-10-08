@@ -10,11 +10,11 @@ using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources;
 
-public class TorDirectoryInfoSource : IDataSource
+public class OnionooDataSource : IDataSource
 {
     private readonly ApiClient _client;
 
-    public TorDirectoryInfoSource(ApiClient client)
+    public OnionooDataSource(ApiClient client)
     {
         _client = client;
     }

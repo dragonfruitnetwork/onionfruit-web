@@ -8,12 +8,12 @@ using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
-public class OnionFruitRedisNodeDatabaseGenerator : IDatabaseGenerator
+public class RedisDatabaseGenerator : IDatabaseGenerator
 {
     private readonly IRedisConnectionProvider _redis;
-    private readonly TorDirectoryInfoSource _torDirectory;
+    private readonly OnionooDataSource _torDirectory;
 
-    public OnionFruitRedisNodeDatabaseGenerator(IRedisConnectionProvider redis, TorDirectoryInfoSource torDirectory)
+    public RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataSource torDirectory)
     {
         _redis = redis;
         _torDirectory = torDirectory;
