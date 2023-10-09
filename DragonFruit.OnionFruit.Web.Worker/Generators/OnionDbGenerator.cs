@@ -22,7 +22,7 @@ public class OnionDbGenerator : IDatabaseGenerator
         LocationDb = locationDb;
     }
     
-    public Task GenerateDatabase(Lazy<IDatabaseFileSink> fileSink)
+    public Task GenerateDatabase(IFileSink fileSink)
     {
         var database = CreateBaseDb();
         
@@ -100,10 +100,9 @@ public class OnionDbGenerator : IDatabaseGenerator
         }));
     }
 
-    protected virtual void OnDatabaseGenerated(Lazy<IDatabaseFileSink> fileSink, OnionDb database)
+    protected virtual void OnDatabaseGenerated(IFileSink fileSink, OnionDb database)
     {
         // write onion.db to file
-        using var file = fileSink.Value.CreateFile("onion.db").Open();
-        database.WriteTo(file);
+        database.WriteTo(fileSink.CreateFile("onion.db"));
     }
 }

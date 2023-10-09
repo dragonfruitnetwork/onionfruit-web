@@ -19,7 +19,7 @@ public class RedisDatabaseGenerator : IDatabaseGenerator
         _torDirectory = torDirectory;
     }
 
-    public async Task GenerateDatabase(Lazy<IDatabaseFileSink> fileSink)
+    public async Task GenerateDatabase(IFileSink fileSink)
     {
         var table = _redis.RedisCollection<OnionFruitNodeInfo>();
         var dbVersion = (long)_torDirectory.DataLastModified.Subtract(DateTime.UnixEpoch).TotalSeconds;

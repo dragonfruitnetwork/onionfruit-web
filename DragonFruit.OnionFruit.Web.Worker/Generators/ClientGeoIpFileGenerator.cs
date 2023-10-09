@@ -21,9 +21,9 @@ public class ClientGeoIpFileGenerator : IDatabaseGenerator
         _locationDbSource = locationDbSource;
     }
 
-    public async Task GenerateDatabase(Lazy<IDatabaseFileSink> fileSink)
+    public async Task GenerateDatabase(IFileSink fileSink)
     {
-        await using (var ip4FileStream = new StreamWriter(fileSink.Value.CreateFile("legacy/geoip").Open(), Encoding.ASCII))
+        await using (var ip4FileStream = new StreamWriter(fileSink.CreateFile("legacy/geoip"), Encoding.ASCII, leaveOpen: true))
         {
             await WriteHeaderAsync(ip4FileStream, 4).ConfigureAwait(false);
             foreach (var entry in _locationDbSource.IPv4AddressRanges)
@@ -42,7 +42,7 @@ public class ClientGeoIpFileGenerator : IDatabaseGenerator
             }
         }
 
-        await using (var ip6FileStream = new StreamWriter(fileSink.Value.CreateFile("legacy/geoip6").Open(), Encoding.ASCII))
+        await using (var ip6FileStream = new StreamWriter(fileSink.CreateFile("legacy/geoip6"), Encoding.ASCII, leaveOpen: true))
         {
             await WriteHeaderAsync(ip6FileStream, 6).ConfigureAwait(false);
             foreach (var entry in _locationDbSource.IPv6AddressRanges)

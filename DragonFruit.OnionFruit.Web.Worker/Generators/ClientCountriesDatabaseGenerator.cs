@@ -22,7 +22,7 @@ public class ClientCountriesDatabaseGenerator : IDatabaseGenerator
         _torInfo = torInfo;
     }
 
-    public async Task GenerateDatabase(Lazy<IDatabaseFileSink> fileSink)
+    public async Task GenerateDatabase(IFileSink fileSink)
     {
         // onionfruit clients accept a dictionary of key -> countrycode[]
         var clientData = new Dictionary<string, IEnumerable<string>>
@@ -30,11 +30,8 @@ public class ClientCountriesDatabaseGenerator : IDatabaseGenerator
             ["in"] = CountriesWithFlag(_torInfo.Countries, TorNodeFlags.Guard),
             ["out"] = CountriesWithFlag(_torInfo.Countries, TorNodeFlags.Exit)
         };
-
-        var file = fileSink.Value.CreateFile("legacy/countries.json");
-
-        await using var writeStream = file.Open();
-        await writeStream.WriteAsync(JsonSerializer.SerializeToUtf8Bytes(clientData)).ConfigureAwait(false);
+        
+        await fileSink.CreateFile("legacy/countries.json").WriteAsync(JsonSerializer.SerializeToUtf8Bytes(clientData)).ConfigureAwait(false);
     }
 
     private static IEnumerable<string> CountriesWithFlag(IEnumerable<IGrouping<string, TorRelayDetails>> info, TorNodeFlags flag)
