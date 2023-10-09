@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
 using JetBrains.Annotations;

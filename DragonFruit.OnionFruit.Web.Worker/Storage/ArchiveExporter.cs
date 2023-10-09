@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using DragonFruit.Data;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
