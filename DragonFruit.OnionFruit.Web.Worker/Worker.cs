@@ -25,7 +25,6 @@ public class Worker : IHostedService
 
     private Timer _workerTimer;
 
-    private const string DatabaseSinkFileName = "onionfruit-data-{0}.zip";
     private const string LastDatabaseVersionKey = "onionfruit-web-worker:dbversion";
 
     public Worker(IServiceScopeFactory ssf, ILogger<Worker> logger)
@@ -92,8 +91,8 @@ public class Worker : IHostedService
             return;
         }
 
-        // file sink used to store static-generated assets for uploading to s3/remote storage using a presigned url.
-        var fileSink = new Lazy<IDatabaseFileSink>(() => new DatabaseFileSink());
+        // file sink used to store static-generated assets for uploading to s3 or saving to a local path
+        var fileSink = new DatabaseFileSink();
 
         foreach (var generator in generatorsToUse)
         {
@@ -127,33 +126,14 @@ public class Worker : IHostedService
             item.Dispose();
         }
 
-        // upload files
-        if (fileSink.IsValueCreated)
+        // upload files todo iterate all sources from config and perform persistance actions.
+        if (fileSink.HasItems)
         {
-            await using var archiveStream = ((DatabaseFileSink)fileSink.Value).GetArchive();
-
-            var fileName = string.Format(DatabaseSinkFileName, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            var uploadUrl = scope.ServiceProvider.GetRequiredService<IConfiguration>()["Storage:UploadUrl"];
-
-            if (string.IsNullOrEmpty(uploadUrl))
-            {
-                _logger.LogWarning("No UploadUrl provided for static files.");
-            }
-            else
-            {
-                _logger.LogInformation("Uploading {name} ({x} bytes)", fileName, archiveStream.Length);
-
-                // todo add retry policy to client
-                var request = new GenericBlobUploadRequest(uploadUrl, fileName, archiveStream);
-                using var response = await scope.ServiceProvider.GetRequiredService<ApiClient>().PerformAsync(request).ConfigureAwait(false);
-
-                _logger.LogInformation("{file} uploaded with status code {code}", fileName, response.StatusCode);
-            }
         }
 
         await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
-
+    
     private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
     {
         var listing = new List<GeneratorDescriptor>();
