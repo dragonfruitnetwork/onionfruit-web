@@ -8,5 +8,5 @@ namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature, ImplicitUseTargetFlags.WithInheritors)]
 public interface IDatabaseGenerator
 {
-    Task GenerateDatabase(Lazy<IDatabaseFileSink> fileSink);
+    Task GenerateDatabase(IFileSink fileSink);
 }
