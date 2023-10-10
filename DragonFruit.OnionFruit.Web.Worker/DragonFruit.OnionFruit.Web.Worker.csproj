@@ -8,7 +8,7 @@
     <ItemGroup>
         <PackageReference Include="DnsClient" Version="1.7.0" />
         <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2023.727.0" />
-        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.1.1" />
+        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.2.0" />
         <PackageReference Include="Google.Protobuf" Version="3.18.0" />
         <PackageReference Include="Grpc.Tools" Version="2.40.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

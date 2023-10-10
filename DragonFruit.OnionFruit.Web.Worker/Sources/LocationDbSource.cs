@@ -171,11 +171,6 @@ public class LocationDbSource : IDataSource, IDisposable
             Buffer.MemoryCopy(addressPtr, bufferPtr, buffer.Length, buffer.Length);
         }
 
-        if (BitConverter.IsLittleEndian)
-        {
-            buffer.Reverse();
-        }
-
         return new IPAddress(buffer);
     }
 
