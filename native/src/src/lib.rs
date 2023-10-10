@@ -60,8 +60,13 @@ pub extern "cdecl" fn sort_network_entries(ptr: *const c_void, length: usize, ou
     }
 
     // collect results and expose entries to caller
-    let mut v4results = create_network_list(v4map);
-    let mut v6results = create_network_list(v6map);
+    let mut v4results = create_network_list(v4map, |num: u32| -> u32 {
+        return u32::from_ne_bytes(num.to_be_bytes());
+    });
+
+    let mut v6results = create_network_list(v6map, |num: u128| -> u128 {
+        return u128::from_ne_bytes(num.to_be_bytes())
+    });
 
     v4results.shrink_to_fit();
     v6results.shrink_to_fit();
@@ -90,13 +95,13 @@ pub unsafe extern "cdecl" fn free_sort_result(ptr: *const InteropNetworkSortResu
     drop(Vec::<InteropNetworkRange<u128>>::from_raw_parts(result.v6entries, result.v6count, result.v6count));
 }
 
-fn create_network_list<T>(map: RangeInclusiveMap<T, NetworkInfo>) -> Vec::<InteropNetworkRange<T>> where T : Copy, T : Eq, T : PartialEq, T : Ord, T : PartialOrd, T : StepFns<T> {
+fn create_network_list<T>(map: RangeInclusiveMap<T, NetworkInfo>, range_value_selector: fn(T) -> T) -> Vec::<InteropNetworkRange<T>> where T : Copy, T : Eq, T : PartialEq, T : Ord, T : PartialOrd, T : StepFns<T> {
     let mut vec = Vec::<InteropNetworkRange<T>>::with_capacity(map.len());
 
     for (range, info) in map.iter() {
         let info = InteropNetworkRange::<T> {
-            start: *range.start(),
-            end: *range.end(),
+            start: range_value_selector(*range.start()),
+            end:range_value_selector( *range.end()),
 
             // clone values to prevent using references that could be disposed of by the caller.
             country_code: info.country_code.clone()
