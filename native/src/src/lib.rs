@@ -65,7 +65,7 @@ pub extern "cdecl" fn sort_network_entries(ptr: *const c_void, length: usize, ou
     });
 
     let mut v6results = create_network_list(v6map, |num: u128| -> u128 {
-        return u128::from_ne_bytes(num.to_be_bytes())
+        return u128::from_ne_bytes(num.to_be_bytes());
     });
 
     v4results.shrink_to_fit();
