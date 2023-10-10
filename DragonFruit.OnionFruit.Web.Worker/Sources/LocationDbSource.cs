@@ -124,7 +124,7 @@ public class LocationDbSource : IDataSource, IDisposable
         }
     }
 
-    private unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr start, nint length)
+    private static unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr start, nint length)
     {
         var v4NetworkRanges = new NetworkAddressRangeInfo[length];
         Span<byte> v4AddressBytes = stackalloc byte[4];
@@ -143,7 +143,7 @@ public class LocationDbSource : IDataSource, IDisposable
         return v4NetworkRanges;
     }
 
-    private unsafe NetworkAddressRangeInfo[] GetIPv6AddressRanges(IntPtr start, nint length)
+    private static unsafe NetworkAddressRangeInfo[] GetIPv6AddressRanges(IntPtr start, nint length)
     {
         var v6NetworkRanges = new NetworkAddressRangeInfo[length];
         Span<byte> v6AddressBytes = stackalloc byte[16];
