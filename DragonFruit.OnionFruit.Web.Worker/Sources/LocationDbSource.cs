@@ -164,7 +164,7 @@ public class LocationDbSource : IDataSource, IDisposable
     /// <summary>
     /// Converts a byte* to a <see cref="IPAddress"/>, using the <see cref="buffer"/> size as the size of the <see cref="addressPtr"/>
     /// </summary>
-    private unsafe IPAddress ParseAddress(Span<byte> buffer, byte* addressPtr)
+    private static unsafe IPAddress ParseAddress(Span<byte> buffer, byte* addressPtr)
     {
         fixed (byte* bufferPtr = buffer)
         {
