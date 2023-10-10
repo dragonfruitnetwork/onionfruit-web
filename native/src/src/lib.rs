@@ -101,7 +101,7 @@ fn create_network_list<T>(map: RangeInclusiveMap<T, NetworkInfo>, range_value_se
     for (range, info) in map.iter() {
         let info = InteropNetworkRange::<T> {
             start: range_value_selector(*range.start()),
-            end:range_value_selector( *range.end()),
+            end: range_value_selector(*range.end()),
 
             // clone values to prevent using references that could be disposed of by the caller.
             country_code: info.country_code.clone()
