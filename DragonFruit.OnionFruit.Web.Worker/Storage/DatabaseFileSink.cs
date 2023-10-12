@@ -36,7 +36,7 @@ public class DatabaseFileSink : IFileSink, IDisposable, IUploadFileSource
 
     public Task CopyToFolder(string path)
     {
-        return CopyFilesTo(name => new FileStream(name, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous));
+        return CopyFilesTo(name => new FileStream(Path.Combine(path, name), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous));
     }
 
     public async Task<Stream> CreateArchiveStream()
