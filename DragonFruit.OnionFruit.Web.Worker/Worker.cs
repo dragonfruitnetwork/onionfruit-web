@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ public class Worker : IHostedService
     private readonly IReadOnlyCollection<GeneratorDescriptor> _descriptors;
 
     private Timer _workerTimer;
+    private readonly Stopwatch _stopwatch;
 
     private const string LastDatabaseVersionKey = "onionfruit-web-worker:dbversion";
 
@@ -31,6 +33,7 @@ public class Worker : IHostedService
     {
         _ssf = ssf;
         _logger = logger;
+        _stopwatch = new Stopwatch();
 
         _exporters = GetExporters(config);
         _descriptors = GetDescriptors();
@@ -53,6 +56,8 @@ public class Worker : IHostedService
         // in debug mode, use minvalue to always perform fetch.
         var lastVersion = DateTimeOffset.MinValue;
 #endif
+        
+        _stopwatch.Restart();
 
         // populate list with the sources that have been updated since last check
         foreach (var sourceType in _descriptors.SelectMany(x => x.SourceTypes).Distinct())
@@ -69,7 +74,8 @@ public class Worker : IHostedService
 
         if (!sourcesTypesToUse.Any())
         {
-            _logger.LogInformation("No sources have been updated. Generator execution skipped.");
+            _stopwatch.Stop();
+            _logger.LogInformation("No sources have been updated. Generator execution skipped (after {ts}).", _stopwatch.Elapsed);
             return;
         }
 
@@ -139,6 +145,9 @@ public class Worker : IHostedService
                 _logger.LogDebug("Export completed successfully");
             }
         }
+
+        _stopwatch.Stop();
+        _logger.LogInformation("Worker update completed successfully (took {ts})", _stopwatch.Elapsed);
 
         await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
