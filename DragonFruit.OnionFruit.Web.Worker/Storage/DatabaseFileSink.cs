@@ -34,10 +34,13 @@ public class DatabaseFileSink : IFileSink, IDisposable, IUploadFileSource
         return tempStream;
     }
 
-    public Task CopyToFolder(string path)
+    public Task CopyToFolder(string path) => CopyFilesTo(name =>
     {
-        return CopyFilesTo(name => new FileStream(Path.Combine(path, name), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous));
-    }
+        var fullPath = Path.Combine(path, name);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+        return new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
+    });
 
     public async Task<Stream> CreateArchiveStream()
     {
