@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var host = Host.CreateDefaultBuilder(args)
+            .ConfigureHostConfiguration(ConfigureHost)
             .ConfigureLogging(ConfigureLogging)
             .ConfigureServices(ConfigureServices)
             .Build();
@@ -31,6 +33,22 @@ public static class Program
         }
 
         await host.RunAsync().ConfigureAwait(false);
+    }
+
+    private static void ConfigureHost(IConfigurationBuilder host)
+    {
+        // windows containers don't allow file mounts, so we allow setting an environment var to the config file path
+        var configBase = Environment.GetEnvironmentVariable("CONFIG_FOLDER_PATH");
+        if (string.IsNullOrEmpty(configBase))
+        {
+            return;
+        }
+
+        var fullConfigBasePath = Path.GetFullPath(configBase);
+        if (Directory.Exists(fullConfigBasePath))
+        {
+            host.SetBasePath(fullConfigBasePath);
+        }
     }
 
     private static void ConfigureLogging(HostBuilderContext host, ILoggingBuilder logging)
