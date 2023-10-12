@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,6 +24,9 @@
     
     <ItemGroup>
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server" />
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
     
 </Project>
