@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Generators;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,16 +20,19 @@ public class Worker : IHostedService
 
     private readonly ILogger<Worker> _logger;
     private readonly IServiceScopeFactory _ssf;
+    private readonly IReadOnlyCollection<IDataExporter> _exporters;
     private readonly IReadOnlyCollection<GeneratorDescriptor> _descriptors;
 
     private Timer _workerTimer;
 
     private const string LastDatabaseVersionKey = "onionfruit-web-worker:dbversion";
 
-    public Worker(IServiceScopeFactory ssf, ILogger<Worker> logger)
+    public Worker(IServiceScopeFactory ssf, IConfiguration config, ILogger<Worker> logger)
     {
         _ssf = ssf;
         _logger = logger;
+
+        _exporters = GetExporters(config);
         _descriptors = GetDescriptors();
     }
 
@@ -127,6 +131,13 @@ public class Worker : IHostedService
         // upload files todo iterate all sources from config and perform persistence actions.
         if (fileSink.HasItems)
         {
+            foreach (var exporter in _exporters)
+            {
+                _logger.LogInformation("Exporting to {dest}", exporter);
+
+                await exporter.PerformUpload(scope.ServiceProvider, fileSink).ConfigureAwait(false);
+                _logger.LogDebug("Export completed successfully");
+            }
         }
 
         await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
@@ -155,6 +166,32 @@ public class Worker : IHostedService
         }
 
         return listing;
+    }
+
+    private IReadOnlyCollection<IDataExporter> GetExporters(IConfiguration config)
+    {
+        var exporters = new List<IDataExporter>();
+        
+        foreach (var section in config.GetSection("Exports").GetChildren())
+        {
+            IDataExporter entity = section["Type"]?.ToUpperInvariant() switch
+            {
+                "FOLDER" => new FolderExporter(),
+                "URL" => new RemoteArchiveExporter(),
+
+                _ => null
+            };
+
+            if (entity == null)
+            {
+                continue;
+            }
+            
+            section.Bind(entity);
+            exporters.Add(entity);
+        }
+        
+        return exporters;
     }
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
