@@ -128,7 +128,7 @@ public class Worker : IHostedService
             item.Dispose();
         }
 
-        // upload files todo iterate all sources from config and perform persistence actions.
+        // upload files
         if (fileSink.HasItems)
         {
             foreach (var exporter in _exporters)
