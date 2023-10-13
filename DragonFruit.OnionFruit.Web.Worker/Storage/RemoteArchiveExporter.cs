@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using DragonFruit.Data;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

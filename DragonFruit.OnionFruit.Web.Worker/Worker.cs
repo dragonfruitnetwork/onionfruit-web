@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Generators;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

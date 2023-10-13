@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 

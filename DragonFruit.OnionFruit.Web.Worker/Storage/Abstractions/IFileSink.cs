@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Storage;
+namespace DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 public interface IFileSink
 {

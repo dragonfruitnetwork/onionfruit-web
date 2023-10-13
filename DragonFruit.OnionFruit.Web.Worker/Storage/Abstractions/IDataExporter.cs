@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Storage;
+namespace DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 public interface IDataExporter
 {

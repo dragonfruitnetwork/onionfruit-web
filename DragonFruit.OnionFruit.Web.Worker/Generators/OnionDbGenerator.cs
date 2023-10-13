@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Google.Protobuf;
 using NetTools;
 

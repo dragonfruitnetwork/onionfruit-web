@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Storage;
+namespace DragonFruit.OnionFruit.Web.Worker;
 
 public static class RedisClientConfigurator
 {

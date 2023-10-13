@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Storage;
 

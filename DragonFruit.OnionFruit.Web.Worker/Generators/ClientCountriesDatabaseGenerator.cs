@@ -9,6 +9,7 @@ using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 

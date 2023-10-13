@@ -2,7 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Storage;
+namespace DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 public interface IUploadFileSource
 {
