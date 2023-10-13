@@ -41,9 +41,12 @@ public class FileSink : IFileSink, IUploadFileSource, IDisposable
     {
         var zipStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.DeleteOnClose);
 
-        using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true);
-        await CopyFilesTo(n => zipArchive.CreateEntry(n, compressionLevel).Open());
+        using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+        {
+            await CopyFilesTo(n => zipArchive.CreateEntry(n, compressionLevel).Open());
+        }
 
+        zipStream.Seek(0, SeekOrigin.Begin);
         return zipStream;
     }
 

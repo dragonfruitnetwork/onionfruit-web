@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DragonFruit.Data;
 using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
@@ -41,10 +42,10 @@ public class RemoteArchiveExporter : IDataExporter
         var logger = services.GetRequiredService<ILogger<RemoteArchiveExporter>>();
         var fileName = string.Format(DatabaseSinkFileName, Prefix ?? DefaultPrefix, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
-        logger.LogInformation("Uploading {name} ({x} bytes)", fileName, archiveStream.Length);
+        var checksum = await MD5.HashDataAsync(archiveStream).ConfigureAwait(false);
+        var request = new GenericBlobUploadRequest(UploadUrl, fileName, archiveStream, checksum);
 
-        // todo add retry policy to client
-        var request = new GenericBlobUploadRequest(UploadUrl, fileName, archiveStream);
+        logger.LogInformation("Uploading {name} ({x} bytes)", fileName, archiveStream.Length);
         using var response = await services.GetRequiredService<ApiClient>().PerformAsync(request).ConfigureAwait(false);
 
         logger.LogInformation("{file} uploaded with status code {code}", fileName, response.StatusCode);

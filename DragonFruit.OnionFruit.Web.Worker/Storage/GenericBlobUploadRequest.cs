@@ -5,25 +5,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using DragonFruit.Data;
+using DragonFruit.Data.Requests;
+using JetBrains.Annotations;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Storage;
 
-public class GenericBlobUploadRequest : ApiRequest
+public class GenericBlobUploadRequest : ApiRequest, IRequestExecutingCallback
 {
     private readonly Stream _file;
-    private readonly Task<byte[]> _md5ChecksumTask;
+    private readonly byte[] _checksum;
     private readonly string _fileName, _submissionEndpoint;
 
-    public GenericBlobUploadRequest(string uploadUrl, string fileName, Stream file)
+    public GenericBlobUploadRequest(string uploadUrl, string fileName, Stream file, [CanBeNull] byte[] checksum)
     {
         _file = file;
+        _checksum = checksum;
         _fileName = fileName;
         _submissionEndpoint = uploadUrl;
-
-        _md5ChecksumTask = CalculateFileChecksumAsync();
 
         Headers.Add(new KeyValuePair<string, string>("If-None-Match", "*"));
     }
@@ -37,27 +36,16 @@ public class GenericBlobUploadRequest : ApiRequest
     {
         get
         {
-            _file.Seek(0, SeekOrigin.Begin);
-
             var content = new StreamContent(_file);
-            content.Headers.ContentMD5 = _md5ChecksumTask.Result;
+            content.Headers.ContentMD5 = _checksum;
             content.Headers.ContentType = new MediaTypeHeaderValue("application/zip");
 
             return content;
         }
     }
 
-    private async Task<byte[]> CalculateFileChecksumAsync()
+    void IRequestExecutingCallback.OnRequestExecuting(ApiClient client)
     {
-        byte[] checksum;
-
         _file.Seek(0, SeekOrigin.Begin);
-        using (var md5Provider = MD5.Create())
-        {
-            checksum = await md5Provider.ComputeHashAsync(_file);
-        }
-
-        _file.Seek(0, SeekOrigin.Begin);
-        return checksum;
     }
 }
