@@ -89,7 +89,7 @@ public class OnionDbGenerator : IDatabaseGenerator
         // versions derived from datasets/current epoch
         DbVersion = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
         TorDirVersion = _onionoo.DataLastModified.ToUnixTimeSeconds(),
-        GeoDirVersion = new DateTimeOffset(_locationDb.Database.CreatedAt).ToUnixTimeSeconds()
+        GeoDirVersion = _locationDb.Database.CreatedAt.ToUnixTimeSeconds()
     };
 
     protected virtual void WriteCountryAddressRanges(OnionDbCountry country, IEnumerable<IPAddressRange> v4Ranges, IEnumerable<IPAddressRange> v6Ranges)
