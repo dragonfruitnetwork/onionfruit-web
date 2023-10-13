@@ -9,7 +9,7 @@ public class FolderExporter : IDataExporter
 {
     public string FolderPath { get; set; }
     public Environment.SpecialFolder? SpecialBasePath { get; set; }
-    
+
     public Task PerformUpload(IServiceProvider services, IUploadFileSource source)
     {
         return source.CopyToFolderAsync(GetFullPath());

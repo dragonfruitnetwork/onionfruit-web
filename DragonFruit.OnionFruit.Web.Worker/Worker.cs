@@ -57,7 +57,7 @@ public class Worker : IHostedService
         // in debug mode, use minvalue to always perform fetch.
         var lastVersion = DateTimeOffset.MinValue;
 #endif
-        
+
         _stopwatch.Restart();
 
         // populate list with the sources that have been updated since last check
@@ -106,7 +106,7 @@ public class Worker : IHostedService
         foreach (var generator in generatorsToUse)
         {
             IDisposable disposableGeneratorInstance = null;
-            
+
             try
             {
                 _logger.LogInformation("Running generator for {name}...", generator.OutputFormat.Name);
@@ -115,7 +115,7 @@ public class Worker : IHostedService
                 var generatorInstance = (IDatabaseGenerator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, generator.OutputFormat, instanceSources);
 
                 disposableGeneratorInstance = generatorInstance as IDisposable;
-                
+
                 await generatorInstance.GenerateDatabase(fileSink).ConfigureAwait(false);
                 _logger.LogInformation("Generator finished successfully");
             }
@@ -152,7 +152,7 @@ public class Worker : IHostedService
 
         await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
-    
+
     private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
     {
         var listing = new List<GeneratorDescriptor>();
@@ -169,8 +169,8 @@ public class Worker : IHostedService
             }
 
             var paramTypes = ctor.GetParameters()
-                                 .Where(x => x.ParameterType is { IsAbstract: false, IsInterface: false } && x.ParameterType.IsAssignableTo(typeof(IDataSource)))
-                                 .Select(x => x.ParameterType);
+                .Where(x => x.ParameterType is {IsAbstract: false, IsInterface: false} && x.ParameterType.IsAssignableTo(typeof(IDataSource)))
+                .Select(x => x.ParameterType);
 
             listing.Add(new GeneratorDescriptor(fileGeneratorType, paramTypes.ToList()));
         }
@@ -181,7 +181,7 @@ public class Worker : IHostedService
     private IReadOnlyCollection<IDataExporter> GetExporters(IConfiguration config)
     {
         var exporters = new List<IDataExporter>();
-        
+
         foreach (var section in config.GetSection("Exports").GetChildren())
         {
             IDataExporter entity = section["Type"]?.ToUpperInvariant() switch
@@ -196,11 +196,11 @@ public class Worker : IHostedService
             {
                 continue;
             }
-            
+
             section.Bind(entity);
             exporters.Add(entity);
         }
-        
+
         return exporters;
     }
 

@@ -11,17 +11,17 @@ public class RemoteArchiveExporter : IDataExporter
 {
     private const string DefaultPrefix = "onionfruit";
     private const string DatabaseSinkFileName = "{0}-data-{1}.zip";
-    
+
     public string Prefix { get; set; }
     public string UploadUrl { get; set; }
-    
+
     public async Task PerformUpload(IServiceProvider services, IUploadFileSource source)
     {
         await using var archiveStream = await source.CreateArchiveStreamAsync().ConfigureAwait(false);
 
         var logger = services.GetRequiredService<ILogger<RemoteArchiveExporter>>();
         var fileName = string.Format(DatabaseSinkFileName, Prefix ?? DefaultPrefix, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-        
+
         logger.LogInformation("Uploading {name} ({x} bytes)", fileName, archiveStream.Length);
 
         // todo add retry policy to client

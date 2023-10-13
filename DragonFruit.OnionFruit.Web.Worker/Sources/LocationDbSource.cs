@@ -17,6 +17,7 @@ using libloc.Access;
 using NetTools;
 using SharpCompress.Compressors.Xz;
 
+// ReSharper disable InconsistentNaming
 namespace DragonFruit.OnionFruit.Web.Worker.Sources;
 
 public record NetworkAddressRangeInfo(IPAddressRange Network, string CountryCode);
@@ -35,18 +36,18 @@ public class LocationDbSource : IDataSource, IDisposable
     }
 
     public ILocationDatabase Database { get; private set; }
-    
+
     public IReadOnlyList<NetworkAddressRangeInfo> IPv4AddressRanges { get; private set; }
     public IReadOnlyList<NetworkAddressRangeInfo> IPv6AddressRanges { get; private set; }
 
     public ILookup<string, IPAddressRange> IPv4CountryAddressRanges { get; private set; }
     public ILookup<string, IPAddressRange> IPv6CountryAddressRanges { get; private set; }
-    
+
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
         var records = await _dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT).ConfigureAwait(false);
         var date = records.Answers.OfType<TxtRecord>().SingleOrDefault()?.Text.First();
-        
+
         if (string.IsNullOrEmpty(date))
         {
             return true;
@@ -68,7 +69,7 @@ public class LocationDbSource : IDataSource, IDisposable
         Database = DatabaseLoader.LoadFromStream(dbFileStream);
 
         // start with a relatively large buffer to pass all entries into
-        var networkList = new List<NetworkEntry>(1500000);
+        var networkList = new List<NetworkEntry>(1_500_000);
         var asciiCache = new Dictionary<string, byte[]>(Database.Countries.Count);
 
         try
@@ -118,7 +119,7 @@ public class LocationDbSource : IDataSource, IDisposable
             {
                 ArrayPool<byte>.Shared.Return(arr);
             }
-        
+
             asciiCache.Clear();
             networkList.Clear();
         }
@@ -128,7 +129,7 @@ public class LocationDbSource : IDataSource, IDisposable
     {
         var v4NetworkRanges = new NetworkAddressRangeInfo[length];
         Span<byte> v4AddressBytes = stackalloc byte[4];
-        
+
         // collect all data and process into something useful
         for (var i = 0; i < length; i++)
         {
@@ -136,7 +137,7 @@ public class LocationDbSource : IDataSource, IDisposable
 
             var startAddress = ParseAddress(v4AddressBytes, entry.start_address);
             var endAddress = ParseAddress(v4AddressBytes, entry.end_address);
-            
+
             v4NetworkRanges[i] = new NetworkAddressRangeInfo(new IPAddressRange(startAddress, endAddress), Encoding.ASCII.GetString(entry.country_code, 2));
         }
 
@@ -147,14 +148,14 @@ public class LocationDbSource : IDataSource, IDisposable
     {
         var v6NetworkRanges = new NetworkAddressRangeInfo[length];
         Span<byte> v6AddressBytes = stackalloc byte[16];
-        
+
         for (var i = 0; i < length; i++)
         {
             var entry = *(IPv6NetworkRange*)(start + sizeof(IPv6NetworkRange) * i);
 
             var startAddress = ParseAddress(v6AddressBytes, entry.start_address);
             var endAddress = ParseAddress(v6AddressBytes, entry.end_address);
-            
+
             v6NetworkRanges[i] = new NetworkAddressRangeInfo(new IPAddressRange(startAddress, endAddress), Encoding.ASCII.GetString(entry.country_code, 2));
         }
 

@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
 using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Google.Protobuf;
 using NetTools;
@@ -22,11 +21,11 @@ public class OnionDbGenerator : IDatabaseGenerator
         Onionoo = onionoo;
         LocationDb = locationDb;
     }
-    
+
     public Task GenerateDatabase(IFileSink fileSink)
     {
         var database = CreateBaseDb();
-        
+
         // iterate through each country and write info
         foreach (var country in LocationDb.Database.Countries)
         {
@@ -36,7 +35,7 @@ public class OnionDbGenerator : IDatabaseGenerator
             {
                 continue;
             }
-            
+
             var countryData = new OnionDbCountry
             {
                 CountryCode = country.Code,
@@ -55,11 +54,11 @@ public class OnionDbGenerator : IDatabaseGenerator
                     case nameof(TorNodeFlags.Guard):
                         countryData.EntryNodeCount++;
                         break;
-                    
+
                     case nameof(TorNodeFlags.Fast):
                         countryData.FastNodeCount++;
                         break;
-                    
+
                     case nameof(TorNodeFlags.Running):
                         countryData.OnlineNodeCount++;
                         break;
@@ -75,7 +74,7 @@ public class OnionDbGenerator : IDatabaseGenerator
         OnDatabaseGenerated(fileSink, database);
         return Task.CompletedTask;
     }
-    
+
     protected virtual OnionDb CreateBaseDb() => new()
     {
         DbFormatVersion = 1,
@@ -93,7 +92,7 @@ public class OnionDbGenerator : IDatabaseGenerator
             Start = (uint)IPAddress.HostToNetworkOrder((int)x.Begin.Address),
             End = (uint)IPAddress.HostToNetworkOrder((int)x.End.Address)
         }));
-        
+
         country.V6Ranges.AddRange(v6Ranges.Select(x => new IPV6Range
         {
             Start = x.Begin.ToString(),

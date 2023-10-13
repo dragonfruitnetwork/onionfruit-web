@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Database;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
 using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Redis.OM.Contracts;
 
@@ -24,7 +23,7 @@ public class RedisDatabaseGenerator : IDatabaseGenerator
     {
         var table = _redis.RedisCollection<OnionFruitNodeInfo>();
         var dbVersion = (long)_torDirectory.DataLastModified.Subtract(DateTime.UnixEpoch).TotalSeconds;
-        
+
         foreach (var relay in _torDirectory.Relays)
         {
             // drop the port off the addresses

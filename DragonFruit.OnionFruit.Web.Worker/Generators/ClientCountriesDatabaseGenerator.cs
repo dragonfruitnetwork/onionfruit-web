@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
 using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
@@ -30,7 +29,7 @@ public class ClientCountriesDatabaseGenerator : IDatabaseGenerator
             ["in"] = CountriesWithFlag(_torInfo.Countries, TorNodeFlags.Guard),
             ["out"] = CountriesWithFlag(_torInfo.Countries, TorNodeFlags.Exit)
         };
-        
+
         await fileSink.CreateFile("legacy/countries.json").WriteAsync(JsonSerializer.SerializeToUtf8Bytes(clientData)).ConfigureAwait(false);
     }
 

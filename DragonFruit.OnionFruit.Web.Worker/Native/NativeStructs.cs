@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+// ReSharper disable InconsistentNaming
 namespace DragonFruit.OnionFruit.Web.Worker.Native;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
