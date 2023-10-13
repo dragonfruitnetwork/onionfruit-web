@@ -7,23 +7,14 @@ using System.Threading.Tasks;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Storage;
 
-public interface IFileSink
-{
-    Stream CreateFile(string pathName);
-}
-
-public interface IUploadFileSource
-{
-    Task CopyToFolder(string path);
-    Task<Stream> CreateArchiveStream();
-}
-
-public class DatabaseFileSink : IFileSink, IDisposable, IUploadFileSource
+/// <summary>
+/// Represents a collection of files that can be copied or compressed.
+/// </summary>
+public class FileSink : IFileSink, IUploadFileSource, IDisposable
 {
     private readonly IDictionary<string, FileStream> _files = new Dictionary<string, FileStream>();
 
     public bool HasItems => _files.Any();
-    public int FileCount => _files.Count;
     
     public Stream CreateFile(string pathName)
     {
@@ -34,7 +25,7 @@ public class DatabaseFileSink : IFileSink, IDisposable, IUploadFileSource
         return tempStream;
     }
 
-    public Task CopyToFolder(string path) => CopyFilesTo(name =>
+    public Task CopyToFolderAsync(string path) => CopyFilesTo(name =>
     {
         var fullPath = Path.Combine(path, name);
 
@@ -42,12 +33,12 @@ public class DatabaseFileSink : IFileSink, IDisposable, IUploadFileSource
         return new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
     });
 
-    public async Task<Stream> CreateArchiveStream()
+    public async Task<Stream> CreateArchiveStreamAsync(CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
     {
         var zipStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.DeleteOnClose);
 
         using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true);
-        await CopyFilesTo(n => zipArchive.CreateEntry(n, CompressionLevel.SmallestSize).Open());
+        await CopyFilesTo(n => zipArchive.CreateEntry(n, compressionLevel).Open());
 
         return zipStream;
     }

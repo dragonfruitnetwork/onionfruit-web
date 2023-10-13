@@ -11,7 +11,7 @@ public class FolderExporter : IDataExporter
     
     public Task PerformUpload(IServiceProvider services, IUploadFileSource source)
     {
-        return source.CopyToFolder(GetFullPath());
+        return source.CopyToFolderAsync(GetFullPath());
     }
 
     private string GetFullPath() => SpecialBasePath.HasValue

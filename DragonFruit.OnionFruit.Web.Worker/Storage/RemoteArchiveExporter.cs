@@ -16,7 +16,7 @@ public class RemoteArchiveExporter : IDataExporter
     
     public async Task PerformUpload(IServiceProvider services, IUploadFileSource source)
     {
-        await using var archiveStream = await source.CreateArchiveStream().ConfigureAwait(false);
+        await using var archiveStream = await source.CreateArchiveStreamAsync().ConfigureAwait(false);
 
         var logger = services.GetRequiredService<ILogger<RemoteArchiveExporter>>();
         var fileName = string.Format(DatabaseSinkFileName, Prefix ?? DefaultPrefix, DateTimeOffset.UtcNow.ToUnixTimeSeconds());

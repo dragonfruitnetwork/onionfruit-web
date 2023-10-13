@@ -100,7 +100,7 @@ public class Worker : IHostedService
         }
 
         // file sink used to store static-generated assets for uploading to s3 or saving to a local path
-        var fileSink = new DatabaseFileSink();
+        var fileSink = new FileSink();
 
         foreach (var generator in generatorsToUse)
         {
