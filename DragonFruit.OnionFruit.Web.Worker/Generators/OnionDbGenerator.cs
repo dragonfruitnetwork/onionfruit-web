@@ -96,8 +96,10 @@ public class OnionDbGenerator : IDatabaseGenerator
     {
         country.V4Ranges.AddRange(v4Ranges.Select(x => new IPV4Range
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Start = (uint)IPAddress.HostToNetworkOrder((int)x.Begin.Address),
             End = (uint)IPAddress.HostToNetworkOrder((int)x.End.Address)
+#pragma warning restore CS0618 // Type or member is obsolete
         }));
 
         country.V6Ranges.AddRange(v6Ranges.Select(x => new IPV6Range
