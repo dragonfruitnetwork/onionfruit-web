@@ -67,7 +67,7 @@ public static class Program
         // redis + redis.om
         services.AddSingleton(RedisClientConfigurator.CreateConnectionMultiplexer(context.Configuration, true));
         services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
-            
+
         // api
         services.AddSingleton<ILookupClient, LookupClient>();
         services.AddSingleton<ApiClient, WorkerApiClient>();

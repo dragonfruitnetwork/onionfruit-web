@@ -16,12 +16,12 @@ public class FileSink : IFileSink, IUploadFileSource, IDisposable
     private readonly IDictionary<string, FileStream> _files = new Dictionary<string, FileStream>();
 
     public bool HasItems => _files.Any();
-    
+
     public Stream CreateFile(string pathName)
     {
         var tempPath = Path.GetTempFileName();
         var tempStream = File.Create(tempPath, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan | FileOptions.DeleteOnClose);
-        
+
         _files[pathName] = tempStream;
         return tempStream;
     }
@@ -58,7 +58,7 @@ public class FileSink : IFileSink, IUploadFileSource, IDisposable
     public void Dispose()
     {
         foreach (var file in _files.Values)
-        { 
+        {
             file.Dispose();
         }
     }
