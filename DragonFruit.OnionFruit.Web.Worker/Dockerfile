@@ -1,12 +1,8 @@
-﻿ARG VERSION=2023.1
-ARG VARIANT=alpine
+﻿ARG IMAGE_VARIANT="7.0-alpine"
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-${VARIANT} AS build
-WORKDIR /src
-COPY . .
-RUN dotnet publish -c Release -o /app/publish -p:Version=${VERSION} /p:UseAppHost=false DragonFruit.OnionFruit.Web.Worker
-
-FROM mcr.microsoft.com/dotnet/runtime:7.0-${VARIANT} AS final
+FROM mcr.microsoft.com/dotnet/runtime:${IMAGE_VARIANT}
 WORKDIR /app
-COPY --from=build /app/publish .
+
+COPY . .
+ENV CONFIG_FOLDER_PATH="./config"
 ENTRYPOINT ["dotnet", "DragonFruit.OnionFruit.Web.Worker.dll"]

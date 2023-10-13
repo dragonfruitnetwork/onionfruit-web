@@ -25,8 +25,8 @@
     <ItemGroup>
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server" />
         <Content Include="..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
+        <Link>.dockerignore</Link>
+    </Content>
     </ItemGroup>
     
 </Project>
