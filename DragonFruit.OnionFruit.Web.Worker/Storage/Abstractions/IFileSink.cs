@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System.IO;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
