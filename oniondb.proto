@@ -25,16 +25,11 @@ message OnionDbCountry {
     uint32 fast_node_count = 7;
     uint32 online_node_count = 8;
 
-    repeated IPV4Range v4_ranges = 9;
-    repeated IPV6Range v6_ranges = 10;
+    repeated AddressRange v4_ranges = 9;
+    repeated AddressRange v6_ranges = 10;
 }
 
-message IPV4Range {
-    uint32 start = 1;
-    uint32 end = 2;
-}
-
-message IPV6Range {
-    string start = 1;
-    string end = 2;
+message AddressRange {
+    bytes start = 1;
+    bytes end = 2;
 }

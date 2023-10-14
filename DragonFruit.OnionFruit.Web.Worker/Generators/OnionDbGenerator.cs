@@ -87,16 +87,16 @@ public class OnionDbGenerator : IDatabaseGenerator
 
     protected virtual void WriteCountryAddressRanges(OnionDbCountry country, IEnumerable<IPAddressRange> v4Ranges, IEnumerable<IPAddressRange> v6Ranges)
     {
-        country.V4Ranges.AddRange(v4Ranges.Select(x => new IPV4Range
+        country.V4Ranges.AddRange(v4Ranges.Select(x => new AddressRange
         {
-            Start = (uint)IPAddress.HostToNetworkOrder((int)x.Begin.Address),
-            End = (uint)IPAddress.HostToNetworkOrder((int)x.End.Address)
+            Start = ByteString.CopyFrom(x.Begin.GetAddressBytes()),
+            End = ByteString.CopyFrom(x.End.GetAddressBytes())
         }));
         
-        country.V6Ranges.AddRange(v6Ranges.Select(x => new IPV6Range
+        country.V6Ranges.AddRange(v6Ranges.Select(x => new AddressRange
         {
-            Start = x.Begin.ToString(),
-            End = x.End.ToString()
+            Start = ByteString.CopyFrom(x.Begin.GetAddressBytes()),
+            End = ByteString.CopyFrom(x.End.GetAddressBytes())
         }));
     }
 
