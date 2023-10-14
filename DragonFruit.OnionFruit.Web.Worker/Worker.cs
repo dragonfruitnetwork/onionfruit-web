@@ -40,7 +40,7 @@ public class Worker : IHostedService
         _stopwatch = new Stopwatch();
 
         _exporters = GetExporters(config);
-        _descriptors = GetDescriptors();
+        _descriptors = GetDescriptors(config);
     }
 
     private async Task PerformUpdate()
@@ -156,13 +156,19 @@ public class Worker : IHostedService
         await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
 
-    private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors()
+    private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors(IConfiguration config)
     {
         var listing = new List<GeneratorDescriptor>();
 
         // get all file generators, determine what generators need what types
         foreach (var fileGeneratorType in GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo(typeof(IDatabaseGenerator))))
         {
+            if (config.GetSection("EnabledGenerators").GetValue<string>(fileGeneratorType.Name)?.Equals("false", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                _logger.LogInformation("{gen} was disabled by configuration", fileGeneratorType.Name);
+                continue;
+            }
+
             var ctor = fileGeneratorType.GetConstructors().SingleOrDefault();
 
             if (ctor == null)
