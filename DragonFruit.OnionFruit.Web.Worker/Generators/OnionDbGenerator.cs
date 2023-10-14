@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Google.Protobuf;
 using NetTools;
 
@@ -95,7 +95,7 @@ public class OnionDbGenerator : IDatabaseGenerator
             Start = ByteString.CopyFrom(x.Begin.GetAddressBytes()),
             End = ByteString.CopyFrom(x.End.GetAddressBytes())
         }));
-        
+
         country.V6Ranges.AddRange(v6Ranges.Select(x => new AddressRange
         {
             Start = ByteString.CopyFrom(x.Begin.GetAddressBytes()),
