@@ -6,7 +6,7 @@ using Redis.OM.Modeling;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Database;
 
-[Document(Prefixes = new[] {"yuna:onionfruit-nodes"}, IndexName = "yuna:onionfruit-nodes-idx", StorageType = StorageType.Json)]
+[Document(Prefixes = new[] {"onionfruit-web:nodes"}, IndexName = "onionfruit-web:node-idx", StorageType = StorageType.Json)]
 public class OnionFruitNodeInfo
 {
     [Indexed]
