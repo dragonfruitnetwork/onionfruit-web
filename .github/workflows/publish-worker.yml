@@ -28,7 +28,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: Setup GitHub NuGet
-        run: dotnet nuget add source --username USERNAME --password ${{ github.token }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/dragonfruitnetwork/index.json"
+        run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build Worker
         run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.ref_name }} DragonFruit.OnionFruit.Web.Worker
@@ -56,7 +56,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Setup GitHub NuGet
-        run: dotnet nuget add source --username USERNAME --password ${{ github.token }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/dragonfruitnetwork/index.json"
+        run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build Worker
         run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.ref_name }} DragonFruit.OnionFruit.Web.Worker
