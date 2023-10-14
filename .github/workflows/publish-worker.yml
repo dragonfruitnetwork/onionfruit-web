@@ -65,7 +65,7 @@ jobs:
         run: docker build -f DragonFruit.OnionFruit.Web.Worker\Dockerfile -t ${{ env.IMAGE_NAME }} --build-arg "IMAGE_VARIANT=7.0-nanoserver-ltsc2022" DragonFruit.OnionFruit.Web.Worker\bin\Release\net7.0\publish
         
       - name: Docker Push
-        run: docker push ${{ env.IMAGE_NAME }} --all-tags
+        run: docker push ${{ env.IMAGE_NAME }}
         
   docker-multiarch-image:
     runs-on: ubuntu-latest
