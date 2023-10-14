@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      IMAGE_NAME: dragonfruitdotnet/onionfruit-web:worker-linux-${{ github.ref_name }}
+      IMAGE_NAME: dragonfruitdotnet/onionfruit-web:worker-linux-${{ github.event.release.tag_name }}
     
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
         run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build Worker
-        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.ref_name }} DragonFruit.OnionFruit.Web.Worker
+        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} DragonFruit.OnionFruit.Web.Worker
 
       - name: Docker Build and Push
         uses: docker/build-push-action@v5
@@ -46,7 +46,7 @@ jobs:
     runs-on: windows-latest
     
     env:
-      IMAGE_NAME: dragonfruitdotnet/onionfruit-web:worker-windows-${{ github.ref_name }}
+      IMAGE_NAME: dragonfruitdotnet/onionfruit-web:worker-windows-${{ github.event.release.tag_name }}
     
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +59,7 @@ jobs:
         run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build Worker
-        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.ref_name }} DragonFruit.OnionFruit.Web.Worker
+        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} DragonFruit.OnionFruit.Web.Worker
         
       - name: Docker Build
         run: docker build -f DragonFruit.OnionFruit.Web.Worker\Dockerfile -t ${{ env.IMAGE_NAME }} --build-arg "IMAGE_VARIANT=7.0-nanoserver-ltsc2022" DragonFruit.OnionFruit.Web.Worker\bin\Release\net7.0\publish
@@ -81,4 +81,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: Create MultiArch+MultiOS Manifest
-        run: docker buildx imagetools create -t dragonfruitdotnet/onionfruit-web:worker -t dragonfruitdotnet/onionfruit-web:worker-${{ github.ref_name }} dragonfruitdotnet/onionfruit-web:worker-windows-${{ github.ref_name }} dragonfruitdotnet/onionfruit-web:worker-linux-${{ github.ref_name }}
+        run: docker buildx imagetools create -t dragonfruitdotnet/onionfruit-web:worker -t dragonfruitdotnet/onionfruit-web:worker-${{ github.event.release.tag_name }} dragonfruitdotnet/onionfruit-web:worker-windows-${{ github.event.release.tag_name }} dragonfruitdotnet/onionfruit-web:worker-linux-${{ github.event.release.tag_name }}
