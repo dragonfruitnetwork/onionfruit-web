@@ -1,6 +1,9 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System.Collections.Generic;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Google.Protobuf;
 using NetTools;
 
@@ -15,11 +18,11 @@ public class OnionLiteDbGenerator : OnionDbGenerator
         : base(onionoo, locationDb)
     {
     }
-    
+
     protected override OnionDb CreateBaseDb()
     {
         var baseDb = base.CreateBaseDb();
-        
+
         baseDb.ClearGeoLicense();
         baseDb.ClearGeoDirVersion();
 

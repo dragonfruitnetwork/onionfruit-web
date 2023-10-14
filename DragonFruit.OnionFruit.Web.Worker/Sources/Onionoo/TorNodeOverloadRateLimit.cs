@@ -1,5 +1,5 @@
-﻿// OnionFruit Web Copyright DragonFruit Network
-// Licensed under the MIT License. Please refer to the LICENSE file at the root of this project for details
+﻿// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using System;
 using System.Text.Json.Serialization;

@@ -7,26 +7,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DnsClient" Version="1.7.0" />
-        <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2023.727.0" />
-        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.2.0" />
-        <PackageReference Include="Google.Protobuf" Version="3.18.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.40.0">
+        <PackageReference Include="DnsClient" Version="1.7.0"/>
+        <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2023.727.0"/>
+        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.2.0"/>
+        <PackageReference Include="Google.Protobuf" Version="3.24.4" />
+        <PackageReference Include="Grpc.Tools" Version="2.58.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="IPAddressRange" Version="6.0.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
-        <PackageReference Include="libloc.Access" Version="2023.1006.0" />
+        <PackageReference Include="IPAddressRange" Version="6.0.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2023.2.0"/>
+        <PackageReference Include="libloc.Access" Version="2023.1013.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
-        <PackageReference Include="Redis.OM" Version="0.5.3" />
+        <PackageReference Include="Redis.OM" Version="0.5.3"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-        <Protobuf Include="..\oniondb.proto" GrpcServices="Server" />
+        <Protobuf Include="..\oniondb.proto" GrpcServices="Server"/>
         <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-    </Content>
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
-    
+
 </Project>

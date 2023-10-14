@@ -1,9 +1,12 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 using Redis.OM.Modeling;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Database;
 
-[Document(Prefixes = new[] { "yuna:onionfruit-nodes" }, IndexName = "yuna:onionfruit-nodes-idx", StorageType = StorageType.Json)]
+[Document(Prefixes = new[] {"yuna:onionfruit-nodes"}, IndexName = "yuna:onionfruit-nodes-idx", StorageType = StorageType.Json)]
 public class OnionFruitNodeInfo
 {
     [Indexed]

@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System;
 using System.IO;
 using System.Linq;
@@ -5,7 +8,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DnsClient;
 using DragonFruit.Data;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -67,7 +69,7 @@ public static class Program
         // redis + redis.om
         services.AddSingleton(RedisClientConfigurator.CreateConnectionMultiplexer(context.Configuration, true));
         services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
-            
+
         // api
         services.AddSingleton<ILookupClient, LookupClient>();
         services.AddSingleton<ApiClient, WorkerApiClient>();

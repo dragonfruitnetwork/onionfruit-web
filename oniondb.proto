@@ -1,17 +1,25 @@
 syntax = "proto3";
 
 message OnionDb {
-    bytes magic_bytes = 1; // always 0xDB
-    uint32 db_format_version = 2;
+    // Magic Bytes. Should always be 0xDB followed by the version number
+    bytes magic_bytes = 1;
+    
+    // Database version number. Higher value means newer database (usually a UNIX Epoch)
+    int64 db_version = 2;
+    
+    // Version of the Tor Onionoo dataset used to build the database. Takes the form of a UNIX Epoch.
+    int64 tor_dir_version = 3;
+    
+    // Version of the IPFire location.db file used to build the address ranges. If provided, is a UNIX Epoch otherwise all v*_range fields will be empty.
+    optional int64 geo_dir_version = 4;
 
-    int64 db_version = 3;
-    int64 tor_dir_version = 4;
-    optional int64 geo_dir_version = 5; // if not provided, all v4/v6Ranges will be empty.
+    // Onionoo Dataset license expression. If null no license data was provided/could be found.
+    optional string tor_license = 5;
 
-    optional string tor_license = 6;
-    optional string geo_license = 7; 
+    // location.db Dataset license expression. If null no license data was provided/could be found.
+    optional string geo_license = 6; 
 
-    repeated OnionDbCountry countries = 8;
+    repeated OnionDbCountry countries = 7;
 }
 
 message OnionDbCountry {

@@ -1,9 +1,12 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Database;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
@@ -23,7 +26,7 @@ public class RedisDatabaseGenerator : IDatabaseGenerator
     {
         var table = _redis.RedisCollection<OnionFruitNodeInfo>();
         var dbVersion = (long)_torDirectory.DataLastModified.Subtract(DateTime.UnixEpoch).TotalSeconds;
-        
+
         foreach (var relay in _torDirectory.Relays)
         {
             // drop the port off the addresses

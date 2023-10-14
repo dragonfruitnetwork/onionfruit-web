@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
@@ -13,29 +12,29 @@ namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
 public class OnionDbGenerator : IDatabaseGenerator
 {
-    protected readonly OnionooDataSource Onionoo;
-    protected readonly LocationDbSource LocationDb;
+    private readonly OnionooDataSource _onionoo;
+    private readonly LocationDbSource _locationDb;
 
     public OnionDbGenerator(OnionooDataSource onionoo, LocationDbSource locationDb)
     {
-        Onionoo = onionoo;
-        LocationDb = locationDb;
+        _onionoo = onionoo;
+        _locationDb = locationDb;
     }
-    
+
     public Task GenerateDatabase(IFileSink fileSink)
     {
         var database = CreateBaseDb();
-        
+
         // iterate through each country and write info
-        foreach (var country in LocationDb.Database.Countries)
+        foreach (var country in _locationDb.Database.Countries)
         {
-            var nodes = Onionoo.Countries.SingleOrDefault(x => x.Key.Equals(country.Code, StringComparison.OrdinalIgnoreCase));
+            var nodes = _onionoo.Countries.SingleOrDefault(x => x.Key.Equals(country.Code, StringComparison.OrdinalIgnoreCase));
 
             if (nodes == null)
             {
                 continue;
             }
-            
+
             var countryData = new OnionDbCountry
             {
                 CountryCode = country.Code,
@@ -54,11 +53,11 @@ public class OnionDbGenerator : IDatabaseGenerator
                     case nameof(TorNodeFlags.Guard):
                         countryData.EntryNodeCount++;
                         break;
-                    
+
                     case nameof(TorNodeFlags.Fast):
                         countryData.FastNodeCount++;
                         break;
-                    
+
                     case nameof(TorNodeFlags.Running):
                         countryData.OnlineNodeCount++;
                         break;
@@ -67,22 +66,26 @@ public class OnionDbGenerator : IDatabaseGenerator
                 countryData.TotalNodeCount++;
             }
 
-            WriteCountryAddressRanges(countryData, LocationDb.IPv4CountryAddressRanges[country.Code], LocationDb.IPv6CountryAddressRanges[country.Code]);
+            WriteCountryAddressRanges(countryData, _locationDb.IPv4CountryAddressRanges[country.Code], _locationDb.IPv6CountryAddressRanges[country.Code]);
             database.Countries.Add(countryData);
         }
 
         OnDatabaseGenerated(fileSink, database);
         return Task.CompletedTask;
     }
-    
+
     protected virtual OnionDb CreateBaseDb() => new()
     {
-        DbFormatVersion = 1,
-        MagicBytes = ByteString.CopyFrom(0xDB),
-        GeoLicense = LocationDb.Database.License,
+        MagicBytes = ByteString.CopyFrom(0xDB, 0x01),
+
+        // tor license can be found at the footer of https://metrics.torproject.org/onionoo.html
+        TorLicense = "CC0",
+        GeoLicense = _locationDb.Database.License,
+
+        // versions derived from datasets/current epoch
         DbVersion = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-        TorDirVersion = Onionoo.DataLastModified.ToUnixTimeSeconds(),
-        GeoDirVersion = new DateTimeOffset(LocationDb.Database.CreatedAt).ToUnixTimeSeconds()
+        TorDirVersion = _onionoo.DataLastModified.ToUnixTimeSeconds(),
+        GeoDirVersion = _locationDb.Database.CreatedAt.ToUnixTimeSeconds()
     };
 
     protected virtual void WriteCountryAddressRanges(OnionDbCountry country, IEnumerable<IPAddressRange> v4Ranges, IEnumerable<IPAddressRange> v6Ranges)

@@ -1,6 +1,10 @@
-﻿using System;
+﻿// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
+using System;
 using System.Runtime.InteropServices;
 
+// ReSharper disable InconsistentNaming
 namespace DragonFruit.OnionFruit.Web.Worker.Native;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -26,8 +30,9 @@ public struct NetworkEntry
 {
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
     public byte[] network;
+
     public byte cidr;
-        
+
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
     public byte[] country_code;
 }
