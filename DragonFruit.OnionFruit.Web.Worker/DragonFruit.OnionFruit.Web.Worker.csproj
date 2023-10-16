@@ -20,6 +20,7 @@
         <PackageReference Include="libloc.Access" Version="2023.1013.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
         <PackageReference Include="Redis.OM" Version="0.5.3"/>
+        <PackageReference Include="Sentry.Extensions.Logging" Version="3.40.1" />
     </ItemGroup>
 
     <ItemGroup>

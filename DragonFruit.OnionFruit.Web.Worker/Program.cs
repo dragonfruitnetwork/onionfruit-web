@@ -62,6 +62,16 @@ public static class Program
             o.SourceName = $"OnionFruit-Web-Worker/v{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}";
         });
 #endif
+
+        logging.AddSentry(o =>
+        {
+            o.Dsn = host.Configuration["Worker:Dsn"] ?? host.Configuration["Dsn"];
+            o.Release = Assembly.GetExecutingAssembly().GetName().Version!.ToString(3);
+
+            o.MaxBreadcrumbs = 50;
+            o.MinimumEventLevel = LogLevel.Error;
+            o.MinimumBreadcrumbLevel = LogLevel.Debug;
+        });
     }
 
     private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
