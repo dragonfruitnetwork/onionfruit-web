@@ -55,6 +55,14 @@ public static class Program
 
     private static void ConfigureLogging(HostBuilderContext host, ILoggingBuilder logging)
     {
+        logging.ClearProviders();
+        logging.AddSimpleConsole(o =>
+        {
+            o.SingleLine = true;
+            o.IncludeScopes = false;
+            o.TimestampFormat = "[dd/MM/yyyy hh:mm:ss] ";
+        });
+
 #if WINDOWS
         logging.AddEventLog(o =>
         {
