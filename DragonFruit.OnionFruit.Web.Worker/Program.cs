@@ -25,7 +25,7 @@ public static class Program
     {
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureHostConfiguration(ConfigureHost)
-            .ConfigureLogging(ConfigureLogging)
+            .ConfigureLogging((host, logging) => ConfigureLogging(logging, host.Configuration, "Worker"))
             .ConfigureServices(ConfigureServices)
             .Build();
 
@@ -53,27 +53,27 @@ public static class Program
         }
     }
 
-    private static void ConfigureLogging(HostBuilderContext host, ILoggingBuilder logging)
+    public static void ConfigureLogging(ILoggingBuilder logging, IConfiguration config, string dsnType)
     {
         logging.ClearProviders();
         logging.AddSimpleConsole(o =>
         {
             o.SingleLine = true;
             o.IncludeScopes = false;
-            o.TimestampFormat = "[dd/MM/yyyy hh:mm:ss] ";
+            o.TimestampFormat = $"[dd/MM/yyyy hh:mm:ss] ({dsnType}) ";
         });
 
 #if WINDOWS
         logging.AddEventLog(o =>
         {
             o.Filter = (_, level) => level >= LogLevel.Information;
-            o.SourceName = $"OnionFruit-Web-Worker/v{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}";
+            o.SourceName = $"OnionFruit-Web-{dsnType}/v{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}";
         });
 #endif
 
         logging.AddSentry(o =>
         {
-            o.Dsn = host.Configuration["Worker:Dsn"] ?? host.Configuration["Dsn"];
+            o.Dsn = config[$"{dsnType}:Dsn"] ?? config["Dsn"];
             o.Release = Assembly.GetExecutingAssembly().GetName().Version!.ToString(3);
 
             o.MaxBreadcrumbs = 50;
