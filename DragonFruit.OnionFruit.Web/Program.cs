@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DnsClient;
 using DragonFruit.Data;
+using DragonFruit.OnionFruit.Web.Data;
 using DragonFruit.OnionFruit.Web.Worker;
 using libloc.Access;
 using Microsoft.AspNetCore.Builder;
@@ -52,10 +53,13 @@ public static class Program
         builder.Services.AddSingleton<ILookupClient, LookupClient>();
         builder.Services.AddSingleton<ApiClient, WorkerApiClient>();
 
+        builder.Services.AddSingleton<LocalAssetStore>();
+
         // register worker if needed
         if (builder.Configuration["Worker:Enable"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
         {
-            builder.Services.AddHostedService<Worker.Worker>();
+            builder.Services.AddSingleton<Worker.Worker>();
+            builder.Services.AddHostedService(s => s.GetRequiredService<Worker.Worker>());
         }
 
         var app = builder.Build();
@@ -71,6 +75,12 @@ public static class Program
         app.UseCors();
 
         app.MapControllers();
+
+        using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            // if worker is enabled, add local exporter
+            scope.ServiceProvider.GetService<Worker.Worker>()?.AddExporter(new LocalWorkerExporter());
+        }
 
         await app.RunAsync().ConfigureAwait(false);
     }

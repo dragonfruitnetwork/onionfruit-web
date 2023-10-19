@@ -25,7 +25,7 @@ public class Worker : IHostedService
 
     private readonly ILogger<Worker> _logger;
     private readonly IServiceScopeFactory _ssf;
-    private readonly IReadOnlyCollection<IDataExporter> _exporters;
+    private readonly ICollection<IDataExporter> _exporters;
     private readonly IReadOnlyCollection<GeneratorDescriptor> _descriptors;
 
     private Timer _workerTimer;
@@ -135,6 +135,8 @@ public class Worker : IHostedService
         await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
 
+    public void AddExporter(IDataExporter exporter) => _exporters.Add(exporter);
+
     private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors(IConfiguration config)
     {
         var listing = new List<GeneratorDescriptor>();
@@ -166,7 +168,7 @@ public class Worker : IHostedService
         return listing;
     }
 
-    private static IReadOnlyCollection<IDataExporter> GetExporters(IConfiguration config)
+    private static ICollection<IDataExporter> GetExporters(IConfiguration config)
     {
         var exporters = new List<IDataExporter>();
 
