@@ -18,6 +18,8 @@ public class OnionFruitNodeInfo
 
     public string CountryCode { get; set; }
     public string CountryName { get; set; }
+
+    public int? ProviderNumber { get; set; }
     public string ProviderName { get; set; }
 
     public TorNodeFlags Flags { get; set; }

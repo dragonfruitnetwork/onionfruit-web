@@ -41,9 +41,12 @@ public class RedisDatabaseGenerator : IDatabaseGenerator
                 DatabaseVersion = dbVersion,
 
                 Flags = relay.Flags,
-                ProviderName = relay.ASName,
+
                 CountryCode = relay.CountryCode,
-                CountryName = relay.CountryName ?? "Unknown Location"
+                CountryName = relay.CountryName ?? "Unknown Location",
+
+                ProviderName = relay.ASName,
+                ProviderNumber = int.TryParse(relay.ASN?[1..], out var asn) ? asn : null,
             };
 
             // write info to redis
