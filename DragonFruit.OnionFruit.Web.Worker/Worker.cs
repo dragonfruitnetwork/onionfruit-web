@@ -163,7 +163,7 @@ public class Worker : IHostedService
         // get all file generators, determine what generators need what types
         foreach (var fileGeneratorType in GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo(typeof(IDatabaseGenerator))))
         {
-            if (config.GetSection("EnabledGenerators").GetValue<string>(fileGeneratorType.Name)?.Equals("false", StringComparison.OrdinalIgnoreCase) == true)
+            if (config.GetSection("Worker:EnabledGenerators").GetValue<string>(fileGeneratorType.Name)?.Equals("false", StringComparison.OrdinalIgnoreCase) == true)
             {
                 _logger.LogInformation("{gen} was disabled by configuration", fileGeneratorType.Name);
                 continue;
@@ -191,7 +191,7 @@ public class Worker : IHostedService
     {
         var exporters = new List<IDataExporter>();
 
-        foreach (var section in config.GetSection("Exports").GetChildren())
+        foreach (var section in config.GetSection("Worker:Exports").GetChildren())
         {
             IDataExporter entity = section["Type"]?.ToUpperInvariant() switch
             {
