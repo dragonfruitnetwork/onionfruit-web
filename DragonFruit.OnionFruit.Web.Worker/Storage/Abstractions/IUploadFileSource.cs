@@ -1,6 +1,7 @@
 // OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -14,6 +15,14 @@ public interface IUploadFileSource
     /// Missing directories will be created by the function.
     /// </summary>
     Task CopyToFolderAsync(string path);
+
+    /// <summary>
+    /// Iterates all files, providing direct access to the underlying streams.
+    /// </summary>
+    /// <remarks>
+    /// Streams provided by this method should not dispose of them (as they could be consumed by others in the future)
+    /// </remarks>
+    Task IterateAllStreams(Func<string, FileStream, Task> iterator);
 
     /// <summary>
     /// Creates a new <see cref="ZipArchive"/> and returns a stream containing the compressed files.

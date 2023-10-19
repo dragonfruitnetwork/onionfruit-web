@@ -37,6 +37,15 @@ public class FileSink : IFileSink, IUploadFileSource, IDisposable
         return new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
     });
 
+    public async Task IterateAllStreams(Func<string, FileStream, Task> iterator)
+    {
+        foreach (var (name, stream) in _files)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            await iterator.Invoke(name, stream).ConfigureAwait(false);
+        }
+    }
+
     public async Task<Stream> CreateArchiveStreamAsync(CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
     {
         var zipStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.DeleteOnClose);
