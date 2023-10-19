@@ -11,7 +11,7 @@
         <PackageReference Include="DragonFruit.Data.Serializers.SystemJson" Version="2023.727.0"/>
         <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.2.0"/>
         <PackageReference Include="Google.Protobuf" Version="3.24.4" />
-        <PackageReference Include="Grpc.Tools" Version="2.58.0">
+        <PackageReference Include="Grpc.Tools" Version="2.59.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -24,10 +24,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="..\appsettings.json"/>
+        <Content Include="..\appsettings.Development.json"/>
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server"/>
-        <Content Include="..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
     </ItemGroup>
 
 </Project>
