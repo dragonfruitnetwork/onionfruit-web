@@ -67,5 +67,7 @@ public class FileSink : IFileSink, IUploadFileSource, IDisposable
         {
             file.Dispose();
         }
+
+        _files.Clear();
     }
 }
