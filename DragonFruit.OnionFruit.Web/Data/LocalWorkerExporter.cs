@@ -16,7 +16,7 @@ namespace DragonFruit.OnionFruit.Web.Data
         public async Task PerformUpload(IServiceProvider services, IUploadFileSource source)
         {
             var localAssetStore = services.GetRequiredService<LocalAssetStore>();
-            var versionedStore = localAssetStore.CreateNewAssetStoreRevision();
+            var versionedStore = localAssetStore.CreateNewAssetStoreRevision(source.Version);
 
             await source.IterateAllStreams((name, stream) => versionedStore.AddFile(name, stream)).ConfigureAwait(false);
         }

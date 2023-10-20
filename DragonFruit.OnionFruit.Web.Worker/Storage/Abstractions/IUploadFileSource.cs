@@ -11,6 +11,11 @@ namespace DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 public interface IUploadFileSource
 {
     /// <summary>
+    /// Gets the version identifier of the contained data
+    /// </summary>
+    public string Version { get; }
+
+    /// <summary>
     /// Copies the contents of the <see cref="FileSink"/> to the specified path.
     /// Missing directories will be created by the function.
     /// </summary>

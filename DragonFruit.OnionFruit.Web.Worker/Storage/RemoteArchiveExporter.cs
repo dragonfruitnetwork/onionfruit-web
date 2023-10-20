@@ -40,7 +40,7 @@ public class RemoteArchiveExporter : IDataExporter
         await using var archiveStream = await source.CreateArchiveStreamAsync().ConfigureAwait(false);
 
         var logger = services.GetRequiredService<ILogger<RemoteArchiveExporter>>();
-        var fileName = string.Format(DatabaseSinkFileName, Prefix ?? DefaultPrefix, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+        var fileName = string.Format(DatabaseSinkFileName, Prefix ?? DefaultPrefix, source.Version);
 
         var checksum = await MD5.HashDataAsync(archiveStream).ConfigureAwait(false);
         var request = new GenericBlobUploadRequest(UploadUrl, fileName, archiveStream, checksum);

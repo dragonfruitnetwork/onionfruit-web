@@ -18,6 +18,13 @@ public class FileSink : IFileSink, IUploadFileSource, IDisposable
 {
     private readonly IDictionary<string, FileStream> _files = new Dictionary<string, FileStream>();
 
+    public FileSink(string version)
+    {
+        Version = version;
+    }
+
+    public string Version { get; }
+
     public bool HasItems => _files.Any();
 
     public Stream CreateFile(string pathName)
