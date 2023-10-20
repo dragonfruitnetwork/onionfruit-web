@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
@@ -15,43 +15,70 @@ namespace DragonFruit.OnionFruit.Web.Data;
 internal class LocalAssetStore
 {
     private readonly string _assetRoot;
-    private readonly IDictionary<string, string> _assetLocations;
+    private readonly Uri _assetRootUri;
+    private readonly IDictionary<string, FileInfo> _assetLocations;
 
     public LocalAssetStore(IConfiguration configuration)
     {
-        _assetRoot = configuration["Server:AssetRoot"] ?? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets");
+        var root = configuration["Server:AssetRoot"];
+
+        _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
+        _assetRootUri = new Uri(_assetRoot);
+
         _assetLocations = GenerateAssetTable();
     }
 
+    public Stream GetFileStream(string relPath)
+    {
+        var fullPath = Path.Combine(_assetRoot, relPath);
+
+        // protect against directory traversal
+        if (!_assetRootUri.IsBaseOf(new Uri(fullPath)))
+        {
+            return null;
+        }
+
+        return new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
+    }
+
     /// <summary>
-    /// Resolves a <see cref="fileName"/> to the currently served version
+    /// Gets the active path of the requested <see cref="fileName"/> in URL form.
     /// </summary>
-    /// <remarks>
-    /// Paths returned by this accessor will use the system's path separator and will need to be checked for URL compatibility.
-    /// </remarks>
-    public string this[string fileName] => _assetLocations.TryGetValue(fileName, out var filePath) ? filePath : null;
+    /// <param name="fileName">The name of the file to request. If there is a path separator it must be entered as a forward-slash</param>
+    /// <example>
+    /// Requesting "legacy/geoip" could return "aa00/legacy/geoip" as that is the version of the file being currently served to users.
+    /// </example>
+    public string GetActiveLocation(string fileName)
+    {
+        if (!_assetLocations.TryGetValue(fileName, out var fileInfo))
+        {
+            return null;
+        }
+
+        return Path.GetRelativePath(_assetRoot, fileInfo.FullName).Replace('\\', '/');
+    }
 
     /// <summary>
     /// Creates a new asset store version, returning a container that can be used to submit files.
     /// </summary>
-    public LocalAssetStoreRevision CreateNewAssetStoreRevision()
+    public LocalAssetStoreRevision CreateNewAssetStoreRevision(string revisionId)
     {
         // use current timestamp for versioning
-        var folderPath = Path.Combine(_assetRoot, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture));
+        var folderPath = Path.Combine(_assetRoot, revisionId);
 
         Directory.CreateDirectory(folderPath);
-        return new LocalAssetStoreRevision(folderPath, s => _assetLocations[s.Replace('\\', '/')] = Path.Combine(folderPath, s));
+        return new LocalAssetStoreRevision(folderPath, s => SetFileInfo(_assetLocations, s, Path.Combine(folderPath, s)));
     }
 
     /// <summary>
-    /// Generates a table of files -> relative filesystem paths
+    /// Generates a table of request paths to relative paths (on filesystem against the provided assetroot)
     /// </summary>
     /// <returns>
     /// A <see cref="IDictionary{TKey,TValue}"/> containing a mapping of file names to relative paths
     /// </returns>
-    private IDictionary<string, string> GenerateAssetTable()
+    private IDictionary<string, FileInfo> GenerateAssetTable()
     {
-        var table = new ConcurrentDictionary<string, string>();
+        var table = new ConcurrentDictionary<string, FileInfo>();
 
         // ensure directory exists
         Directory.CreateDirectory(_assetRoot);
@@ -59,15 +86,22 @@ internal class LocalAssetStore
         // get all folders and order by value
         foreach (var file in Directory.GetDirectories(_assetRoot).Order().SelectMany(x => Directory.GetFiles(x, "*", SearchOption.AllDirectories)))
         {
-            var relPath = Path.GetRelativePath(_assetRoot, file);
-
             // If the path was `12345/testing/target.txt`, the key would be testing/target.txt so the versioning directory part needs extracting.
             // The GetRootFolder function will get the first path but the slash needs trimming as well, so 1 is added to the length.
+            var relPath = Path.GetRelativePath(_assetRoot, file);
             var versionPathLength = GetRootFolder(relPath).Length + 1;
-            table[relPath.Substring(versionPathLength).Replace('\\', '/')] = relPath;
+
+            SetFileInfo(table, relPath.Substring(versionPathLength), file);
         }
 
         return table;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void SetFileInfo(IDictionary<string, FileInfo> table, string requestSubpath, string filePath)
+    {
+        // request urls use forward slashes
+        table[requestSubpath.Replace('\\', '/')] = new FileInfo(filePath);
     }
 
     // https://stackoverflow.com/a/7911591
@@ -102,7 +136,7 @@ internal class LocalAssetStoreRevision
 
     public async Task AddFile(string fileName, Stream input)
     {
-        if (fileName.Contains(".."))
+        if (fileName.Contains("..", StringComparison.OrdinalIgnoreCase))
         {
             throw new ArgumentException("Directory traversal not allowed");
         }
