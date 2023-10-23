@@ -12,8 +12,10 @@ using Microsoft.Extensions.Configuration;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
-internal class LocalAssetStore
+public class LocalAssetStore
 {
+    public record LocalAssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt);
+
     private readonly string _assetRoot;
     private readonly Uri _assetRootUri;
     private readonly IDictionary<string, FileInfo> _assetLocations;
@@ -28,7 +30,7 @@ internal class LocalAssetStore
         _assetLocations = GenerateAssetTable();
     }
 
-    public Stream GetFileStream(string relPath)
+    public Stream GetReadableFileStream(string relPath)
     {
         var fullPath = Path.Combine(_assetRoot, relPath);
 
@@ -46,16 +48,16 @@ internal class LocalAssetStore
     /// </summary>
     /// <param name="fileName">The name of the file to request. If there is a path separator it must be entered as a forward-slash</param>
     /// <example>
-    /// Requesting "legacy/geoip" could return "aa00/legacy/geoip" as that is the version of the file being currently served to users.
+    /// Requesting "legacy/geoip" could return an asset info object with the versioned path "aa00/legacy/geoip" as that is the version of the file being currently served to users.
     /// </example>
-    public string GetActiveLocation(string fileName)
+    public LocalAssetInfo GetAssetInfo(string fileName)
     {
         if (!_assetLocations.TryGetValue(fileName, out var fileInfo))
         {
             return null;
         }
 
-        return Path.GetRelativePath(_assetRoot, fileInfo.FullName).Replace('\\', '/');
+        return new LocalAssetInfo(fileName, Path.GetRelativePath(_assetRoot, fileInfo.FullName).Replace('\\', '/'), fileInfo.CreationTimeUtc);
     }
 
     /// <summary>
@@ -123,7 +125,7 @@ internal class LocalAssetStore
     }
 }
 
-internal class LocalAssetStoreRevision
+public class LocalAssetStoreRevision
 {
     private readonly string _basePath;
     private readonly Action<string> _promoteItemCallback;
