@@ -17,7 +17,6 @@ public class LocalAssetStore
     public record LocalAssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt);
 
     private readonly string _assetRoot;
-    private readonly Uri _assetRootUri;
     private readonly IDictionary<string, FileInfo> _assetLocations;
 
     public LocalAssetStore(IConfiguration configuration)
@@ -25,22 +24,19 @@ public class LocalAssetStore
         var root = configuration["Server:AssetRoot"];
 
         _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
-        _assetRootUri = new Uri(_assetRoot);
-
         _assetLocations = GenerateAssetTable();
     }
 
     public Stream GetReadableFileStream(string relPath)
     {
-        var fullPath = Path.Combine(_assetRoot, relPath);
+        var fullPath = Path.GetFullPath(Path.Combine(_assetRoot, relPath));
 
-        // protect against directory traversal
-        if (!_assetRootUri.IsBaseOf(new Uri(fullPath)))
+        if (!fullPath.StartsWith(_assetRoot, StringComparison.OrdinalIgnoreCase))
         {
             return null;
         }
 
-        return new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
+        return File.Exists(fullPath) ? new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan) : null;
     }
 
     /// <summary>
