@@ -79,7 +79,13 @@ public static class Program
         using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
             // if worker is enabled, add local exporter
-            scope.ServiceProvider.GetService<Worker.Worker>()?.AddExporter(new LocalWorkerExporter());
+            var worker = scope.ServiceProvider.GetService<Worker.Worker>();
+
+            if (worker != null)
+            {
+                worker.AddExporter(new LocalWorkerExporter());
+                await Worker.Program.ValidateRedisStructures(scope.ServiceProvider).ConfigureAwait(false);
+            }
         }
 
         await app.RunAsync().ConfigureAwait(false);
