@@ -24,8 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\appsettings.json"/>
-        <Content Include="..\appsettings.Development.json"/>
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server"/>
     </ItemGroup>
 

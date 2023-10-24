@@ -13,9 +13,4 @@
       <ProjectReference Include="..\DragonFruit.OnionFruit.Web.Worker\DragonFruit.OnionFruit.Web.Worker.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="..\appsettings.json"/>
-        <Content Include="..\appsettings.Development.json"/>
-    </ItemGroup>
-
 </Project>
