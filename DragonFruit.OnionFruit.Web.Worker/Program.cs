@@ -96,7 +96,7 @@ public static class Program
         services.AddHostedService<Worker>();
     }
 
-    private static async Task ValidateRedisStructures(IServiceProvider services)
+    public static async Task ValidateRedisStructures(IServiceProvider services)
     {
         var config = services.GetRequiredService<IConfiguration>();
         var redis = services.GetRequiredService<IRedisConnectionProvider>();
