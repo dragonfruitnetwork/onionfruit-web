@@ -56,7 +56,7 @@ public static class Program
         builder.Services.AddSingleton<LocalAssetStore>();
 
         // register worker if needed
-        if (builder.Configuration["Worker:Enable"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
+        if (builder.Configuration["Worker:Enabled"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
         {
             builder.Services.AddSingleton<Worker.Worker>();
             builder.Services.AddHostedService(s => s.GetRequiredService<Worker.Worker>());
