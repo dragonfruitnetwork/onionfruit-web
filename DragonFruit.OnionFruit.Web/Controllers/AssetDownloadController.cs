@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.Web;
 using DragonFruit.OnionFruit.Web.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,7 @@ public class AssetDownloadController : ControllerBase
     [HttpGet("{*assetPath}")]
     public IActionResult ResolveAssetPath(string assetPath)
     {
+        assetPath = HttpUtility.UrlDecode(assetPath);
         var versionedAsset = _assetStore.GetAssetInfo(assetPath);
 
         if (versionedAsset == null)
@@ -41,6 +43,7 @@ public class AssetDownloadController : ControllerBase
     [HttpGet("dl/{*versionedAssetPath}")]
     public IActionResult DownloadVersionedAsset(string versionedAssetPath)
     {
+        versionedAssetPath = HttpUtility.UrlDecode(versionedAssetPath);
         var fs = _assetStore.GetReadableFileStream(versionedAssetPath);
 
         if (fs == null)
