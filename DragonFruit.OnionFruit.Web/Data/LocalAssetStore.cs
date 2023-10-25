@@ -33,21 +33,16 @@ public class LocalAssetStore : IDisposable
         _assetFileWatcher = new FileSystemWatcher
         {
             Path = _assetRoot,
-            IncludeSubdirectories = true
+            IncludeSubdirectories = true,
+            NotifyFilter = NotifyFilters.FileName
         };
 
         // directory deletions don't cause a cascade of events for each file, but as we delete individual files this isn't really an issue.
         // directories aren't stored in the set so removal is perfectly fine.
         _assetFileWatcher.Deleted += (_, e) => _accessibleFilePaths.Remove(e.FullPath);
-        _assetFileWatcher.Created += (_, e) =>
-        {
-            if (File.Exists(e.FullPath)) _accessibleFilePaths.Add(e.FullPath);
-        };
-
+        _assetFileWatcher.Created += (_, e) => _accessibleFilePaths.Add(e.FullPath);
         _assetFileWatcher.Renamed += (_, e) =>
         {
-            if (Directory.Exists(e.FullPath)) return;
-
             _accessibleFilePaths.Remove(e.OldFullPath);
             _accessibleFilePaths.Add(e.FullPath);
         };
