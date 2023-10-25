@@ -12,26 +12,58 @@ using Microsoft.Extensions.Configuration;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
-public class LocalAssetStore
+public class LocalAssetStore : IDisposable
 {
     public record LocalAssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt);
 
     private readonly string _assetRoot;
-    private readonly IDictionary<string, FileInfo> _assetLocations;
+    private readonly ISet<string> _accessibleFilePaths;
+    private readonly IDictionary<string, FileInfo> _activeAssetMap;
+
+    private readonly FileSystemWatcher _assetFileWatcher;
 
     public LocalAssetStore(IConfiguration configuration)
     {
         var root = configuration["Server:AssetRoot"];
-
         _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
-        _assetLocations = GenerateAssetTable();
+
+        // create variables
+        _accessibleFilePaths = new HashSet<string>();
+        _activeAssetMap = new ConcurrentDictionary<string, FileInfo>();
+        _assetFileWatcher = new FileSystemWatcher
+        {
+            Path = _assetRoot,
+            IncludeSubdirectories = true
+        };
+
+        // directory deletions don't cause a cascade of events for each file, but as we delete individual files this isn't really an issue.
+        // directories aren't stored in the set so removal is perfectly fine.
+        _assetFileWatcher.Deleted += (_, e) => _accessibleFilePaths.Remove(e.FullPath);
+        _assetFileWatcher.Created += (_, e) =>
+        {
+            if (File.Exists(e.FullPath)) _accessibleFilePaths.Add(e.FullPath);
+        };
+
+        _assetFileWatcher.Renamed += (_, e) =>
+        {
+            if (Directory.Exists(e.FullPath)) return;
+
+            _accessibleFilePaths.Remove(e.OldFullPath);
+            _accessibleFilePaths.Add(e.FullPath);
+        };
+
+        PopulateAssetTables();
+
+        // enable watcher events after populating table
+        _assetFileWatcher.EnableRaisingEvents = true;
     }
 
     public Stream GetReadableFileStream(string relPath)
     {
         var fullPath = Path.GetFullPath(Path.Combine(_assetRoot, relPath));
 
-        if (!fullPath.StartsWith(_assetRoot, StringComparison.OrdinalIgnoreCase))
+        // check the full path against a list of files that can be served
+        if (!_accessibleFilePaths.Contains(fullPath))
         {
             return null;
         }
@@ -48,7 +80,7 @@ public class LocalAssetStore
     /// </example>
     public LocalAssetInfo GetAssetInfo(string fileName)
     {
-        if (!_assetLocations.TryGetValue(fileName, out var fileInfo))
+        if (!_activeAssetMap.TryGetValue(fileName, out var fileInfo))
         {
             return null;
         }
@@ -65,41 +97,36 @@ public class LocalAssetStore
         var folderPath = Path.Combine(_assetRoot, revisionId);
 
         Directory.CreateDirectory(folderPath);
-        return new LocalAssetStoreRevision(folderPath, s => SetFileInfo(_assetLocations, s, Path.Combine(folderPath, s)));
+        return new LocalAssetStoreRevision(folderPath, s => SetFileInfo(s, Path.Combine(folderPath, s)));
     }
 
     /// <summary>
-    /// Generates a table of request paths to relative paths (on filesystem against the provided assetroot)
+    /// Populates a table of request paths to relative paths (on filesystem against the provided asset root), along with a set of all files that can be downloaded by a client.
     /// </summary>
-    /// <returns>
-    /// A <see cref="IDictionary{TKey,TValue}"/> containing a mapping of file names to relative paths
-    /// </returns>
-    private IDictionary<string, FileInfo> GenerateAssetTable()
+    private void PopulateAssetTables()
     {
-        var table = new ConcurrentDictionary<string, FileInfo>();
-
         // ensure directory exists
         Directory.CreateDirectory(_assetRoot);
 
         // get all folders and order by value
         foreach (var file in Directory.GetDirectories(_assetRoot).Order().SelectMany(x => Directory.GetFiles(x, "*", SearchOption.AllDirectories)))
         {
+            _accessibleFilePaths.Add(file);
+
             // If the path was `12345/testing/target.txt`, the key would be testing/target.txt so the versioning directory part needs extracting.
             // The GetRootFolder function will get the first path but the slash needs trimming as well, so 1 is added to the length.
             var relPath = Path.GetRelativePath(_assetRoot, file);
             var versionPathLength = GetRootFolder(relPath).Length + 1;
 
-            SetFileInfo(table, relPath.Substring(versionPathLength), file);
+            SetFileInfo(relPath.Substring(versionPathLength), file);
         }
-
-        return table;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetFileInfo(IDictionary<string, FileInfo> table, string requestSubpath, string filePath)
+    private void SetFileInfo(string requestSubpath, string filePath)
     {
         // request urls use forward slashes
-        table[requestSubpath.Replace('\\', '/')] = new FileInfo(filePath);
+        _activeAssetMap[requestSubpath.Replace('\\', '/')] = new FileInfo(filePath);
     }
 
     // https://stackoverflow.com/a/7911591
@@ -118,6 +145,11 @@ public class LocalAssetStore
         }
 
         return path;
+    }
+
+    public void Dispose()
+    {
+        _assetFileWatcher?.Dispose();
     }
 }
 
