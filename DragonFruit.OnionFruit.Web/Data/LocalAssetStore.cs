@@ -20,8 +20,8 @@ public class LocalAssetStore : IDisposable
 
     private readonly string _assetRoot;
     private readonly Timer _assetRootOrphanTimer;
-    private readonly ISet<string> _accessibleFilePaths;
     private readonly FileSystemWatcher _assetFileWatcher;
+    private readonly ICollection<string> _accessibleFilePaths;
     private readonly IDictionary<string, FileInfo> _activeAssetMap;
 
     public LocalAssetStore(IConfiguration configuration)
