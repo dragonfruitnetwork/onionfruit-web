@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 
 namespace DragonFruit.OnionFruit.Web.Data;
@@ -18,6 +19,7 @@ public class LocalAssetStore : IDisposable
     private const int ExpiryThreshold = 5;
 
     private readonly string _assetRoot;
+    private readonly Timer _assetRootOrphanTimer;
     private readonly ISet<string> _accessibleFilePaths;
     private readonly FileSystemWatcher _assetFileWatcher;
     private readonly IDictionary<string, FileInfo> _activeAssetMap;
@@ -27,7 +29,6 @@ public class LocalAssetStore : IDisposable
         var root = configuration["Server:AssetRoot"];
         _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
 
-        // create variables
         _accessibleFilePaths = new HashSet<string>();
         _activeAssetMap = new ConcurrentDictionary<string, FileInfo>();
         _assetFileWatcher = new FileSystemWatcher
@@ -51,6 +52,9 @@ public class LocalAssetStore : IDisposable
 
         // enable watcher events after populating table
         _assetFileWatcher.EnableRaisingEvents = true;
+
+        // run orphaned asset task now and once per day
+        _assetRootOrphanTimer = new Timer(_ => DeleteOrphanedAssets(), null, TimeSpan.Zero, TimeSpan.FromDays(1));
     }
 
     public Stream GetReadableFileStream(string relPath)
@@ -96,7 +100,7 @@ public class LocalAssetStore : IDisposable
     }
 
     /// <summary>
-    /// Removes assets that are no longer accessible by a user
+    /// Removes orphaned assets that are no longer accessible by a user
     /// </summary>
     public int DeleteOrphanedAssets()
     {
@@ -195,5 +199,6 @@ public class LocalAssetStore : IDisposable
     public void Dispose()
     {
         _assetFileWatcher?.Dispose();
+        _assetRootOrphanTimer?.Dispose();
     }
 }
