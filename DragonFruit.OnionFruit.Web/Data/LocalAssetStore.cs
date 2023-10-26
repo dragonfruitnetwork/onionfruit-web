@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
@@ -19,16 +20,19 @@ public class LocalAssetStore : IDisposable
     private const int ExpiryThreshold = 5;
 
     private readonly string _assetRoot;
-    private readonly Timer _assetRootOrphanTimer;
+    private readonly ILogger<LocalAssetStore> _logger;
     private readonly FileSystemWatcher _assetFileWatcher;
     private readonly ICollection<string> _accessibleFilePaths;
     private readonly IDictionary<string, FileInfo> _activeAssetMap;
 
-    public LocalAssetStore(IConfiguration configuration)
+    private Timer _assetRootOrphanTimer;
+
+    public LocalAssetStore(IConfiguration configuration, ILogger<LocalAssetStore> logger)
     {
         var root = configuration["Server:AssetRoot"];
         _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
 
+        _logger = logger;
         _accessibleFilePaths = new HashSet<string>();
         _activeAssetMap = new ConcurrentDictionary<string, FileInfo>();
         _assetFileWatcher = new FileSystemWatcher
@@ -49,12 +53,6 @@ public class LocalAssetStore : IDisposable
         };
 
         PopulateAssetTables();
-
-        // enable watcher events after populating table
-        _assetFileWatcher.EnableRaisingEvents = true;
-
-        // run orphaned asset task now and once per day
-        _assetRootOrphanTimer = new Timer(_ => DeleteOrphanedAssets(), null, TimeSpan.Zero, TimeSpan.FromDays(1));
     }
 
     public Stream GetReadableFileStream(string relPath)
@@ -116,6 +114,8 @@ public class LocalAssetStore : IDisposable
             }
 
             File.Delete(oldFile);
+            _logger?.LogInformation("Deleted orphaned file {file}", oldFile);
+
             filesDeleted++;
         }
 
@@ -125,6 +125,15 @@ public class LocalAssetStore : IDisposable
         }
 
         return filesDeleted;
+    }
+
+    /// <summary>
+    /// Starts filesystem watchers and orphaned file check timers
+    /// </summary>
+    public void StartWatchers()
+    {
+        _assetFileWatcher.EnableRaisingEvents = true;
+        _assetRootOrphanTimer = new Timer(_ => DeleteOrphanedAssets(), null, TimeSpan.Zero, TimeSpan.FromDays(1));
     }
 
     /// <summary>

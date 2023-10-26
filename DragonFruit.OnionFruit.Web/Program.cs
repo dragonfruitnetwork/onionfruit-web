@@ -78,7 +78,11 @@ public static class Program
 
         using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
-            // if worker is enabled, add local exporter
+            // setup local file watchers and orphaned file task
+            // as the assetstore is registered in the dependency container watchers will be started immediately after instance creation
+            scope.ServiceProvider.GetRequiredService<LocalAssetStore>().StartWatchers();
+
+            // if worker is enabled, add local exporter and run redis migrations
             var worker = scope.ServiceProvider.GetService<Worker.Worker>();
 
             if (worker != null)
