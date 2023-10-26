@@ -5,10 +5,12 @@ using System;
 using System.Globalization;
 using System.Web;
 using DragonFruit.OnionFruit.Web.Data;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DragonFruit.OnionFruit.Web.Controllers;
 
+[EnableCors]
 [Route("~/assets")]
 public class AssetDownloadController : ControllerBase
 {
