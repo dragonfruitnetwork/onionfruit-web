@@ -12,15 +12,16 @@ using Microsoft.Extensions.Configuration;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
+public record LocalAssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt);
+
 public class LocalAssetStore : IDisposable
 {
-    public record LocalAssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt);
+    private const int ExpiryThreshold = 5;
 
     private readonly string _assetRoot;
     private readonly ISet<string> _accessibleFilePaths;
-    private readonly IDictionary<string, FileInfo> _activeAssetMap;
-
     private readonly FileSystemWatcher _assetFileWatcher;
+    private readonly IDictionary<string, FileInfo> _activeAssetMap;
 
     public LocalAssetStore(IConfiguration configuration)
     {
@@ -96,6 +97,34 @@ public class LocalAssetStore : IDisposable
     }
 
     /// <summary>
+    /// Removes assets that are no longer accessible by a user
+    /// </summary>
+    public int DeleteOrphanedAssets()
+    {
+        var filesDeleted = 0;
+        var activeFiles = _activeAssetMap.Values.Select(x => x.FullName);
+
+        // delete all files that are no longer used and have been preserved for the minimum expiry timespan
+        foreach (var oldFile in Directory.GetFiles(_assetRoot, "*", SearchOption.AllDirectories).Except(activeFiles))
+        {
+            if (File.GetCreationTime(oldFile).AddDays(ExpiryThreshold) > DateTime.Now)
+            {
+                continue;
+            }
+
+            File.Delete(oldFile);
+            filesDeleted++;
+        }
+
+        if (filesDeleted > 0)
+        {
+            DeleteEmptyDirectories(_assetRoot);
+        }
+
+        return filesDeleted;
+    }
+
+    /// <summary>
     /// Populates a table of request paths to relative paths (on filesystem against the provided asset root), along with a set of all files that can be downloaded by a client.
     /// </summary>
     private void PopulateAssetTables()
@@ -117,6 +146,24 @@ public class LocalAssetStore : IDisposable
         }
     }
 
+    /// <summary>
+    /// Recursively deletes empty directories given a starting location.
+    /// </summary>
+    /// <param name="startLocation">The directory to start at</param>
+    /// <remarks>Adapted from https://stackoverflow.com/a/2811654 with related comments/optimisations applied</remarks>
+    private static void DeleteEmptyDirectories(string startLocation)
+    {
+        foreach (var directory in Directory.GetDirectories(startLocation))
+        {
+            DeleteEmptyDirectories(directory);
+
+            if (!Directory.EnumerateFileSystemEntries(directory).Any())
+            {
+                Directory.Delete(directory, false);
+            }
+        }
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void SetFileInfo(string requestSubpath, string filePath)
     {
@@ -124,7 +171,11 @@ public class LocalAssetStore : IDisposable
         _activeAssetMap[requestSubpath.Replace('\\', '/')] = new FileInfo(filePath);
     }
 
-    // https://stackoverflow.com/a/7911591
+    /// <summary>
+    /// Returns the root of a relative path
+    /// </summary>
+    /// <param name="path"></param>
+    /// <remarks>Based on the answer https://stackoverflow.com/a/7911591</remarks>
     private static string GetRootFolder(string path)
     {
         while (true)
