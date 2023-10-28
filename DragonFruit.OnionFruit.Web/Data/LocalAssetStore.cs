@@ -86,6 +86,15 @@ public class LocalAssetStore : IDisposable
     }
 
     /// <summary>
+    /// Gets whether a specified asset revision exists
+    /// </summary>
+    public bool AssetRevisionExists(string revisionId)
+    {
+        var pathPrefix = Path.Combine(_assetRoot, revisionId);
+        return _accessibleFilePaths.Any(x => x.StartsWith(pathPrefix, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
     /// Creates a new asset store version, returning a container that can be used to submit files.
     /// </summary>
     public LocalAssetStoreRevision CreateNewAssetStoreRevision(string revisionId)
@@ -145,7 +154,7 @@ public class LocalAssetStore : IDisposable
         Directory.CreateDirectory(_assetRoot);
 
         // get all folders and order by value
-        foreach (var file in Directory.GetDirectories(_assetRoot).Order().SelectMany(x => Directory.GetFiles(x, "*", SearchOption.AllDirectories)))
+        foreach (var file in Directory.GetDirectories(_assetRoot).OrderBy(Directory.GetCreationTimeUtc).SelectMany(x => Directory.GetFiles(x, "*", SearchOption.AllDirectories)))
         {
             _accessibleFilePaths.Add(file);
 

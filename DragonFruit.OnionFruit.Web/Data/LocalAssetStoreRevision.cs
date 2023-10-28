@@ -14,18 +14,19 @@ public class LocalAssetStoreRevision
 
     public LocalAssetStoreRevision(string basePath, Action<string> promoteItemCallback)
     {
-        _basePath = basePath;
+        _basePath = $"{basePath.TrimEnd('/')}/";
         _promoteItemCallback = promoteItemCallback;
     }
 
     public async Task AddFile(string fileName, Stream input)
     {
-        if (fileName.Contains("..", StringComparison.OrdinalIgnoreCase))
+        var fullPath = Path.Combine(_basePath, fileName);
+
+        if (!fullPath.StartsWith(_basePath, StringComparison.OrdinalIgnoreCase))
         {
-            throw new ArgumentException("Directory traversal not allowed");
+            throw new ArgumentException($"{nameof(fileName)} traverses directories, which is not allowed");
         }
 
-        var fullPath = Path.Combine(_basePath, fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
         using (var file = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous))
