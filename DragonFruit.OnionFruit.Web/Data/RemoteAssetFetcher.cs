@@ -27,6 +27,7 @@ namespace DragonFruit.OnionFruit.Web.Data
         private readonly LocalAssetStore _assetStore;
         private readonly ApiClient _client;
 
+        private ChannelMessageQueue _redisMessageQueue;
         private Timer _timer;
 
         public RemoteAssetFetcher(ILogger<RemoteAssetFetcher> logger, IConnectionMultiplexer redis, IConfiguration configuration, LocalAssetStore assetStore, ApiClient client)
@@ -100,9 +101,15 @@ namespace DragonFruit.OnionFruit.Web.Data
 
         private async Task DownloadAssetBundle(string name, string revisionId = null)
         {
+            if (!Path.GetExtension(name).Equals(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogWarning("File {name} is not a zip file and cannot be used.", name);
+                return;
+            }
+
             var downloadUrl = string.Format(_configuration["RemoteAssets:DownloadUrl"], name);
 
-            using var content = await _client.PerformAsync<FileStream>(downloadUrl);
+            using var content = await _client.PerformAsync<FileStream>(downloadUrl).ConfigureAwait(false);
             using var zipStream = new ZipArchive(content, ZipArchiveMode.Read);
 
             var assetStore = _assetStore.CreateNewAssetStoreRevision(revisionId ?? FileNameToRevisionId(name));
@@ -114,6 +121,46 @@ namespace DragonFruit.OnionFruit.Web.Data
             }
         }
 
+        /// <summary>
+        /// Event callback triggered by the local <see cref="_timer"/>
+        /// </summary>
+        private async Task PerformTimerUpdate()
+        {
+            _logger.LogInformation("Performing Timer-based asset update check...");
+
+            try
+            {
+                await PerformAssetCheck().ConfigureAwait(false);
+                _timer.Change(TimeSpan.FromDays(1), Timeout.InfiniteTimeSpan);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Timer-controlled update failed: {err}", e.Message);
+                _timer.Change(TimeSpan.FromMinutes(30), Timeout.InfiniteTimeSpan);
+            }
+        }
+
+        /// <summary>
+        /// Event callback triggered by the attached redis database.
+        /// </summary>
+        private async Task PerformRedisUpdate(ChannelMessage channel)
+        {
+            if (channel.Message.IsNullOrEmpty)
+            {
+                return;
+            }
+
+            try
+            {
+                await DownloadAssetBundle(channel.Message).ConfigureAwait(false);
+                _timer?.Change(TimeSpan.FromDays(1), Timeout.InfiniteTimeSpan);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Redis-based update (asset id {id}) failed: {err}", channel.Message, e.Message);
+            }
+        }
+
         private static string FileNameToRevisionId(string fileName)
         {
             var normalisedFileName = Path.GetFileNameWithoutExtension(fileName).ToLowerInvariant();
@@ -122,14 +169,30 @@ namespace DragonFruit.OnionFruit.Web.Data
             return Convert.ToHexString(fileNameHash).ToLowerInvariant();
         }
 
-        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        async Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            RedisChannel? channelIdentifier = _configuration["Server:RedisUpdateChannelName"];
+
+            if (channelIdentifier.HasValue)
+            {
+                _redisMessageQueue = await _redis.GetSubscriber().SubscribeAsync(channelIdentifier.Value).ConfigureAwait(false);
+                _redisMessageQueue.OnMessage(PerformRedisUpdate);
+            }
+
+            _timer = new Timer(_ => PerformTimerUpdate(), null, TimeSpan.Zero, Timeout.InfiniteTimeSpan);
         }
 
-        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        async Task IHostedService.StopAsync(CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            if (_timer != null)
+            {
+                await _timer.DisposeAsync().ConfigureAwait(false);
+            }
+
+            if (_redisMessageQueue != null)
+            {
+                await _redisMessageQueue.UnsubscribeAsync();
+            }
         }
     }
 }
