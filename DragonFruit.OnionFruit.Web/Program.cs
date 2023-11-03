@@ -33,7 +33,8 @@ public static class Program
             policy.SetIsOriginAllowed(s =>
             {
                 var uri = new Uri(s, UriKind.Absolute);
-                return uri.Host == "localhost" || uri.Host.EndsWith("dragonfruit.network");
+                return uri.Host == "localhost" || uri.Host.Equals("dragonfruit.network", StringComparison.OrdinalIgnoreCase)
+                                               || uri.Host.EndsWith(".dragonfruit.network", StringComparison.OrdinalIgnoreCase);
             });
         }));
 
