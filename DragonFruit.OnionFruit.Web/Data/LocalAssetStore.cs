@@ -33,8 +33,10 @@ public class LocalAssetStore : IDisposable
         _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
 
         _logger = logger;
-        _accessibleFilePaths = new HashSet<string>();
-        _activeAssetMap = new ConcurrentDictionary<string, FileInfo>();
+
+        _accessibleFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        _activeAssetMap = new ConcurrentDictionary<string, FileInfo>(StringComparer.OrdinalIgnoreCase);
+
         _assetFileWatcher = new FileSystemWatcher
         {
             Path = _assetRoot,
