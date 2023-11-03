@@ -55,11 +55,16 @@ public static class Program
 
         builder.Services.AddSingleton<LocalAssetStore>();
 
-        // register worker if needed
+        // register worker if running in integrated mode (worker copies files out
+        // cannot run both the integrated worker and the remote asset fetcher at same time due to different versioning systems used.
         if (builder.Configuration["Worker:Enabled"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
         {
             builder.Services.AddSingleton<Worker.Worker>();
             builder.Services.AddHostedService(s => s.GetRequiredService<Worker.Worker>());
+        }
+        else
+        {
+            builder.Services.AddHostedService<RemoteAssetFetcher>();
         }
 
         var app = builder.Build();
