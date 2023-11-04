@@ -8,11 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
+[UsedImplicitly]
 public record LocalAssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt);
 
 public class LocalAssetStore : IDisposable

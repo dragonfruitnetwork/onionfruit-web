@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Database;
+using JetBrains.Annotations;
 using libloc.Abstractions;
 using libloc.Access;
 using Microsoft.AspNetCore.Cors;
@@ -13,6 +14,7 @@ using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Controllers;
 
+[UsedImplicitly]
 public record ConnectionStatusResponse(string IpAddress, bool IsTor, string CountryCode, string CountryName, int? ASNumber, string ASName);
 
 [EnableCors]
