@@ -1,11 +1,21 @@
 ﻿{
   "profiles": {
-    "Server": {
+    "ServerAndWorker": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:3001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "IntegratedWorker",
+        "REDIS_CREATE_INDEXES": "true",
+        "REDIS_REGEN_INDEXES": "true"
+      }
+    },
+    "Server": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:3001",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Debug",
         "REDIS_CREATE_INDEXES": "true",
         "REDIS_REGEN_INDEXES": "true"
       }
