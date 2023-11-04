@@ -2,6 +2,7 @@
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -43,8 +44,12 @@ namespace DragonFruit.OnionFruit.Web.Data
         {
             _logger.LogInformation("Performing asset download check");
 
-            var listingUrl = _configuration["RemoteAssets:ListingUrl"] ?? string.Format(_configuration["RemoteAssets:DownloadUrl"], string.Empty);
-            var jsonPath = _configuration["RemoteAssets:ListingPath"] ?? "$[*]";
+            var clock = new Stopwatch();
+
+            clock.Start();
+
+            var jsonPath = _configuration["Server:RemoteAssets:ListingPath"] ?? "$[*]";
+            var listingUrl = _configuration["Server:RemoteAssets:ListingUrl"] ?? string.Format(_configuration["Server:RemoteAssets:DownloadUrl"], string.Empty);
 
             if (!JsonPath.TryParse(jsonPath, out var jsonPathSelector))
             {
@@ -74,8 +79,8 @@ namespace DragonFruit.OnionFruit.Web.Data
             var targetElement = eval.Matches.Where(x => x.Value != null)
                 .Select(x => new
                 {
-                    Name = x.Value[_configuration["RemoteAssets:EntryNameKey"]]?.GetValue<string>(),
-                    Date = x.Value[_configuration["RemoteAssets:EntryDateKey"]]?.GetValue<DateTime>()
+                    Name = x.Value[_configuration["Server:RemoteAssets:EntryNameKey"]]?.GetValue<string>(),
+                    Date = x.Value[_configuration["Server:RemoteAssets:EntryDateKey"]]?.GetValue<DateTime>()
                 })
                 .Where(x => Path.GetExtension(x.Name).Equals(".zip", StringComparison.InvariantCultureIgnoreCase))
                 .MaxBy(x => x.Date);
@@ -97,6 +102,9 @@ namespace DragonFruit.OnionFruit.Web.Data
             }
 
             await DownloadAssetBundle(targetElement.Name, revisionId).ConfigureAwait(false);
+
+            clock.Stop();
+            _logger.LogInformation("Asset check completed successfully ({x} elapsed)", clock.Elapsed);
         }
 
         private async Task DownloadAssetBundle(string name, string revisionId = null)
@@ -107,18 +115,20 @@ namespace DragonFruit.OnionFruit.Web.Data
                 return;
             }
 
-            var downloadUrl = string.Format(_configuration["RemoteAssets:DownloadUrl"], name);
+            var downloadUrl = string.Format(_configuration["Server:RemoteAssets:DownloadUrl"], name);
 
             using var content = await _client.PerformAsync<FileStream>(downloadUrl).ConfigureAwait(false);
             using var zipStream = new ZipArchive(content, ZipArchiveMode.Read);
 
-            var assetStore = _assetStore.CreateNewAssetStoreRevision(revisionId ?? FileNameToRevisionId(name));
+            var assetStore = _assetStore.CreateNewAssetStoreRevision(revisionId ??= FileNameToRevisionId(name));
 
             foreach (var zipEntry in zipStream.Entries)
             {
                 using var zipEntryStream = zipEntry.Open();
                 await assetStore.AddFile(zipEntry.FullName, zipEntryStream).ConfigureAwait(false);
             }
+
+            _logger.LogInformation("Asset store revision {id} submitted successfully.", revisionId);
         }
 
         /// <summary>

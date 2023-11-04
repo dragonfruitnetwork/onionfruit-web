@@ -31,7 +31,12 @@ public class LocalAssetStoreRevision
 
         using (var file = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous))
         {
-            input.Seek(0, SeekOrigin.Begin);
+            // archive streams can't be seeked
+            if (file.Position > 0 && file.CanSeek)
+            {
+                input.Seek(0, SeekOrigin.Begin);
+            }
+
             await input.CopyToAsync(file).ConfigureAwait(false);
         }
 
