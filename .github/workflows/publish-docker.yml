@@ -1,4 +1,4 @@
-﻿name: Publish Worker
+﻿name: Publish Docker Images
 
 on:
   release:
@@ -10,6 +10,12 @@ permissions:
 jobs:
   docker-linux:
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix: 
+        project: 
+          - { name: "DragonFruit.OnionFruit.Web", tag-prefix: "" }
+          - { name: "DragonFruit.OnionFruit.Web.Worker", tag-prefix: "worker-" }
 
     steps:
       - uses: actions/checkout@v4
@@ -28,19 +34,31 @@ jobs:
         run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build Worker
-        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} DragonFruit.OnionFruit.Web.Worker
+        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} ${{ matrix.project.name }}
 
       - name: Docker Build and Push
         uses: docker/build-push-action@v5
         with:
-          context: DragonFruit.OnionFruit.Web.Worker/bin/Release/net7.0/publish
-          tags: dragonfruitdotnet/onionfruit-web:worker-linux
-          file: DragonFruit.OnionFruit.Web.Worker/Dockerfile
+          context: ${{ matrix.project.name }}/bin/Release/net7.0/publish
+          tags: dragonfruitdotnet/onionfruit-web:${{ matrix.project.tag-prefix }}linux
           platforms: linux/arm64,linux/amd64
+          file: Dockerfile
           push: true
+          build-args:
+            - ENTRYPOINT_FILENAME=${{ matrix.project.name }}.dll
+            - IMAGE_VARIANT=7.0-alpine
           
   docker-windows:
     runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        project:
+          - { name: "DragonFruit.OnionFruit.Web", tag-prefix: "" }
+          - { name: "DragonFruit.OnionFruit.Web.Worker", tag-prefix: "worker-" }
+          
+    env:
+      DOCKER_TAG: dragonfruitdotnet/onionfruit-web:${{ matrix.project.tag-prefix }}windows
     
     steps:
       - uses: actions/checkout@v4
@@ -53,13 +71,13 @@ jobs:
         run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build Worker
-        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} DragonFruit.OnionFruit.Web.Worker
+        run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} ${{ matrix.project.name }}
         
       - name: Docker Build
-        run: docker build -f DragonFruit.OnionFruit.Web.Worker\Dockerfile -t dragonfruitdotnet/onionfruit-web:worker-windows --build-arg "IMAGE_VARIANT=7.0-nanoserver-ltsc2022" DragonFruit.OnionFruit.Web.Worker\bin\Release\net7.0\publish
+        run: docker build -f Dockerfile -t ${{ env.DOCKER_TAG }} --build-arg "IMAGE_VARIANT=7.0-nanoserver-ltsc2022" --build-arg "ENTRYPOINT_FILENAME=${{ matrix.project.name }}.dll" ${{ matrix.project.name }}\bin\Release\net7.0\publish
         
       - name: Docker Push
-        run: docker push dragonfruitdotnet/onionfruit-web:worker-windows
+        run: docker push ${{ env.DOCKER_TAG }}
         
   docker-multiarch-image:
     runs-on: ubuntu-latest
@@ -74,5 +92,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      - name: Create MultiArch+MultiOS Manifest
+      - name: Create MultiArch+MultiOS Manifest (Server)
+        run: docker buildx imagetools create -t dragonfruitdotnet/onionfruit-web -t dragonfruitdotnet/onionfruit-web:${{ github.event.release.tag_name }} dragonfruitdotnet/onionfruit-web:windows dragonfruitdotnet/onionfruit-web:linux
+          
+      - name: Create MultiArch+MultiOS Manifest (Worker)
         run: docker buildx imagetools create -t dragonfruitdotnet/onionfruit-web:worker -t dragonfruitdotnet/onionfruit-web:worker-${{ github.event.release.tag_name }} dragonfruitdotnet/onionfruit-web:worker-windows dragonfruitdotnet/onionfruit-web:worker-linux
