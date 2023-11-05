@@ -49,7 +49,7 @@ public static class Program
         var fullConfigBasePath = Path.GetFullPath(configBase);
         if (Directory.Exists(fullConfigBasePath))
         {
-            host.SetBasePath(fullConfigBasePath);
+            host.SetBasePath(fullConfigBasePath).AddJsonFile("appsettings.json");
         }
     }
 

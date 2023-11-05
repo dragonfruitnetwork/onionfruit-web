@@ -8,6 +8,7 @@ using DragonFruit.OnionFruit.Web.Worker;
 using libloc.Access;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Redis.OM;
 using Redis.OM.Contracts;
@@ -20,6 +21,12 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        var configPathBase = Environment.GetEnvironmentVariable("CONFIG_PATH_BASE");
+
+        if (!string.IsNullOrEmpty(configPathBase))
+        {
+            builder.Configuration.SetBasePath(configPathBase).AddJsonFile("appsettings.json");
+        }
 
         Worker.Program.ConfigureLogging(builder.Logging, builder.Configuration, "Server");
 
