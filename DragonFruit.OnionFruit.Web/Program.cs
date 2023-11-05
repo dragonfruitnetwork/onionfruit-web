@@ -21,7 +21,7 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        var configPathBase = Environment.GetEnvironmentVariable("CONFIG_PATH_BASE");
+        var configPathBase = Environment.GetEnvironmentVariable("CONFIG_FOLDER_PATH");
 
         if (!string.IsNullOrEmpty(configPathBase))
         {
