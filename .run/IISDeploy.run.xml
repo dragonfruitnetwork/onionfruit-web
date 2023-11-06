@@ -1,0 +1,6 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="IISDeploy" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
+    <riderPublish configuration="Release" platform="Any CPU" publish_profile="IISDeploy.pubxml" pubxml_path="$PROJECT_DIR$/DragonFruit.OnionFruit.Web/Properties/PublishProfiles/IISDeploy.pubxml" uuid_high="9198180637370437578" uuid_low="-4858057777374021437" />
+    <method v="2" />
+  </configuration>
+</component>
