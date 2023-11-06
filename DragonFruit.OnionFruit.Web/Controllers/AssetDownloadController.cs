@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Web;
 using DragonFruit.OnionFruit.Web.Data;
 using Microsoft.AspNetCore.Cors;
@@ -38,7 +39,9 @@ public class AssetDownloadController : ControllerBase
         }
 
         Response.Headers.LastModified = versionedAsset.CreatedAt.ToString("r");
-        return RedirectToAction("DownloadVersionedAsset", new {versionedAssetPath = versionedAsset.VersionedPath});
+
+        var redirectUrl = Url.Action("DownloadVersionedAsset", new {versionedAssetPath = versionedAsset.VersionedPath});
+        return Redirect(HttpUtility.UrlDecode(redirectUrl));
     }
 
     [HttpGet("~/asset-dl/{*versionedAssetPath}")]
@@ -52,6 +55,6 @@ public class AssetDownloadController : ControllerBase
             return NotFound();
         }
 
-        return File(fs, "application/octet-stream");
+        return File(fs, "application/octet-stream", Path.GetFileName(versionedAssetPath));
     }
 }
