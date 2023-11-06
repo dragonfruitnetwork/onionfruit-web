@@ -1,0 +1,33 @@
+﻿name: WebDeploy Package Generation
+
+on:
+  release:
+    types: [ published ]
+
+permissions:
+  packages: read
+  contents: write
+
+jobs:  
+  webdeploy-windows:
+    runs-on: windows-latest
+    
+    env:
+      OUTPUT_FILE_NAME: OnionFruit-Web-${{ github.ref_name }}.zip
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup GitHub NuGet
+        run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
+
+      - name: Build Server Package
+        run:  dotnet publish -c Release -r win-x64 --self-contained false -p:Version=${{ github.event.release.tag_name }} -p:PublishProfile=IISDeploy.pubxml -p:EnvironmentName=Production -p:WebServerPublish=true DragonFruit.OnionFruit.Web
+
+      - name: Archive Output
+        run: Compress-Archive -Path .\DragonFruit.OnionFruit.Web\bin\publish\* -DestinationPath ${{ env.OUTPUT_FILE_NAME }}
+
+      - name: Upload Deploy Package
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.OUTPUT_FILE_NAME }}
