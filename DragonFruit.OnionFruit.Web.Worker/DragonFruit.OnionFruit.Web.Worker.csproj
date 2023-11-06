@@ -5,6 +5,10 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(ServerPublish)' == 'true'">
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="DnsClient" Version="1.7.0"/>
