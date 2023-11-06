@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace DragonFruit.OnionFruit.Web.Controllers;
 
 [EnableCors]
-[Route("~/assets")]
 public class AssetDownloadController : ControllerBase
 {
     private readonly LocalAssetStore _assetStore;
@@ -21,7 +20,7 @@ public class AssetDownloadController : ControllerBase
         _assetStore = assetStore;
     }
 
-    [HttpGet("{*assetPath}")]
+    [HttpGet("~/assets/{*assetPath}")]
     public IActionResult ResolveAssetPath(string assetPath)
     {
         assetPath = HttpUtility.UrlDecode(assetPath);
@@ -42,7 +41,7 @@ public class AssetDownloadController : ControllerBase
         return RedirectToAction("DownloadVersionedAsset", new {versionedAssetPath = versionedAsset.VersionedPath});
     }
 
-    [HttpGet("dl/{*versionedAssetPath}")]
+    [HttpGet("~/asset-dl/{*versionedAssetPath}")]
     public IActionResult DownloadVersionedAsset(string versionedAssetPath)
     {
         versionedAssetPath = HttpUtility.UrlDecode(versionedAssetPath);
