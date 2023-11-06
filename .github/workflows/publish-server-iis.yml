@@ -22,7 +22,7 @@ jobs:
         run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build Server Package
-        run:  dotnet publish -c Release -r win-x64 --self-contained false -p:Version=${{ github.event.release.tag_name }} -p:PublishProfile=IISDeploy.pubxml -p:EnvironmentName=Production -p:WebServerPublish=true DragonFruit.OnionFruit.Web
+        run:  dotnet publish -c Release -r win-x64 --self-contained false -p:Version=${{ github.event.release.tag_name }} -p:PublishProfile=IISDeploy.pubxml -p:EnvironmentName=Production -p:ServerPublish=true DragonFruit.OnionFruit.Web
 
       - name: Archive Output
         run: Compress-Archive -Path .\DragonFruit.OnionFruit.Web\bin\publish\* -DestinationPath ${{ env.OUTPUT_FILE_NAME }}
