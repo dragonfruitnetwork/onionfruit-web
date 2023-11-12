@@ -119,7 +119,7 @@ public class LocalAssetStore : IDisposable
         var activeFiles = _activeAssetMap.Values.Select(x => x.FullName);
 
         // delete all files that are no longer used and have been preserved for the minimum expiry timespan
-        foreach (var oldFile in Directory.GetFiles(_assetRoot, "*", SearchOption.AllDirectories).Except(activeFiles))
+        foreach (var oldFile in Directory.GetDirectories(_assetRoot).SelectMany(x => Directory.GetFiles(x, "*", SearchOption.AllDirectories)).Except(activeFiles))
         {
             if (File.GetCreationTime(oldFile).AddDays(ExpiryThreshold) > DateTime.Now)
             {
