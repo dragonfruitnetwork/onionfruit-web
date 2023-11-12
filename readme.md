@@ -11,8 +11,9 @@ The system is split into two systems:
 - The server responsible for serving user-initiated requests for data (designed to scale horizontally independent of the worker process)
 
 ### Deployment
+Deployment can be done on either a Windows or Linux-based server. Docker images are built on each release for both the server and worker images and can be found on [Dockerhub](https://hub.docker.com/r/dragonfruitdotnet/onionfruit-web)
 
-WIP - will be completed once the project is more complete.
+See deployment.md for further instruction on how to deploy.
 
 ### License
 These libraries and components are licensed under Apache 2.0. Refer to the license file for more info.
