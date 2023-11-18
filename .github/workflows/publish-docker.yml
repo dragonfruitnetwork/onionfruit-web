@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     
     strategy:
-      matrix: 
-        project: 
+      matrix:
+        project:
           - { name: "DragonFruit.OnionFruit.Web", tag-prefix: "" }
           - { name: "DragonFruit.OnionFruit.Web.Worker", tag-prefix: "worker-" }
 
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '8.0.x'
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
@@ -29,25 +29,22 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Setup GitHub NuGet
         run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
-      - name: Build Worker
+      - name: Build
         run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} ${{ matrix.project.name }}
 
-      - name: Docker Build and Push
+      - name: Image Build and Push
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.project.name }}/bin/Release/net7.0/publish
+          context: ${{ matrix.project.name }}/bin/Release/net8.0/publish
           tags: dragonfruitdotnet/onionfruit-web:${{ matrix.project.tag-prefix }}linux
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ${{ matrix.project.name }}/Dockerfile
           push: true
-          build-args:
-            - ENTRYPOINT_FILENAME=${{ matrix.project.name }}.dll
-            - IMAGE_VARIANT=7.0-alpine
-          
+  
   docker-windows:
     runs-on: windows-latest
     
@@ -56,12 +53,16 @@ jobs:
         project:
           - { name: "DragonFruit.OnionFruit.Web", tag-prefix: "" }
           - { name: "DragonFruit.OnionFruit.Web.Worker", tag-prefix: "worker-" }
-          
+    
     env:
       DOCKER_TAG: dragonfruitdotnet/onionfruit-web:${{ matrix.project.tag-prefix }}windows
     
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -70,15 +71,15 @@ jobs:
       - name: Setup GitHub NuGet
         run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
-      - name: Build Worker
+      - name: Build
         run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} ${{ matrix.project.name }}
-        
-      - name: Docker Build
-        run: docker build -f Dockerfile -t ${{ env.DOCKER_TAG }} --build-arg "IMAGE_VARIANT=7.0-nanoserver-ltsc2022" --build-arg "ENTRYPOINT_FILENAME=${{ matrix.project.name }}.dll" ${{ matrix.project.name }}\bin\Release\net7.0\publish
-        
-      - name: Docker Push
+
+      - name: Image Build
+        run: docker build -f ${{ matrix.project.name }}\Dockerfile -t ${{ env.DOCKER_TAG }} --build-arg "IMAGEVARIANT=nanoserver-ltsc2022" ${{ matrix.project.name }}\bin\Release\net8.0\publish
+
+      - name: Image Push
         run: docker push ${{ env.DOCKER_TAG }}
-        
+  
   docker-multiarch-image:
     runs-on: ubuntu-latest
 
@@ -91,9 +92,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Create MultiArch+MultiOS Manifest (Server)
         run: docker buildx imagetools create -t dragonfruitdotnet/onionfruit-web -t dragonfruitdotnet/onionfruit-web:${{ github.event.release.tag_name }} dragonfruitdotnet/onionfruit-web:windows dragonfruitdotnet/onionfruit-web:linux
-          
+
       - name: Create MultiArch+MultiOS Manifest (Worker)
         run: docker buildx imagetools create -t dragonfruitdotnet/onionfruit-web:worker -t dragonfruitdotnet/onionfruit-web:worker-${{ github.event.release.tag_name }} dragonfruitdotnet/onionfruit-web:worker-windows dragonfruitdotnet/onionfruit-web:worker-linux
