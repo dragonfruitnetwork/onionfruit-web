@@ -35,6 +35,6 @@ public class ClientCountriesDatabaseGenerator : IDatabaseGenerator
 
     private static IEnumerable<string> CountriesWithFlag(IEnumerable<IGrouping<string, TorRelayDetails>> info, TorNodeFlags flag)
     {
-        return info.Where(x => x.Any(y => y.Flags.HasFlag(flag))).Select(x => x.Key);
+        return info.Where(x => x.Any(y => y.Flags.HasFlag(flag))).Select(x => x.Key.ToUpperInvariant());
     }
 }
