@@ -55,13 +55,13 @@ public class ConnectionStatusController : ControllerBase
         }
 
         // if not on redis, use cloudflare to check if tor and libloc to get network info
-        var (country, asInfo) = await _libloc.PerformAsync(a => GetConnectionInfo(a, ipAddress)).ConfigureAwait(false);
-        var isTor = HttpContext.Request.Headers.TryGetValue("CF-IPCountry", out var cloudflareCountry) && cloudflareCountry == "T1";
+        var cloudflareCountryDetected = HttpContext.Request.Headers.TryGetValue("CF-IPCountry", out var cloudflareCountry);
+        var (country, asInfo) = await _libloc.PerformAsync(a => GetConnectionInfo(a, ipAddress, cloudflareCountryDetected ? cloudflareCountry.ToString() : null)).ConfigureAwait(false);
 
-        return new ConnectionStatusResponse(ipAddress.ToString(), isTor, country?.Code ?? "XX", country?.Name ?? "Unknown Country", asInfo?.Number, asInfo?.Name);
+        return new ConnectionStatusResponse(ipAddress.ToString(), cloudflareCountryDetected && cloudflareCountry == "T1", country?.Code ?? "XX", country?.Name ?? "Unknown Country", asInfo?.Number, asInfo?.Name);
     }
 
-    private (IDatabaseCountry country, IDatabaseAS asInfo) GetConnectionInfo(ILocationDatabase x, IPAddress address)
+    private (IDatabaseCountry country, IDatabaseAS asInfo) GetConnectionInfo(ILocationDatabase x, IPAddress address, [CanBeNull] string countryCodeOverride)
     {
         IDatabaseAS asInfo = null;
         IDatabaseCountry country = null;
@@ -71,7 +71,7 @@ public class ConnectionStatusController : ControllerBase
         if (addr != null)
         {
             asInfo = x.AS.GetAS((int)addr.ASN);
-            country = x.Countries.GetCountry(addr.CountryCode);
+            country = x.Countries.GetCountry(countryCodeOverride ?? addr.CountryCode);
         }
 
         return (country, asInfo);
