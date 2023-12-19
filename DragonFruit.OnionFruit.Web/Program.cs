@@ -33,8 +33,7 @@ public static class Program
         builder.Services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower);
         builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy =>
         {
-            policy.AllowAnyMethod();
-            policy.AllowAnyHeader();
+            policy.WithMethods("GET");
             policy.SetPreflightMaxAge(TimeSpan.FromHours(12));
 
             policy.SetIsOriginAllowed(s =>
