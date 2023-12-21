@@ -25,18 +25,9 @@ namespace DragonFruit.OnionFruit.Web.Worker.Sources;
 
 public record NetworkAddressRangeInfo(IPAddressRange Network, string CountryCode);
 
-public class LocationDbSource : IDataSource, IDisposable
+public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : IDataSource, IDisposable
 {
-    private readonly ILookupClient _dnsClient;
-    private readonly ApiClient _apiClient;
-
     private const string LastUpdateRecordAddress = "_v1._db.location.ipfire.org";
-
-    public LocationDbSource(ILookupClient dnsClient, ApiClient apiClient)
-    {
-        _dnsClient = dnsClient;
-        _apiClient = apiClient;
-    }
 
     public ILocationDatabase Database { get; private set; }
 
@@ -48,7 +39,7 @@ public class LocationDbSource : IDataSource, IDisposable
 
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
-        var records = await _dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT).ConfigureAwait(false);
+        var records = await dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT).ConfigureAwait(false);
         var date = records.Answers.OfType<TxtRecord>().SingleOrDefault()?.Text.First();
 
         if (string.IsNullOrEmpty(date))
@@ -63,7 +54,7 @@ public class LocationDbSource : IDataSource, IDisposable
     {
         var dbFileStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan | FileOptions.DeleteOnClose);
 
-        await using (var downloadStream = await _apiClient.PerformAsync<FileStream>(new LocationDbDownloadRequest()).ConfigureAwait(false))
+        await using (var downloadStream = await apiClient.PerformAsync<FileStream>(new LocationDbDownloadRequest()).ConfigureAwait(false))
         await using (var xzStream = new XZStream(downloadStream))
         {
             await xzStream.CopyToAsync(dbFileStream).ConfigureAwait(false);
