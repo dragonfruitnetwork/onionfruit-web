@@ -31,10 +31,10 @@ public class OnionooDataSource(ApiClient client) : IDataSource
                 return false;
 
             case HttpStatusCode.OK:
-                var serializer = client.Serializers.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
+                var serializer = (IAsyncSerializer)client.Serializers.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
 
                 var networkStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                var data = serializer.Deserialize<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(networkStream);
+                var data = await serializer.DeserializeAsync<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(networkStream);
 
                 Relays = data.Relays;
                 DataLastModified = response.Content.Headers.LastModified?.UtcDateTime ?? DateTime.UtcNow;
