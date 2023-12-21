@@ -69,6 +69,8 @@ public class Worker : IHostedService
         {
             var source = (IDataSource)ActivatorUtilities.CreateInstance(scope.ServiceProvider, sourceType);
 
+            _logger.LogInformation("Checking if {source} has been updated", sourceType.Name);
+
             sourceInstances[sourceType] = source;
             dataSourceUpdated |= await source.HasDataChanged(lastVersion).ConfigureAwait(false);
         }
@@ -81,6 +83,7 @@ public class Worker : IHostedService
         }
 
         // fetch all data sources
+        _logger.LogInformation("Waiting for {count} sources to be fetched...", sourceInstances.Count);
         await Task.WhenAll(sourceInstances.Select(x => x.Value.CollectData())).ConfigureAwait(false);
 
         // file sink used to store static-generated assets for uploading to s3 or saving to a local path
@@ -92,7 +95,7 @@ public class Worker : IHostedService
 
             try
             {
-                _logger.LogInformation("Running generator for {name}...", generatorDescriptor.OutputFormat.Name);
+                _logger.LogInformation("Running {name}...", generatorDescriptor.OutputFormat.Name);
 
                 var instanceSources = generatorDescriptor.SourceTypes.Select(x => (object)sourceInstances[x]).ToArray();
                 var generatorInstance = (IDatabaseGenerator)ActivatorUtilities.CreateInstance(scope.ServiceProvider, generatorDescriptor.OutputFormat, instanceSources);
@@ -100,11 +103,11 @@ public class Worker : IHostedService
                 disposableGeneratorInstance = generatorInstance as IDisposable;
 
                 await generatorInstance.GenerateDatabase(fileSink).ConfigureAwait(false);
-                _logger.LogInformation("Generator finished successfully");
+                _logger.LogInformation("{name} finished successfully", generatorDescriptor.OutputFormat.Name);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Database Generator {x} has failed: {err}", generatorDescriptor.OutputFormat.Name, e.Message);
+                _logger.LogError(e, "{x} has failed: {err}", generatorDescriptor.OutputFormat.Name, e.Message);
             }
             finally
             {
