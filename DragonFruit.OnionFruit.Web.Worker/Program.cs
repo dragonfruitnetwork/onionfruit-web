@@ -5,9 +5,12 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DnsClient;
 using DragonFruit.Data;
+using DragonFruit.Data.Serializers;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -90,7 +93,17 @@ public static class Program
 
         // api
         services.AddSingleton<ILookupClient, LookupClient>();
-        services.AddSingleton<ApiClient, WorkerApiClient>();
+        services.AddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
+
+        services.Configure<ApiClient>(c =>
+        {
+            c.UserAgent = $"OnionFruit-Web-Worker/{typeof(Program).Assembly.GetName().Version?.ToString(3)}";
+            c.Serializers.Configure<ApiJsonSerializer>(json =>
+            {
+                json.SerializerOptions = new JsonSerializerOptions();
+                json.SerializerOptions.Converters.Add(new DateTimeConverter());
+            });
+        });
 
         // timed service
         services.AddHostedService<Worker>();

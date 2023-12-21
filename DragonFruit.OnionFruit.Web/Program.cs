@@ -3,8 +3,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DnsClient;
 using DragonFruit.Data;
+using DragonFruit.Data.Serializers;
 using DragonFruit.OnionFruit.Web.Data;
 using DragonFruit.OnionFruit.Web.Worker;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 using libloc.Access;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -58,7 +60,17 @@ public static class Program
 
         // api clients
         builder.Services.AddSingleton<ILookupClient, LookupClient>();
-        builder.Services.AddSingleton<ApiClient, WorkerApiClient>();
+        builder.Services.AddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
+
+        builder.Services.Configure<ApiClient>(c =>
+        {
+            c.UserAgent = $"OnionFruit-Web/{typeof(Program).Assembly.GetName().Version?.ToString(3)}";
+            c.Serializers.Configure<ApiJsonSerializer>(json =>
+            {
+                json.SerializerOptions = new JsonSerializerOptions();
+                json.SerializerOptions.Converters.Add(new DateTimeConverter());
+            });
+        });
 
         builder.Services.AddSingleton<LocalAssetStore>();
 
