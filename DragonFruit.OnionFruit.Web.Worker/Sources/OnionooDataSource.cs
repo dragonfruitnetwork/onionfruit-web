@@ -13,15 +13,8 @@ using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources;
 
-public class OnionooDataSource : IDataSource
+public class OnionooDataSource(ApiClient client) : IDataSource
 {
-    private readonly ApiClient _client;
-
-    public OnionooDataSource(ApiClient client)
-    {
-        _client = client;
-    }
-
     public DateTimeOffset DataLastModified { get; private set; }
 
     public IReadOnlyList<TorRelayDetails> Relays { get; private set; }
@@ -30,26 +23,30 @@ public class OnionooDataSource : IDataSource
 
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
-        var request = new TorStatusDetailsRequest().Build(_client);
+        var request = new TorStatusRequest
+        {
+            LastModified = lastVersionDate
+        };
+
+        var requestMessage = request.BuildRequest(client.Serializers);
 
         // change to head (so the body isn't sent)
-        request.Method = HttpMethod.Head;
-        request.Headers.IfModifiedSince = lastVersionDate;
+        requestMessage.Method = HttpMethod.Head;
 
-        using var response = await _client.PerformAsync(request).ConfigureAwait(false);
+        using var response = await client.PerformAsync(request).ConfigureAwait(false);
         return response.StatusCode != HttpStatusCode.NotModified;
     }
 
     public async Task CollectData()
     {
-        using (var response = await _client.PerformAsync(new TorStatusDetailsRequest()).ConfigureAwait(false))
+        using (var response = await client.PerformAsync(new TorStatusRequest()).ConfigureAwait(false))
         {
             if (!response.IsSuccessStatusCode)
             {
                 // todo handle failure
             }
 
-            var serializer = _client.Serializer.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
+            var serializer = client.Serializers.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
 
             var networkStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             var data = serializer.Deserialize<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(networkStream);

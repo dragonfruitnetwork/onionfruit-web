@@ -1,40 +1,23 @@
 ﻿// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
+using System;
 using System.Collections.Generic;
 using DragonFruit.Data;
-using DragonFruit.Data.Parameters;
+using DragonFruit.Data.Requests;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
-public class TorStatusSummaryRequest : TorStatusRequest
+public partial class TorStatusRequest : ApiRequest
 {
-    public override string Stub => "summary";
-}
+    public override string RequestPath => $"https://onionoo.torproject.org/details";
 
-public class TorStatusDetailsRequest : TorStatusRequest
-{
-    public override string Stub => "details";
-}
-
-public class TorStatusBandwidthRequest : TorStatusRequest
-{
-    public override string Stub => "bandwidth";
-}
-
-public class TorStatusClientsRequest : TorStatusRequest
-{
-    public override string Stub => "clients";
-
-    public override TorNodeType? Type => TorNodeType.Bridge;
-}
-
-public abstract class TorStatusRequest : ApiRequest
-{
-    public override string Path => $"https://onionoo.torproject.org/{Stub}";
-
-    public abstract string Stub { get; }
+    /// <summary>
+    /// The date the previous request was made.
+    /// If set, data will only be returned if a newer version is available
+    /// </summary>
+    public DateTimeOffset? LastModified { get; set; }
 
     /// <summary>
     /// Query to filter nodes by
@@ -42,7 +25,7 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_search
     /// </remarks>
-    [QueryParameter("search")]
+    [RequestParameter(ParameterType.Query, "search")]
     public string Query { get; set; }
 
     /// <summary>
@@ -51,7 +34,7 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_host_name
     /// </remarks>
-    [QueryParameter("host_name")]
+    [RequestParameter(ParameterType.Query, "host_name")]
     public string Hostname { get; set; }
 
     /// <summary>
@@ -60,7 +43,7 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_recommended_version
     /// </remarks>
-    [QueryParameter("recommended_version")]
+    [RequestParameter(ParameterType.Query, "recommended_version")]
     public bool? FilterRecommendedVersion { get; set; }
 
     /// <summary>
@@ -69,7 +52,7 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_country
     /// </remarks>
-    [QueryParameter("country")]
+    [RequestParameter(ParameterType.Query, "country")]
     public string CountryCode { get; set; }
 
     /// <summary>
@@ -78,25 +61,25 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_os
     /// </remarks>
-    [QueryParameter("os")]
+    [RequestParameter(ParameterType.Query, "os")]
     public string OperatingSystem { get; set; }
 
     /// <summary>
     /// When set, filters out nodes by their current uptime status
     /// </summary>
-    [QueryParameter("running")]
+    [RequestParameter(ParameterType.Query, "running")]
     public bool? Running { get; set; }
 
     /// <summary>
     /// Optional offset
     /// </summary>
-    [QueryParameter("offset")]
+    [RequestParameter(ParameterType.Query, "offset")]
     public int? Offset { get; set; }
 
     /// <summary>
     /// Optional limit
     /// </summary>
-    [QueryParameter("limit")]
+    [RequestParameter(ParameterType.Query, "limit")]
     public int? Limit { get; set; }
 
     /// <summary>
@@ -105,7 +88,8 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_type
     /// </remarks>
-    [QueryParameter("type", EnumHandlingMode.StringLower)]
+    [EnumOptions(EnumOption.StringLower)]
+    [RequestParameter(ParameterType.Query, "type")]
     public virtual TorNodeType? Type { get; set; }
 
     /// <summary>
@@ -115,7 +99,8 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_order
     /// </remarks>
-    [QueryParameter("order", CollectionConversionMode.Concatenated)]
+    [EnumerableOptions(EnumerableOption.Concatenated)]
+    [RequestParameter(ParameterType.Query, "order")]
     public IEnumerable<string> Order { get; set; }
 
     /// <summary>
@@ -124,6 +109,10 @@ public abstract class TorStatusRequest : ApiRequest
     /// <remarks>
     /// https://metrics.torproject.org/onionoo.html#parameters_fields
     /// </remarks>
-    [QueryParameter("fields", CollectionConversionMode.Concatenated)]
+    [EnumerableOptions(EnumerableOption.Concatenated)]
+    [RequestParameter(ParameterType.Query, "fields")]
     public IEnumerable<string> ResponseFields { get; set; }
+
+    [RequestParameter(ParameterType.Header, "If-Modified-Since")]
+    protected string LastModifiedString => LastModified?.ToString("R");
 }
