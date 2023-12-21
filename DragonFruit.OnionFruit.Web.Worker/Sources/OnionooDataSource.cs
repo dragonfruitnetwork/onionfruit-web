@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
@@ -23,39 +22,40 @@ public class OnionooDataSource(ApiClient client) : IDataSource
 
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
-        var request = new TorStatusRequest
-        {
-            LastModified = lastVersionDate
-        };
-
-        var requestMessage = request.BuildRequest(client.Serializers);
-
-        // change to head (so the body isn't sent)
-        requestMessage.Method = HttpMethod.Head;
-
+        var request = new TorStatusRequest {LastModified = lastVersionDate};
         using var response = await client.PerformAsync(request).ConfigureAwait(false);
-        return response.StatusCode != HttpStatusCode.NotModified;
+
+        switch (response.StatusCode)
+        {
+            case HttpStatusCode.NotModified:
+                return false;
+
+            case HttpStatusCode.OK:
+                var serializer = client.Serializers.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
+
+                var networkStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                var data = serializer.Deserialize<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(networkStream);
+
+                Relays = data.Relays;
+                DataLastModified = response.Content.Headers.LastModified?.UtcDateTime ?? DateTime.UtcNow;
+
+                return true;
+
+            default:
+                // todo log issue
+                return false;
+        }
     }
 
     public async Task CollectData()
     {
-        using (var response = await client.PerformAsync(new TorStatusRequest()).ConfigureAwait(false))
+        if (DataLastModified == default)
         {
-            if (!response.IsSuccessStatusCode)
-            {
-                // todo handle failure
-            }
-
-            var serializer = client.Serializers.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
-
-            var networkStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var data = serializer.Deserialize<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(networkStream);
-
-            Relays = data.Relays;
-            DataLastModified = response.Content.Headers.LastModified?.UtcDateTime ?? DateTime.UtcNow;
+            // force refresh
+            await HasDataChanged(DateTimeOffset.MinValue);
         }
 
-        // get country info
+        // process country info
         Countries = Relays.AsParallel().Where(x => !string.IsNullOrEmpty(x.CountryCode)).GroupBy(x => x.CountryCode).ToList();
     }
 }
