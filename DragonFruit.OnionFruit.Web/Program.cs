@@ -60,16 +60,20 @@ public static class Program
 
         // api clients
         builder.Services.AddSingleton<ILookupClient, LookupClient>();
-        builder.Services.AddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
-
-        builder.Services.Configure<ApiClient>(c =>
+        builder.Services.AddSingleton<ApiClient>(_ =>
         {
-            c.UserAgent = $"OnionFruit-Web/{typeof(Program).Assembly.GetName().Version?.ToString(3)}";
-            c.Serializers.Configure<ApiJsonSerializer>(json =>
+            var client = new ApiClient<ApiJsonSerializer>
+            {
+                UserAgent = $"OnionFruit-Web-Worker/{typeof(Program).Assembly.GetName().Version?.ToString(3)}"
+            };
+
+            client.Serializers.Configure<ApiJsonSerializer>(json =>
             {
                 json.SerializerOptions = new JsonSerializerOptions();
                 json.SerializerOptions.Converters.Add(new DateTimeConverter());
             });
+
+            return client;
         });
 
         builder.Services.AddSingleton<LocalAssetStore>();

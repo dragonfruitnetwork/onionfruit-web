@@ -93,16 +93,20 @@ public static class Program
 
         // api
         services.AddSingleton<ILookupClient, LookupClient>();
-        services.AddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
-
-        services.Configure<ApiClient>(c =>
+        services.AddSingleton<ApiClient>(_ =>
         {
-            c.UserAgent = $"OnionFruit-Web-Worker/{typeof(Program).Assembly.GetName().Version?.ToString(3)}";
-            c.Serializers.Configure<ApiJsonSerializer>(json =>
+            var client = new ApiClient<ApiJsonSerializer>
+            {
+                UserAgent = $"OnionFruit-Web-Worker/{typeof(Program).Assembly.GetName().Version?.ToString(3)}"
+            };
+
+            client.Serializers.Configure<ApiJsonSerializer>(json =>
             {
                 json.SerializerOptions = new JsonSerializerOptions();
                 json.SerializerOptions.Converters.Add(new DateTimeConverter());
             });
+
+            return client;
         });
 
         // timed service
