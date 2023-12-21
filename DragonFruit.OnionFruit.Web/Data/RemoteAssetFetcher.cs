@@ -25,6 +25,7 @@ namespace DragonFruit.OnionFruit.Web.Data
         private readonly ILogger<RemoteAssetFetcher> _logger;
         private readonly IConnectionMultiplexer _redis;
         private readonly IConfiguration _configuration;
+        private readonly JsonPath _assetSelectorPath;
         private readonly LocalAssetStore _assetStore;
         private readonly ApiClient _client;
 
@@ -38,31 +39,29 @@ namespace DragonFruit.OnionFruit.Web.Data
             _configuration = configuration;
             _assetStore = assetStore;
             _client = client;
+
+            var jsonPath = _configuration["Server:RemoteAssets:ListingPath"] ?? "$[*]";
+            if (!JsonPath.TryParse(jsonPath, out _assetSelectorPath))
+            {
+                _logger.LogError("Path expression {p} was invalid. Execution cannot continue until fixed", jsonPath);
+            }
         }
 
         private async Task PerformAssetCheck()
         {
             _logger.LogInformation("Performing asset download check");
 
+            PathResult eval;
+
             var clock = new Stopwatch();
+            var listingUrl = _configuration["Server:RemoteAssets:ListingUrl"] ?? string.Format(_configuration["Server:RemoteAssets:DownloadUrl"], string.Empty);
 
             clock.Start();
 
-            var jsonPath = _configuration["Server:RemoteAssets:ListingPath"] ?? "$[*]";
-            var listingUrl = _configuration["Server:RemoteAssets:ListingUrl"] ?? string.Format(_configuration["Server:RemoteAssets:DownloadUrl"], string.Empty);
-
-            if (!JsonPath.TryParse(jsonPath, out var jsonPathSelector))
-            {
-                _logger.LogError("Path expression {p} was invalid. Execution cannot continue until fixed", jsonPath);
-                return;
-            }
-
-            PathResult eval;
-
             try
             {
-                var jsonNode = await _client.PerformAsync<JsonNode>(listingUrl).ConfigureAwait(false);
-                eval = jsonPathSelector.Evaluate(jsonNode);
+                var jsonNode = await _client.PerformAsync<JsonObject>(listingUrl).ConfigureAwait(false);
+                eval = _assetSelectorPath.Evaluate(jsonNode);
             }
             catch (Exception e)
             {
@@ -72,7 +71,7 @@ namespace DragonFruit.OnionFruit.Web.Data
 
             if (!string.IsNullOrEmpty(eval.Error))
             {
-                _logger.LogError("Path {p} could not be evaluated: {err}", jsonPath, eval.Error);
+                _logger.LogError("Path {p} could not be evaluated: {err}", _assetSelectorPath, eval.Error);
             }
 
             // convert json elements to objects, filter out non .zip files and get newest one
@@ -181,6 +180,12 @@ namespace DragonFruit.OnionFruit.Web.Data
 
         async Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
+            // don't start timers if the path is invalid
+            if (_assetSelectorPath == null)
+            {
+                return;
+            }
+
             RedisChannel? channelIdentifier = _configuration["Server:RedisUpdateChannelName"];
 
             if (channelIdentifier.HasValue)
