@@ -63,7 +63,8 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
         Database = DatabaseLoader.LoadFromStream(dbFileStream);
 
         // start with a relatively large buffer to pass all entries into
-        var networkList = new List<NetworkEntry>(1_500_000);
+        var counter = 0;
+        var networkList = new NetworkEntry[Database.Networks.Count];
         var asciiCache = new Dictionary<string, byte[]>(Database.Countries.Count);
 
         try
@@ -87,10 +88,21 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
                 }
 
                 entry.country_code = asciiBuffer;
-                networkList.Add(entry);
+                networkList[counter++] = entry;
             }
 
-            NativeMethods.PerformNetworkSort(networkList.ToArray(), networkList.Count, out var networkSortResult);
+            // can't have unsafe and async mixed together...
+            // by using an array instead of a list, no additional copy is made
+            unsafe NetworkSortResult PerformSort()
+            {
+                fixed (NetworkEntry* ptr = networkList)
+                {
+                    NativeMethods.PerformNetworkSort(ptr, counter + 1, out var networkSortResult);
+                    return networkSortResult;
+                }
+            }
+
+            var networkSortResult = PerformSort();
 
             try
             {
@@ -115,14 +127,13 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
             }
 
             asciiCache.Clear();
-            networkList.Clear();
         }
     }
 
     private static unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr start, nint length)
     {
-        var v4NetworkRanges = new NetworkAddressRangeInfo[length];
         Span<byte> v4AddressBytes = stackalloc byte[4];
+        var v4NetworkRanges = new NetworkAddressRangeInfo[length];
 
         // collect all data and process into something useful
         for (var i = 0; i < length; i++)
