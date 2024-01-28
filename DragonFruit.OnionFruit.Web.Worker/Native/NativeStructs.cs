@@ -41,8 +41,10 @@ public struct NetworkEntry
 public struct NetworkSortResult
 {
     public IntPtr v4Entries;
+    public nint v4Capacity;
     public nint v4Count;
 
     public IntPtr v6Entries;
+    public nint v6Capacity;
     public nint v6Count;
 }

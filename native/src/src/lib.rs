@@ -71,15 +71,14 @@ pub extern "cdecl" fn sort_network_entries(ptr: *const c_void, length: usize, ou
     v4results.shrink_to_fit();
     v6results.shrink_to_fit();
 
-    assert!(v4results.len() == v4results.capacity());
-    assert!(v6results.len() == v6results.capacity());
-
     unsafe {
         *out = InteropNetworkSortResult {
             v4entries: v4results.as_mut_ptr(),
+            v4capacity: v4results.capacity(),
             v4count: v4results.len(),
 
             v6entries: v6results.as_mut_ptr(),
+            v6capacity: v6results.capacity(),
             v6count: v6results.len()
         };
     }
@@ -91,8 +90,8 @@ pub extern "cdecl" fn sort_network_entries(ptr: *const c_void, length: usize, ou
 #[no_mangle]
 pub unsafe extern "cdecl" fn free_sort_result(ptr: *const InteropNetworkSortResult) {
     let result = *ptr;
-    drop(Vec::<InteropNetworkRange<u32>>::from_raw_parts(result.v4entries, result.v4count, result.v4count));
-    drop(Vec::<InteropNetworkRange<u128>>::from_raw_parts(result.v6entries, result.v6count, result.v6count));
+    mem::drop(Vec::<InteropNetworkRange<u32>>::from_raw_parts(result.v4entries, result.v4count, result.v4capacity));
+    mem::drop(Vec::<InteropNetworkRange<u128>>::from_raw_parts(result.v6entries, result.v6count, result.v6capacity));
 }
 
 fn create_network_list<T>(map: RangeInclusiveMap<T, NetworkInfo>, range_value_selector: fn(T) -> T) -> Vec::<InteropNetworkRange<T>> where T : Copy, T : Eq, T : PartialEq, T : Ord, T : PartialOrd, T : StepFns<T> {
