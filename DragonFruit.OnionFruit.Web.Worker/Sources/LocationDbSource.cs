@@ -91,18 +91,7 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
                 networkList[counter++] = entry;
             }
 
-            // can't have unsafe and async mixed together...
-            // by using an array instead of a list, no additional copy is made
-            unsafe NetworkSortResult PerformSort()
-            {
-                fixed (NetworkEntry* ptr = networkList)
-                {
-                    NativeMethods.PerformNetworkSort(ptr, counter + 1, out var networkSortResult);
-                    return networkSortResult;
-                }
-            }
-
-            var networkSortResult = PerformSort();
+            NativeMethods.PerformNetworkSort(networkList, counter, out var networkSortResult);
 
             try
             {
