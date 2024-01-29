@@ -18,8 +18,10 @@ pub struct InteropNetworkRange<T> {
 #[derive(Clone, Copy)]
 pub struct InteropNetworkSortResult {
     pub v4entries: *mut InteropNetworkRange<u32>,
+    pub v4capacity: usize, // usually matches v4count
     pub v4count: usize,
 
     pub v6entries: *mut InteropNetworkRange<u128>,
-    pub v6count: usize
+    pub v6capacity: usize, // usually matches v6Count
+    pub v6count: usize,
 }

@@ -63,7 +63,8 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
         Database = DatabaseLoader.LoadFromStream(dbFileStream);
 
         // start with a relatively large buffer to pass all entries into
-        var networkList = new List<NetworkEntry>(1_500_000);
+        var counter = 0;
+        var networkList = new NetworkEntry[Database.Networks.Count];
         var asciiCache = new Dictionary<string, byte[]>(Database.Countries.Count);
 
         try
@@ -87,10 +88,10 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
                 }
 
                 entry.country_code = asciiBuffer;
-                networkList.Add(entry);
+                networkList[counter++] = entry;
             }
 
-            NativeMethods.PerformNetworkSort(networkList.ToArray(), networkList.Count, out var networkSortResult);
+            NativeMethods.PerformNetworkSort(networkList, counter, out var networkSortResult);
 
             try
             {
@@ -115,14 +116,13 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
             }
 
             asciiCache.Clear();
-            networkList.Clear();
         }
     }
 
     private static unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr start, nint length)
     {
-        var v4NetworkRanges = new NetworkAddressRangeInfo[length];
         Span<byte> v4AddressBytes = stackalloc byte[4];
+        var v4NetworkRanges = new NetworkAddressRangeInfo[length];
 
         // collect all data and process into something useful
         for (var i = 0; i < length; i++)
