@@ -69,7 +69,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Setup GitHub NuGet
-        run: dotnet nuget update source github --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
+        run: dotnet nuget update source dragonfruit --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
 
       - name: Build
         run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} ${{ matrix.project.name }}
