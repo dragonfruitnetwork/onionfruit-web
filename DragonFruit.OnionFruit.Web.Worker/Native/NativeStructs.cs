@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 namespace DragonFruit.OnionFruit.Web.Worker.Native;
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
 public unsafe struct IPv4NetworkRange
 {
     public fixed byte start_address[4];
@@ -16,7 +16,7 @@ public unsafe struct IPv4NetworkRange
     public fixed byte country_code[2];
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
 public unsafe struct IPv6NetworkRange
 {
     public fixed byte start_address[16];
@@ -25,7 +25,7 @@ public unsafe struct IPv6NetworkRange
     public fixed byte country_code[2];
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
 public struct NetworkEntry
 {
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
@@ -37,7 +37,7 @@ public struct NetworkEntry
     public byte[] country_code;
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
 public struct NetworkSortResult
 {
     public IntPtr v4Entries;
