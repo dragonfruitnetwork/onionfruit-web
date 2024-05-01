@@ -76,7 +76,7 @@ public static class Program
 
         logging.AddSentry(o =>
         {
-            o.Dsn = config[$"{dsnType}:Dsn"] ?? config["Dsn"];
+            o.Dsn = config[$"{dsnType}:Dsn"] ?? config["Dsn"] ?? string.Empty;
             o.Release = Assembly.GetExecutingAssembly().GetName().Version!.ToString(3);
 
             o.MaxBreadcrumbs = 50;
