@@ -157,16 +157,15 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
         }
     }
 
-    private static unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr startPtr, nint length)
+    private static unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr start, nint length)
     {
-        var v4NetworkRanges = new NetworkAddressRangeInfo[length];
-        var start = (IPv4NetworkRange*)startPtr;
-
         Span<byte> v4AddressBytes = stackalloc byte[4];
+        var v4NetworkRanges = new NetworkAddressRangeInfo[length];
 
         for (var i = 0; i < length; i++)
         {
-            var entry = *(start + i);
+            var entry = *(IPv4NetworkRange*)(start + sizeof(IPv4NetworkRange) * i);
+
             var startAddress = ParseAddress(v4AddressBytes, entry.start_address);
             var endAddress = ParseAddress(v4AddressBytes, entry.end_address);
 
@@ -176,16 +175,15 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
         return v4NetworkRanges;
     }
 
-    private static unsafe NetworkAddressRangeInfo[] GetIPv6AddressRanges(IntPtr startPtr, nint length)
+    private static unsafe NetworkAddressRangeInfo[] GetIPv6AddressRanges(IntPtr start, nint length)
     {
         var v6NetworkRanges = new NetworkAddressRangeInfo[length];
-        var start = (IPv4NetworkRange*)startPtr;
-
         Span<byte> v6AddressBytes = stackalloc byte[16];
 
         for (var i = 0; i < length; i++)
         {
-            var entry = *(start + i);
+            var entry = *(IPv6NetworkRange*)(start + sizeof(IPv6NetworkRange) * i);
+
             var startAddress = ParseAddress(v6AddressBytes, entry.start_address);
             var endAddress = ParseAddress(v6AddressBytes, entry.end_address);
 
