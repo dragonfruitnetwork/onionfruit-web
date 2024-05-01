@@ -33,12 +33,4 @@
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="data\legacy\countries.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="data\" />
-    </ItemGroup>
-
 </Project>
