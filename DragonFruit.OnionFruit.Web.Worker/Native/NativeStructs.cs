@@ -26,15 +26,11 @@ public unsafe struct IPv6NetworkRange
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct NetworkEntry
+public unsafe struct NetworkEntry
 {
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-    public byte[] network;
-
+    public fixed byte network[16];
     public byte cidr;
-
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-    public byte[] country_code;
+    public fixed byte country_code[2];
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
