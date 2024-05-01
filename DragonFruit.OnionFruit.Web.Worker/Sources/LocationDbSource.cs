@@ -2,12 +2,13 @@
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using DnsClient;
@@ -61,74 +62,111 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
         }
 
         Database = DatabaseLoader.LoadFromStream(dbFileStream);
-
-        // start with a relatively large buffer to pass all entries into
-        var counter = 0;
-        var networkList = new NetworkEntry[Database.Networks.Count];
-        var asciiCache = new Dictionary<string, byte[]>(Database.Countries.Count);
+        NetworkSortResult networkSortResult;
+        IntPtr networkArray = IntPtr.Zero;
 
         try
         {
-            foreach (var network in Database)
+            var networkCount = BuildUnmanagedNetworkStructArray(Database, out networkArray);
+            NativeMethods.PerformNetworkSort(networkArray, networkCount, out networkSortResult);
+        }
+        finally
+        {
+            // clear up unmanaged network array at earliest opportunity
+            if (networkArray != IntPtr.Zero)
             {
-                var entry = new NetworkEntry
-                {
-                    network = network.Network.Network.GetAddressBytes(),
-                    cidr = network.Network.Cidr
-                };
+                Marshal.FreeHGlobal(networkArray);
+            }
+        }
 
+        try
+        {
+            // run processors in parallel
+            var v4AddressProcess = Task.Factory.StartNew(() => GetIPv4AddressRanges(networkSortResult.v4Entries, networkSortResult.v4Count), TaskCreationOptions.LongRunning);
+            var v6AddressProcess = Task.Factory.StartNew(() => GetIPv6AddressRanges(networkSortResult.v6Entries, networkSortResult.v6Count), TaskCreationOptions.LongRunning);
+
+            IPv4AddressRanges = await v4AddressProcess.ConfigureAwait(false);
+            IPv6AddressRanges = await v6AddressProcess.ConfigureAwait(false);
+
+            IPv4CountryAddressRanges = IPv4AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);
+            IPv6CountryAddressRanges = IPv6AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            // ensure unmanaged memory is cleared regardless of success/failure
+            NativeMethods.ClearSortResult(ref networkSortResult);
+        }
+    }
+
+    /// <summary>
+    /// Copies the network tree from the provided <see cref="ILocationDatabase"/> to a block of unmanaged memory
+    /// consisting of <see cref="NetworkEntry"/> structs and returns the pointer to the start of the block.
+    /// </summary>
+    /// <remarks>
+    /// A call to <see cref="Marshal.FreeHGlobal"/> is required to deallocate the unmanaged memory block (<see cref="arrayPtr"/>)
+    /// </remarks>
+    /// <param name="networks">The network database to get the tree from</param>
+    /// <param name="arrayPtr">(Output) pointer to the start of the unmanaged block</param>
+    /// <returns>The number of <see cref="NetworkEntry"/> structs written</returns>
+    private static unsafe int BuildUnmanagedNetworkStructArray(ILocationDatabase networks, out IntPtr arrayPtr)
+    {
+        var unmanagedNetworkList = Marshal.AllocHGlobal(Unsafe.SizeOf<NetworkEntry>() * networks.Networks.Count);
+        var asciiCache = new Dictionary<string, byte[]>(networks.Countries.Count);
+        var currentItem = (NetworkEntry*)unmanagedNetworkList;
+        var count = 0;
+
+        try
+        {
+            foreach (var network in networks)
+            {
                 // use asciiCache to prevent loads of pointless array allocations
                 if (!asciiCache.TryGetValue(network.CountryCode, out var asciiBuffer))
                 {
-                    var buffer = ArrayPool<byte>.Shared.Rent(2);
-                    Encoding.ASCII.GetBytes(network.CountryCode, 0, 2, buffer, 0);
+                    var buffer = Encoding.ASCII.GetBytes(network.CountryCode, 0, 2);
 
                     asciiCache[network.CountryCode] = buffer;
                     asciiBuffer = buffer;
                 }
 
-                entry.country_code = asciiBuffer;
-                networkList[counter++] = entry;
+                // get pointer and increment for next iteration (if one)
+                var currentEntry = currentItem++;
+
+                fixed (byte* networkBytes = network.Network.Network.MapToIPv6().GetAddressBytes())
+                {
+                    Buffer.MemoryCopy(networkBytes, currentEntry->network, 16, 16);
+                }
+
+                fixed (byte* countryCodeBytes = asciiBuffer)
+                {
+                    Buffer.MemoryCopy(countryCodeBytes, currentEntry->country_code, 2, 2);
+                }
+
+                currentEntry->cidr = network.Network.Cidr;
+                count++;
             }
 
-            NativeMethods.PerformNetworkSort(networkList, counter, out var networkSortResult);
-
-            try
-            {
-                IPv4AddressRanges = GetIPv4AddressRanges(networkSortResult.v4Entries, networkSortResult.v4Count);
-                IPv6AddressRanges = GetIPv6AddressRanges(networkSortResult.v6Entries, networkSortResult.v6Count);
-
-                IPv4CountryAddressRanges = IPv4AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);
-                IPv6CountryAddressRanges = IPv6AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);
-            }
-            finally
-            {
-                // ensure unmanaged memory is cleared regardless of success/failure
-                NativeMethods.ClearSortResult(ref networkSortResult);
-            }
+            arrayPtr = unmanagedNetworkList;
+            return count;
         }
-        finally
+        catch
         {
-            // return all used buffers
-            foreach (var arr in asciiCache.Values)
-            {
-                ArrayPool<byte>.Shared.Return(arr);
-            }
+            Marshal.FreeHGlobal(unmanagedNetworkList);
+            arrayPtr = IntPtr.Zero;
 
-            asciiCache.Clear();
+            throw;
         }
     }
 
-    private static unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr start, nint length)
+    private static unsafe NetworkAddressRangeInfo[] GetIPv4AddressRanges(IntPtr startPtr, nint length)
     {
-        Span<byte> v4AddressBytes = stackalloc byte[4];
         var v4NetworkRanges = new NetworkAddressRangeInfo[length];
+        var start = (IPv4NetworkRange*)startPtr;
 
-        // collect all data and process into something useful
+        Span<byte> v4AddressBytes = stackalloc byte[4];
+
         for (var i = 0; i < length; i++)
         {
-            var entry = *(IPv4NetworkRange*)(start + sizeof(IPv4NetworkRange) * i);
-
+            var entry = *(start + i);
             var startAddress = ParseAddress(v4AddressBytes, entry.start_address);
             var endAddress = ParseAddress(v4AddressBytes, entry.end_address);
 
@@ -138,15 +176,16 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
         return v4NetworkRanges;
     }
 
-    private static unsafe NetworkAddressRangeInfo[] GetIPv6AddressRanges(IntPtr start, nint length)
+    private static unsafe NetworkAddressRangeInfo[] GetIPv6AddressRanges(IntPtr startPtr, nint length)
     {
         var v6NetworkRanges = new NetworkAddressRangeInfo[length];
+        var start = (IPv4NetworkRange*)startPtr;
+
         Span<byte> v6AddressBytes = stackalloc byte[16];
 
         for (var i = 0; i < length; i++)
         {
-            var entry = *(IPv6NetworkRange*)(start + sizeof(IPv6NetworkRange) * i);
-
+            var entry = *(start + i);
             var startAddress = ParseAddress(v6AddressBytes, entry.start_address);
             var endAddress = ParseAddress(v6AddressBytes, entry.end_address);
 
@@ -157,7 +196,7 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
     }
 
     /// <summary>
-    /// Converts a byte* to a <see cref="IPAddress"/>, using the <see cref="buffer"/> size as the size of the <see cref="addressPtr"/>
+    /// Converts a <c>byte*</c> to an <see cref="IPAddress"/> using the <see cref="buffer"/> size as the size of the <see cref="addressPtr"/>
     /// </summary>
     private static unsafe IPAddress ParseAddress(Span<byte> buffer, byte* addressPtr)
     {
