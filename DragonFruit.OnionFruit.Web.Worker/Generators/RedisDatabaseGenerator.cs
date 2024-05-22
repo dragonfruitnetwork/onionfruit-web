@@ -11,29 +11,20 @@ using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
-public class RedisDatabaseGenerator : IDatabaseGenerator
+public class RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataSource torDirectory) : IDatabaseGenerator
 {
-    private readonly IRedisConnectionProvider _redis;
-    private readonly OnionooDataSource _torDirectory;
-
-    public RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataSource torDirectory)
-    {
-        _redis = redis;
-        _torDirectory = torDirectory;
-    }
-
     public async Task GenerateDatabase(IFileSink fileSink)
     {
-        var table = _redis.RedisCollection<OnionFruitNodeInfo>();
-        var dbVersion = (long)_torDirectory.DataLastModified.Subtract(DateTime.UnixEpoch).TotalSeconds;
+        var table = redis.RedisCollection<OnionFruitNodeInfo>();
+        var dbVersion = (long)torDirectory.DataLastModified.Subtract(DateTime.UnixEpoch).TotalSeconds;
 
-        foreach (var relay in _torDirectory.Relays)
+        foreach (var relay in torDirectory.Relays)
         {
             // drop the port off the addresses
             var ipAddresses = relay.OrAddresses.Select(x => x[..x.LastIndexOf(':')]);
 
             // concat any exit addresses
-            if (relay.ExitAddresses?.Any() == true)
+            if (relay.ExitAddresses?.Length > 0)
                 ipAddresses = ipAddresses.Concat(relay.ExitAddresses);
 
             var info = new OnionFruitNodeInfo
@@ -43,7 +34,7 @@ public class RedisDatabaseGenerator : IDatabaseGenerator
                 Flags = relay.Flags,
 
                 CountryCode = relay.CountryCode,
-                CountryName = relay.CountryName ?? "Unknown Location",
+                CountryName = CountryMap.Instance.GetCountryName(relay.CountryCode) ?? relay.CountryName ?? "Unknown Location",
 
                 ProviderName = relay.ASName,
                 ProviderNumber = int.TryParse(relay.ASN?[1..], out var asn) ? asn : null,
