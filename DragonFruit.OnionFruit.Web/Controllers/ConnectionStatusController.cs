@@ -4,6 +4,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using DragonFruit.OnionFruit.Web.Worker;
 using DragonFruit.OnionFruit.Web.Worker.Database;
 using JetBrains.Annotations;
 using libloc.Abstractions;
@@ -19,17 +20,8 @@ public record ConnectionStatusResponse(string IpAddress, bool IsTor, string Coun
 
 [EnableCors]
 [Route("connectionStatus")]
-public class ConnectionStatusController : ControllerBase
+public class ConnectionStatusController(IRedisConnectionProvider redis, ILocationDbAccessor libloc) : ControllerBase
 {
-    private readonly IRedisConnectionProvider _redis;
-    private readonly ILocationDbAccessor _libloc;
-
-    public ConnectionStatusController(IRedisConnectionProvider redis, ILocationDbAccessor libloc)
-    {
-        _redis = redis;
-        _libloc = libloc;
-    }
-
     [HttpGet]
     public async Task<ConnectionStatusResponse> GetConnectionStatus()
     {
@@ -48,20 +40,19 @@ public class ConnectionStatusController : ControllerBase
         }
 
         // check internal redis database of known nodes
-        var nodeInfo = await _redis.RedisCollection<OnionFruitNodeInfo>().SingleOrDefaultAsync(x => x.IpAddress == connectionIpAddress).ConfigureAwait(false);
+        var nodeInfo = await redis.RedisCollection<OnionFruitNodeInfo>().SingleOrDefaultAsync(x => x.IpAddress == connectionIpAddress).ConfigureAwait(false);
         if (nodeInfo != null)
         {
             return new ConnectionStatusResponse(ipAddress.ToString(), true, nodeInfo.CountryCode, nodeInfo.CountryName, nodeInfo.ProviderNumber, nodeInfo.ProviderName);
         }
 
-        // if not on redis, use cloudflare to check if tor and libloc to get network info
-        var cloudflareCountryDetected = HttpContext.Request.Headers.TryGetValue("CF-IPCountry", out var cloudflareCountry);
-        var (country, asInfo) = await _libloc.PerformAsync(a => GetConnectionInfo(a, ipAddress, cloudflareCountryDetected ? cloudflareCountry.ToString() : null)).ConfigureAwait(false);
+        var cloudflareEnabled = HttpContext.Request.Headers.TryGetValue("CF-IPCountry", out var cloudflareCountry);
+        var (countryCode, countryName, asInfo) = await libloc.PerformAsync(db => GetConnectionInfo(db, ipAddress, cloudflareEnabled ? cloudflareCountry.ToString() : null)).ConfigureAwait(false);
 
-        return new ConnectionStatusResponse(ipAddress.ToString(), cloudflareCountryDetected && cloudflareCountry == "T1", country?.Code ?? "XX", country?.Name ?? "Unknown Country", asInfo?.Number, asInfo?.Name);
+        return new ConnectionStatusResponse(ipAddress.ToString(), cloudflareEnabled && cloudflareCountry.ToString() is "T1" or "XX", countryCode, CountryMap.Instance.GetCountryName(countryCode) ?? countryName, asInfo?.Number, asInfo?.Name);
     }
 
-    private (IDatabaseCountry country, IDatabaseAS asInfo) GetConnectionInfo(ILocationDatabase x, IPAddress address, [CanBeNull] string countryCodeOverride)
+    private (string countryCode, string countryName, IDatabaseAS asInfo) GetConnectionInfo(ILocationDatabase x, IPAddress address, [CanBeNull] string countryCodeOverride)
     {
         IDatabaseAS asInfo = null;
         IDatabaseCountry country = null;
@@ -74,6 +65,6 @@ public class ConnectionStatusController : ControllerBase
             country = x.Countries.GetCountry(countryCodeOverride ?? addr.CountryCode);
         }
 
-        return (country, asInfo);
+        return (country?.Code ?? "XX", country?.Name ?? "Unknown Country", asInfo);
     }
 }
