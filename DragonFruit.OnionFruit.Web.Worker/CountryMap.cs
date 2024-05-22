@@ -33,6 +33,6 @@ namespace DragonFruit.OnionFruit.Web.Worker
         /// <summary>
         /// Gets the country name associated with the provided <see cref="code"/>, or <c>null</c> if not found.
         /// </summary>
-        public string GetCountryName(string code) => CodeMap.GetValueOrDefault(code);
+        public string GetCountryName(string code) => CodeMap.GetValueOrDefault(code.ToUpperInvariant());
     }
 }

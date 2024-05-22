@@ -30,10 +30,10 @@ public class RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataS
             var info = new OnionFruitNodeInfo
             {
                 DatabaseVersion = dbVersion,
-
                 Flags = relay.Flags,
 
-                CountryCode = relay.CountryCode,
+                // onionoo returns country codes in lowercase, which need to be changed for compatibility with everything else.
+                CountryCode = relay.CountryCode.ToUpperInvariant(),
                 CountryName = CountryMap.Instance.GetCountryName(relay.CountryCode) ?? relay.CountryName ?? "Unknown Location",
 
                 ProviderName = relay.ASName,
