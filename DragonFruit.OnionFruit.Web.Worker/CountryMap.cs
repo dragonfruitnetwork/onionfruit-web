@@ -11,7 +11,7 @@ namespace DragonFruit.OnionFruit.Web.Worker
     {
         static CountryMap()
         {
-            using var mapping = typeof(CountryMap).Assembly.GetManifestResourceStream($"{typeof(CountryMap).Assembly.FullName}.country-descriptors.json");
+            using var mapping = typeof(CountryMap).Assembly.GetManifestResourceStream($"{typeof(CountryMap).Assembly.GetName().Name}.country-descriptors.json");
             Instance = JsonSerializer.Deserialize<CountryMap>(mapping);
         }
 
