@@ -1,13 +1,14 @@
 ﻿// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DragonFruit.OnionFruit.Web.Worker
 {
-    public class CountryMap
+    public class CountryMap : IJsonOnDeserialized
     {
         static CountryMap()
         {
@@ -34,5 +35,14 @@ namespace DragonFruit.OnionFruit.Web.Worker
         /// Gets the country name associated with the provided <see cref="code"/>, or <c>null</c> if not found.
         /// </summary>
         public string GetCountryName(string code) => CodeMap.GetValueOrDefault(code.ToUpperInvariant());
+
+        void IJsonOnDeserialized.OnDeserialized()
+        {
+            // convert the dictionary to a frozen dictionary if it's not already
+            if (CodeMap.GetType().GetGenericTypeDefinition() != typeof(FrozenDictionary<,>))
+            {
+                CodeMap = CodeMap.ToFrozenDictionary();
+            }
+        }
     }
 }
