@@ -28,20 +28,20 @@ namespace DragonFruit.OnionFruit.Web.Worker
         /// <summary>
         /// The mapping of country codes to country names
         /// </summary>
-        [JsonInclude, JsonPropertyName("countries")]
-        private IReadOnlyDictionary<string, string> CodeMap { get; set; }
+        [JsonPropertyName("countries")]
+        public IReadOnlyDictionary<string, string> SourceMap { get; set; }
 
         /// <summary>
         /// Gets the country name associated with the provided <see cref="code"/>, or <c>null</c> if not found.
         /// </summary>
-        public string GetCountryName(string code) => CodeMap.GetValueOrDefault(code.ToUpperInvariant());
+        public string GetCountryName(string code) => SourceMap.GetValueOrDefault(code.ToUpperInvariant());
 
         void IJsonOnDeserialized.OnDeserialized()
         {
             // convert the dictionary to a frozen dictionary if it's not already
-            if (CodeMap.GetType().GetGenericTypeDefinition() != typeof(FrozenDictionary<,>))
+            if (SourceMap.GetType().GetGenericTypeDefinition() != typeof(FrozenDictionary<,>))
             {
-                CodeMap = CodeMap.ToFrozenDictionary();
+                SourceMap = SourceMap.ToFrozenDictionary();
             }
         }
     }
