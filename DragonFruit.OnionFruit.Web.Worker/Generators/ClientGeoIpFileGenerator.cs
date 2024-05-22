@@ -14,23 +14,16 @@ namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 /// <summary>
 /// Generator responsible for generating the CSV files used by Tor clients
 /// </summary>
-public class ClientGeoIpFileGenerator : IDatabaseGenerator
+public class ClientGeoIpFileGenerator(LocationDbSource locationDbSource) : IDatabaseGenerator
 {
-    private readonly LocationDbSource _locationDbSource;
-
-    public ClientGeoIpFileGenerator(LocationDbSource locationDbSource)
-    {
-        _locationDbSource = locationDbSource;
-    }
-
     public async Task GenerateDatabase(IFileSink fileSink)
     {
         await using (var ip4FileStream = new StreamWriter(fileSink.CreateFile("legacy/geoip"), Encoding.ASCII, leaveOpen: true))
         {
             await WriteHeaderAsync(ip4FileStream, 4).ConfigureAwait(false);
-            foreach (var entry in _locationDbSource.IPv4AddressRanges)
+            foreach (var entry in locationDbSource.IPv4AddressRanges)
             {
-                if (entry.CountryCode.Any(x => x is < 'A' or > 'Z'))
+                if (entry.CountryCode.Any(x => !char.IsAsciiLetterUpper(x)))
                 {
                     continue;
                 }
@@ -47,9 +40,9 @@ public class ClientGeoIpFileGenerator : IDatabaseGenerator
         await using (var ip6FileStream = new StreamWriter(fileSink.CreateFile("legacy/geoip6"), Encoding.ASCII, leaveOpen: true))
         {
             await WriteHeaderAsync(ip6FileStream, 6).ConfigureAwait(false);
-            foreach (var entry in _locationDbSource.IPv6AddressRanges)
+            foreach (var entry in locationDbSource.IPv6AddressRanges)
             {
-                if (entry.CountryCode.Any(x => x is < 'A' or > 'Z'))
+                if (entry.CountryCode.Any(x => !char.IsAsciiLetterUpper(x)))
                 {
                     continue;
                 }
@@ -61,6 +54,6 @@ public class ClientGeoIpFileGenerator : IDatabaseGenerator
 
     private async Task WriteHeaderAsync(TextWriter writer, int addressVersion)
     {
-        await writer.WriteLineAsync($"# OnionFruit GeoIP File (IPv{addressVersion}). Generated using IPFire's location.db licenced under {_locationDbSource.Database.License}.").ConfigureAwait(false);
+        await writer.WriteLineAsync($"# OnionFruit GeoIP File (IPv{addressVersion}). Generated using IPFire's location.db licenced under {locationDbSource.Database.License}.").ConfigureAwait(false);
     }
 }

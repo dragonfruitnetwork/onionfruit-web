@@ -12,13 +12,8 @@ namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 /// <summary>
 /// A variant of the onion.db file without address ranges. Used on the DragonFruit website.
 /// </summary>
-public class OnionLiteDbGenerator : OnionDbGenerator
+public class OnionLiteDbGenerator(OnionooDataSource onionoo, LocationDbSource locationDb) : OnionDbGenerator(onionoo, locationDb)
 {
-    public OnionLiteDbGenerator(OnionooDataSource onionoo, LocationDbSource locationDb)
-        : base(onionoo, locationDb)
-    {
-    }
-
     protected override OnionDb CreateBaseDb()
     {
         var baseDb = base.CreateBaseDb();
