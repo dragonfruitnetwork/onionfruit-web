@@ -12,21 +12,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DnsClient" Version="1.7.0"/>
-        <PackageReference Include="DragonFruit.Data" Version="4.0.0" />
-        <PackageReference Include="DragonFruit.Data.Roslyn" Version="4.0.0" />
+        <PackageReference Include="DnsClient" Version="1.8.0" />
+        <PackageReference Include="DragonFruit.Data" Version="4.1.1" />
+        <PackageReference Include="DragonFruit.Data.Roslyn" Version="4.1.1" />
         <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.3.1" />
-        <PackageReference Include="Google.Protobuf" Version="3.26.1" />
-        <PackageReference Include="Grpc.Tools" Version="2.63.0">
+        <PackageReference Include="Google.Protobuf" Version="3.28.2" />
+        <PackageReference Include="Grpc.Tools" Version="2.66.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="IPAddressRange" Version="6.0.0"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
         <PackageReference Include="libloc.Access" Version="2023.1220.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-        <PackageReference Include="Redis.OM" Version="0.7.1" />
-        <PackageReference Include="Sentry.Extensions.Logging" Version="4.6.2" />
+        <PackageReference Include="Redis.OM" Version="0.7.4" />
+        <PackageReference Include="Sentry.Extensions.Logging" Version="4.11.0" />
     </ItemGroup>
 
     <ItemGroup>
