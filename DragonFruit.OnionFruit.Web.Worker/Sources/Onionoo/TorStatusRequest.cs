@@ -11,7 +11,7 @@ namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 public partial class TorStatusRequest : ApiRequest
 {
-    public override string RequestPath => $"https://onionoo.torproject.org/details";
+    public override string RequestPath => "https://onionoo.torproject.org/details";
 
     /// <summary>
     /// The date the previous request was made.
