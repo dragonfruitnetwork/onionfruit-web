@@ -53,7 +53,7 @@ public class RemoteArchiveExporter : IDataExporter
         if (response.IsSuccessStatusCode && !string.IsNullOrEmpty(RedisNotificationChannel))
         {
             var redis = services.GetRequiredService<IConnectionMultiplexer>().GetSubscriber();
-            var messageHitCount = await redis.PublishAsync(RedisNotificationChannel, fileName).ConfigureAwait(false);
+            var messageHitCount = await redis.PublishAsync(RedisChannel.Literal(RedisNotificationChannel), fileName).ConfigureAwait(false);
 
             logger.LogInformation("Upload notification successfully hit {x} clients", messageHitCount);
         }

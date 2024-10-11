@@ -69,9 +69,9 @@ namespace DragonFruit.OnionFruit.Web.Data
                 throw;
             }
 
-            if (!string.IsNullOrEmpty(eval.Error))
+            if (!eval.Matches.Any())
             {
-                _logger.LogError("Path {p} could not be evaluated: {err}", _assetSelectorPath, eval.Error);
+                _logger.LogError("Path {p} could not be evaluated", _assetSelectorPath);
             }
 
             // convert json elements to objects, filter out non .zip files and get newest one
@@ -186,11 +186,13 @@ namespace DragonFruit.OnionFruit.Web.Data
                 return;
             }
 
-            RedisChannel? channelIdentifier = _configuration["Server:RedisUpdateChannelName"];
+            var channelName = _configuration["Server:RedisUpdateChannelName"];
 
-            if (channelIdentifier.HasValue)
+            if (!string.IsNullOrEmpty(channelName))
             {
-                _redisMessageQueue = await _redis.GetSubscriber().SubscribeAsync(channelIdentifier.Value).ConfigureAwait(false);
+                var channelIdentifier = RedisChannel.Literal(channelName);
+
+                _redisMessageQueue = await _redis.GetSubscriber().SubscribeAsync(channelIdentifier).ConfigureAwait(false);
                 _redisMessageQueue.OnMessage(PerformRedisUpdate);
             }
 
