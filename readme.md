@@ -4,7 +4,6 @@ The web-facing components that power OnionFruit&trade; clients
 [![DragonFruit Discord](https://img.shields.io/discord/482528405292843018?label=Discord&style=popout)](https://discord.gg/VA26u5Z)
 ![Docker Image Version](https://img.shields.io/docker/v/dragonfruitdotnet/onionfruit-web?logo=docker&label=Docker&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fdragonfruitdotnet%2Fonionfruit-web%2Ftags)
 
-
 ## Overview
 This repo holds the server-side components used to provide OnionFruit&trade; clients with geolocation data, alongside Tor connection detection services.
 
