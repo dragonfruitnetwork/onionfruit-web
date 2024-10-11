@@ -7,7 +7,7 @@
     <ItemGroup>
         <PackageReference Include="JsonPath.Net" Version="1.1.6" />
         <PackageReference Include="libloc.Access" Version="2023.1220.0" />
-        <PackageReference Include="System.Text.Json" Version="8.0.4" />
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
     </ItemGroup>
 
     <ItemGroup>
