@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
@@ -37,7 +37,7 @@ jobs:
         run: dotnet publish -c Release -p:UseAppHost=false -p:Version=${{ github.event.release.tag_name }} ${{ matrix.project.name }}
 
       - name: Image Build and Push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.project.name }}/bin/Release/net8.0/publish
           tags: dragonfruitdotnet/onionfruit-web:${{ matrix.project.tag-prefix }}linux
@@ -59,7 +59,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
