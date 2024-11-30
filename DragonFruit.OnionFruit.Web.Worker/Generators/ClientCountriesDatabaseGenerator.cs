@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
-using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
 public class ClientCountriesDatabaseGenerator(OnionooDataSource torInfo) : IDatabaseGenerator
 {
-    public async Task GenerateDatabase(IFileSink fileSink)
+    public async Task GenerateDatabase(FileSink fileSink)
     {
         // onionfruit clients accept a dictionary of key -> countrycode[]
         var clientData = new Dictionary<string, IEnumerable<string>>

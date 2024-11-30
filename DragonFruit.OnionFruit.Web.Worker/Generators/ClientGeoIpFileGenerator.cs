@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
-using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
@@ -16,7 +16,7 @@ namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 /// </summary>
 public class ClientGeoIpFileGenerator(LocationDbSource locationDbSource) : IDatabaseGenerator
 {
-    public async Task GenerateDatabase(IFileSink fileSink)
+    public async Task GenerateDatabase(FileSink fileSink)
     {
         await using (var ip4FileStream = new StreamWriter(fileSink.CreateFile("legacy/geoip"), Encoding.ASCII, leaveOpen: true))
         {

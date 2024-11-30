@@ -4,26 +4,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Storage;
 
 /// <summary>
 /// Represents a collection of files that can be copied or compressed.
 /// </summary>
-public class FileSink : IFileSink, IUploadFileSource, IDisposable
+public class FileSink(string version) : IUploadFileSource, IDisposable
 {
     private readonly IDictionary<string, FileStream> _files = new Dictionary<string, FileStream>();
 
-    public FileSink(string version)
-    {
-        Version = version;
-    }
-
-    public string Version { get; }
+    public string Version { get; } = version;
 
     public bool HasItems => _files.Any();
 
@@ -51,19 +44,6 @@ public class FileSink : IFileSink, IUploadFileSource, IDisposable
             stream.Seek(0, SeekOrigin.Begin);
             await iterator.Invoke(name, stream).ConfigureAwait(false);
         }
-    }
-
-    public async Task<Stream> CreateArchiveStreamAsync(CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
-    {
-        var zipStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.DeleteOnClose);
-
-        using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
-        {
-            await CopyFilesTo(n => zipArchive.CreateEntry(n, compressionLevel).Open());
-        }
-
-        zipStream.Seek(0, SeekOrigin.Begin);
-        return zipStream;
     }
 
     private async Task CopyFilesTo(Func<string, Stream> streamSelector)
