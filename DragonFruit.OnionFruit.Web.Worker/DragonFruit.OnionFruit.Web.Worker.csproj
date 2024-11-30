@@ -23,11 +23,11 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="IPAddressRange" Version="6.1.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
         <PackageReference Include="libloc.Access" Version="2023.1220.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-        <PackageReference Include="Redis.OM" Version="0.7.6" />
-        <PackageReference Include="Sentry.Extensions.Logging" Version="4.6.2" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+        <PackageReference Include="Redis.OM" Version="0.7.1" />
+        <PackageReference Include="Sentry.Extensions.Logging" Version="4.13.0" />
         <PackageReference Include="StackExchange.Redis" Version="2.8.22" />
     </ItemGroup>
 
