@@ -12,6 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AWSSDK.S3" Version="3.7.408.1" />
         <PackageReference Include="DnsClient" Version="1.7.0"/>
         <PackageReference Include="DragonFruit.Data" Version="4.0.0" />
         <PackageReference Include="DragonFruit.Data.Roslyn" Version="4.0.0" />
@@ -32,6 +33,10 @@
     <ItemGroup>
         <EmbeddedResource Include="country-descriptors.json" />
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="data\legacy\countries.json" />
     </ItemGroup>
 
 </Project>
