@@ -7,10 +7,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Amazon.Runtime;
+using Amazon.S3;
 using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -91,6 +94,23 @@ public static class Program
         services.AddSingleton(RedisClientConfigurator.CreateConnectionMultiplexer(context.Configuration, true));
         services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
 
+        var clientConfig = new AmazonS3Config();
+
+        if (context.Configuration["S3:Region"] is { } region)
+        {
+            clientConfig.RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region);
+        }
+        else if (context.Configuration["S3:Endpoint"] is { } endpoint)
+        {
+            clientConfig.ServiceURL = endpoint;
+        }
+
+        var authentication = new BasicAWSCredentials(context.Configuration["S3:AccessKey"], context.Configuration["S3:SecretKey"]);
+        services.AddSingleton(new AmazonS3Client(authentication, clientConfig));
+
+        services.AddSingleton<IDataExporter>(s => ActivatorUtilities.CreateInstance<S3StorageManager>(s, context.Configuration["S3:BucketName"]));
+        services.AddHostedService(s => (S3StorageManager)s.GetRequiredService<IDataExporter>());
+
         // api
         services.AddSingleton<ILookupClient, LookupClient>();
         services.AddSingleton<ApiClient>(_ =>
@@ -109,7 +129,6 @@ public static class Program
             return client;
         });
 
-        // timed service
         services.AddHostedService<Worker>();
     }
 

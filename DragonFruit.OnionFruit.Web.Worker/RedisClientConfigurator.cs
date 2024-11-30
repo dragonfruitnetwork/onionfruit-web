@@ -9,6 +9,9 @@ namespace DragonFruit.OnionFruit.Web.Worker;
 
 public static class RedisClientConfigurator
 {
+    public const string DefaultKeyPrefix = "onionfruit-web-worker";
+    public const string PrefixConfigKey = "Redis:KeyPrefix";
+
     /// <summary>
     /// Creates a <see cref="IConnectionMultiplexer"/> from the provided <see cref="IConfiguration"/>.
     /// Further applying socket-related settings based on whether it is in worker mode.

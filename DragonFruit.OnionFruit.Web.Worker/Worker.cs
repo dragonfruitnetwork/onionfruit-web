@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Generators;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
-using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,23 +23,24 @@ public class Worker : IHostedService
 {
     private record GeneratorDescriptor(Type OutputFormat, IReadOnlyList<Type> SourceTypes);
 
+    private readonly Stopwatch _stopwatch;
+    private readonly IConfiguration _config;
     private readonly ILogger<Worker> _logger;
+    private readonly IDataExporter _exporter;
     private readonly IServiceScopeFactory _ssf;
-    private readonly ICollection<IDataExporter> _exporters;
     private readonly IReadOnlyCollection<GeneratorDescriptor> _descriptors;
 
     private Timer _workerTimer;
-    private readonly Stopwatch _stopwatch;
 
-    private const string LastDatabaseVersionKey = "onionfruit-web-worker:dbversion";
+    private const string LastDatabaseVersionKey = "dbversion";
 
-    public Worker(IServiceScopeFactory ssf, IConfiguration config, ILogger<Worker> logger)
+    public Worker(IServiceScopeFactory ssf, IConfiguration config, IDataExporter exporter, ILogger<Worker> logger)
     {
         _ssf = ssf;
+        _config = config;
         _logger = logger;
+        _exporter = exporter;
         _stopwatch = new Stopwatch();
-
-        _exporters = GetExporters(config);
         _descriptors = GetDescriptors(config);
     }
 
@@ -124,24 +124,25 @@ public class Worker : IHostedService
         // upload files
         if (fileSink.HasItems)
         {
-            foreach (var exporter in _exporters)
+            try
             {
-                _logger.LogInformation("Exporting to {dest}", exporter);
-
-                await exporter.PerformUpload(scope.ServiceProvider, fileSink).ConfigureAwait(false);
-                _logger.LogDebug("Export completed successfully");
+                _logger.LogInformation("Uploading files to storage...");
+                await _exporter.PerformUpload(fileSink).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to upload files: {err}", e.Message);
             }
         }
 
         _stopwatch.Stop();
         _logger.LogInformation("Worker update completed successfully (took {ts})", _stopwatch.Elapsed);
 
-        await redis.StringSetAsync(LastDatabaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
+        var redisPrefix = _config[RedisClientConfigurator.PrefixConfigKey] ?? RedisClientConfigurator.DefaultKeyPrefix;
+        await redis.StringSetAsync($"{redisPrefix}:{LastDatabaseVersionKey}", nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
 
-    public void AddExporter(IDataExporter exporter) => _exporters.Add(exporter);
-
-    private IReadOnlyCollection<GeneratorDescriptor> GetDescriptors(IConfiguration config)
+    private List<GeneratorDescriptor> GetDescriptors(IConfiguration config)
     {
         var listing = new List<GeneratorDescriptor>();
 
@@ -170,32 +171,6 @@ public class Worker : IHostedService
         }
 
         return listing;
-    }
-
-    private static ICollection<IDataExporter> GetExporters(IConfiguration config)
-    {
-        var exporters = new List<IDataExporter>();
-
-        foreach (var section in config.GetSection("Worker:Exports").GetChildren())
-        {
-            IDataExporter entity = section["Type"]?.ToUpperInvariant() switch
-            {
-                "FOLDER" => new FolderExporter(),
-                "URL" => new RemoteArchiveExporter(),
-
-                _ => null
-            };
-
-            if (entity == null)
-            {
-                continue;
-            }
-
-            section.Bind(entity);
-            exporters.Add(entity);
-        }
-
-        return exporters;
     }
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)

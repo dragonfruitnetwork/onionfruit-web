@@ -7,6 +7,7 @@ using DragonFruit.Data.Serializers;
 using DragonFruit.OnionFruit.Web.Data;
 using DragonFruit.OnionFruit.Web.Worker;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 using libloc.Access;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -76,18 +77,22 @@ public static class Program
             return client;
         });
 
-        builder.Services.AddSingleton<LocalAssetStore>();
-
-        // register worker if running in integrated mode (worker copies files out
-        // cannot run both the integrated worker and the remote asset fetcher at same time due to different versioning systems used.
-        if (builder.Configuration["Worker:Enabled"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
+        // register worker if running in integrated mode, using the local asset store for file management
+        if (builder.Configuration["Server:UseBuiltInWorker"]?.Equals("false", StringComparison.OrdinalIgnoreCase) != true)
         {
+            builder.Services.AddSingleton<LocalAssetStore>();
+
+            builder.Services.AddSingleton<IDataExporter, LocalWorkerExporter>();
+            builder.Services.AddSingleton<IRemoteAssetStore>(s => s.GetRequiredService<LocalAssetStore>());
+
             builder.Services.AddSingleton<Worker.Worker>();
+
             builder.Services.AddHostedService(s => s.GetRequiredService<Worker.Worker>());
+            builder.Services.AddHostedService(s => s.GetRequiredService<LocalAssetStore>());
         }
         else
         {
-            builder.Services.AddHostedService<RemoteAssetFetcher>();
+            builder.Services.AddSingleton<IRemoteAssetStore, RemoteAssetStore>();
         }
 
         var app = builder.Build();
@@ -98,7 +103,6 @@ public static class Program
         app.UseDeveloperExceptionPage();
 #endif
 
-        app.UseStaticFiles();
         app.UseRouting();
         app.UseCors();
 
@@ -106,16 +110,9 @@ public static class Program
 
         using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
-            // setup local file watchers and orphaned file task
-            // as the assetstore is registered in the dependency container watchers will be started immediately after instance creation
-            scope.ServiceProvider.GetRequiredService<LocalAssetStore>().StartWatchers();
-
-            // if worker is enabled, add local exporter and run redis migrations
-            var worker = scope.ServiceProvider.GetService<Worker.Worker>();
-
-            if (worker != null)
+            // if worker is not enabled, run redis migrations
+            if (scope.ServiceProvider.GetService<Worker.Worker>() != null)
             {
-                worker.AddExporter(new LocalWorkerExporter());
                 await Worker.Program.ValidateRedisStructures(scope.ServiceProvider).ConfigureAwait(false);
             }
         }

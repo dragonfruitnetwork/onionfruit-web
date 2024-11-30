@@ -6,14 +6,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Database;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
-using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
 public class RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataSource torDirectory) : IDatabaseGenerator
 {
-    public async Task GenerateDatabase(IFileSink fileSink)
+    public async Task GenerateDatabase(FileSink fileSink)
     {
         var table = redis.RedisCollection<OnionFruitNodeInfo>();
         var dbVersion = (long)torDirectory.DataLastModified.Subtract(DateTime.UnixEpoch).TotalSeconds;
@@ -33,7 +33,7 @@ public class RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataS
                 Flags = relay.Flags,
 
                 // onionoo returns country codes in lowercase, which need to be changed for compatibility with everything else.
-                CountryCode = relay.CountryCode.ToUpperInvariant(),
+                CountryCode = relay.CountryCode?.ToUpperInvariant(),
                 CountryName = CountryMap.Instance.GetCountryName(relay.CountryCode) ?? relay.CountryName ?? "Unknown Location",
 
                 ProviderName = relay.ASName,
