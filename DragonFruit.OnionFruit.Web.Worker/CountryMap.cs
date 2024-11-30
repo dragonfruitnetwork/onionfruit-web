@@ -34,7 +34,7 @@ namespace DragonFruit.OnionFruit.Web.Worker
         /// <summary>
         /// Gets the country name associated with the provided <see cref="code"/>, or <c>null</c> if not found.
         /// </summary>
-        public string GetCountryName(string code) => SourceMap.GetValueOrDefault(code.ToUpperInvariant());
+        public string GetCountryName(string code) => code == null ? null : SourceMap.GetValueOrDefault(code.ToUpperInvariant(), null);
 
         void IJsonOnDeserialized.OnDeserialized()
         {
