@@ -3,10 +3,9 @@
 
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Threading.Tasks;
 
-namespace DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
+namespace DragonFruit.OnionFruit.Web.Worker.Storage;
 
 public interface IUploadFileSource
 {
@@ -28,9 +27,4 @@ public interface IUploadFileSource
     /// Streams provided by this method should not dispose of them (as they could be consumed by others in the future)
     /// </remarks>
     Task IterateAllStreams(Func<string, FileStream, Task> iterator);
-
-    /// <summary>
-    /// Creates a new <see cref="ZipArchive"/> and returns a stream containing the compressed files.
-    /// </summary>
-    Task<Stream> CreateArchiveStreamAsync(CompressionLevel compressionLevel = CompressionLevel.SmallestSize);
 }

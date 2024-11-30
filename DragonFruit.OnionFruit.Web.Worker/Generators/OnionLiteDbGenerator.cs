@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
-using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Google.Protobuf;
 using NetTools;
 
@@ -29,7 +29,7 @@ public class OnionLiteDbGenerator(OnionooDataSource onionoo, LocationDbSource lo
         // litedb doesn't include address ranges
     }
 
-    protected override void OnDatabaseGenerated(IFileSink fileSink, OnionDb database)
+    protected override void OnDatabaseGenerated(FileSink fileSink, OnionDb database)
     {
         database.WriteTo(fileSink.CreateFile("onion.lite.db"));
     }

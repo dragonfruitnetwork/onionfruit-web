@@ -8,16 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using JetBrains.Annotations;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
-[UsedImplicitly]
-public record LocalAssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt);
-
-public class LocalAssetStore : IDisposable
+public class LocalAssetStore : IAssetStore, IHostedService, IDisposable
 {
     private const int ExpiryThreshold = 5;
 
@@ -32,12 +30,14 @@ public class LocalAssetStore : IDisposable
     public LocalAssetStore(IConfiguration configuration, ILogger<LocalAssetStore> logger)
     {
         var root = configuration["Server:AssetRoot"];
-        _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
 
+        _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
         _logger = logger;
 
         _accessibleFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         _activeAssetMap = new ConcurrentDictionary<string, FileInfo>(StringComparer.OrdinalIgnoreCase);
+
+        Directory.CreateDirectory(_assetRoot);
 
         _assetFileWatcher = new FileSystemWatcher
         {
@@ -79,29 +79,20 @@ public class LocalAssetStore : IDisposable
     /// <example>
     /// Requesting "legacy/geoip" could return an asset info object with the versioned path "aa00/legacy/geoip" as that is the version of the file being currently served to users.
     /// </example>
-    public LocalAssetInfo GetAssetInfo(string fileName)
+    public Task<AssetInfo> GetAssetInfo(string fileName)
     {
         if (!_activeAssetMap.TryGetValue(fileName, out var fileInfo))
         {
-            return null;
+            return Task.FromResult<AssetInfo>(null);
         }
 
-        return new LocalAssetInfo(fileName, Path.GetRelativePath(_assetRoot, fileInfo.FullName).Replace('\\', '/'), fileInfo.CreationTimeUtc);
-    }
-
-    /// <summary>
-    /// Gets whether a specified asset revision exists
-    /// </summary>
-    public bool AssetRevisionExists(string revisionId)
-    {
-        var pathPrefix = Path.Combine(_assetRoot, revisionId);
-        return _accessibleFilePaths.Any(x => x.StartsWith(pathPrefix, StringComparison.OrdinalIgnoreCase));
+        return Task.FromResult(new AssetInfo(fileName, Path.GetRelativePath(_assetRoot, fileInfo.FullName).Replace('\\', '/'), fileInfo.CreationTimeUtc, Path.GetDirectoryName(fileInfo.DirectoryName)));
     }
 
     /// <summary>
     /// Creates a new asset store version, returning a container that can be used to submit files.
     /// </summary>
-    public LocalAssetStoreRevision CreateNewAssetStoreRevision(string revisionId)
+    public IAssetStoreRevision CreateAssetStoreRevision(string revisionId)
     {
         // use current timestamp for versioning
         var folderPath = Path.Combine(_assetRoot, revisionId);
@@ -113,7 +104,7 @@ public class LocalAssetStore : IDisposable
     /// <summary>
     /// Removes orphaned assets that are no longer accessible by a user
     /// </summary>
-    public int DeleteOrphanedAssets()
+    private int DeleteOrphanedAssets()
     {
         var filesDeleted = 0;
         var activeFiles = _activeAssetMap.Values.Select(x => x.FullName);
@@ -138,15 +129,6 @@ public class LocalAssetStore : IDisposable
         }
 
         return filesDeleted;
-    }
-
-    /// <summary>
-    /// Starts filesystem watchers and orphaned file check timers
-    /// </summary>
-    public void StartWatchers()
-    {
-        _assetFileWatcher.EnableRaisingEvents = true;
-        _assetRootOrphanTimer = new Timer(_ => DeleteOrphanedAssets(), null, TimeSpan.Zero, TimeSpan.FromDays(1));
     }
 
     /// <summary>
@@ -199,8 +181,7 @@ public class LocalAssetStore : IDisposable
     /// <summary>
     /// Returns the root of a relative path
     /// </summary>
-    /// <param name="path"></param>
-    /// <remarks>Based on the answer https://stackoverflow.com/a/7911591</remarks>
+    /// <remarks>Based on https://stackoverflow.com/a/7911591</remarks>
     private static string GetRootFolder(string path)
     {
         while (true)
@@ -222,5 +203,25 @@ public class LocalAssetStore : IDisposable
     {
         _assetFileWatcher?.Dispose();
         _assetRootOrphanTimer?.Dispose();
+    }
+
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        _assetRootOrphanTimer?.Dispose();
+
+        _assetFileWatcher.EnableRaisingEvents = true;
+        _assetRootOrphanTimer = new Timer(_ => DeleteOrphanedAssets(), null, TimeSpan.Zero, TimeSpan.FromDays(1));
+
+        return Task.CompletedTask;
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        _assetFileWatcher.EnableRaisingEvents = false;
+
+        _assetRootOrphanTimer?.Dispose();
+        _assetRootOrphanTimer = null;
+
+        return Task.CompletedTask;
     }
 }

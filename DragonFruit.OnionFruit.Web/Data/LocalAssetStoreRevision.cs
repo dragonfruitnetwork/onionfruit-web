@@ -7,16 +7,9 @@ using System.Threading.Tasks;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
-public class LocalAssetStoreRevision
+public class LocalAssetStoreRevision(string basePath, Action<string> promoteItemCallback) : IAssetStoreRevision
 {
-    private readonly string _basePath;
-    private readonly Action<string> _promoteItemCallback;
-
-    public LocalAssetStoreRevision(string basePath, Action<string> promoteItemCallback)
-    {
-        _basePath = $"{basePath.TrimEnd('/')}/";
-        _promoteItemCallback = promoteItemCallback;
-    }
+    private readonly string _basePath = $"{basePath.TrimEnd('/')}/";
 
     public async Task AddFile(string fileName, Stream input)
     {
@@ -40,6 +33,6 @@ public class LocalAssetStoreRevision
             await input.CopyToAsync(file).ConfigureAwait(false);
         }
 
-        _promoteItemCallback.Invoke(fileName);
+        promoteItemCallback.Invoke(fileName);
     }
 }

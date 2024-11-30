@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Enums;
-using DragonFruit.OnionFruit.Web.Worker.Storage.Abstractions;
+using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Google.Protobuf;
 using NetTools;
 
@@ -12,7 +12,7 @@ namespace DragonFruit.OnionFruit.Web.Worker.Generators;
 
 public class OnionDbGenerator(OnionooDataSource onionoo, LocationDbSource locationDb) : IDatabaseGenerator
 {
-    public Task GenerateDatabase(IFileSink fileSink)
+    public Task GenerateDatabase(FileSink fileSink)
     {
         var database = CreateBaseDb();
 
@@ -94,7 +94,7 @@ public class OnionDbGenerator(OnionooDataSource onionoo, LocationDbSource locati
         }));
     }
 
-    protected virtual void OnDatabaseGenerated(IFileSink fileSink, OnionDb database)
+    protected virtual void OnDatabaseGenerated(FileSink fileSink, OnionDb database)
     {
         // write onion.db to file
         database.WriteTo(fileSink.CreateFile("onion.db"));
