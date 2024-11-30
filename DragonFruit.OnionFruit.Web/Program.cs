@@ -110,7 +110,7 @@ public static class Program
 
         using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
-            // if worker is not enabled, run redis migrations
+            // if worker is enabled, run redis migrations
             if (scope.ServiceProvider.GetService<Worker.Worker>() != null)
             {
                 await Worker.Program.ValidateRedisStructures(scope.ServiceProvider).ConfigureAwait(false);
