@@ -17,7 +17,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
@@ -31,6 +31,6 @@ jobs:
         run: Compress-Archive -Path .\DragonFruit.OnionFruit.Web\bin\publish\* -DestinationPath ${{ env.OUTPUT_FILE_NAME }}
 
       - name: Upload Deploy Package
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.OUTPUT_FILE_NAME }}
