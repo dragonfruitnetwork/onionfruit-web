@@ -176,7 +176,7 @@ public class Worker : IHostedService
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         _workerTimer?.Dispose();
-        _workerTimer = new Timer(_ => PerformUpdate(), null, TimeSpan.Zero, TimeSpan.FromHours(12));
+        _workerTimer = new Timer(s => _ = PerformUpdate(), null, TimeSpan.Zero, TimeSpan.FromHours(12));
 
         return Task.CompletedTask;
     }

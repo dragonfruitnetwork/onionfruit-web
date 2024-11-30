@@ -5,9 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JsonPath.Net" Version="1.1.6" />
+        <PackageReference Include="JsonPath.Net" Version="2.0.0" />
         <PackageReference Include="libloc.Access" Version="2023.1220.0" />
-        <PackageReference Include="System.Text.Json" Version="8.0.5" />
+        <PackageReference Include="System.Text.Json" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
