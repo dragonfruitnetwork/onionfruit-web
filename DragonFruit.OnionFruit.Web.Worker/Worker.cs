@@ -52,10 +52,13 @@ public class Worker : IHostedService
         var sourceInstances = new Dictionary<Type, IDataSource>();
 
         var redis = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase();
+        var keyPrefix = _config[RedisClientConfigurator.PrefixConfigKey] ?? RedisClientConfigurator.DefaultKeyPrefix;
+
+        var databaseVersionKey = new RedisKey($"{keyPrefix}:{LastDatabaseVersionKey}");
         var nextVersion = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
 #if !DEBUG
-        var lastUpdatedValue = await redis.StringGetAsync(LastDatabaseVersionKey).ConfigureAwait(false);
+        var lastUpdatedValue = await redis.StringGetAsync(databaseVersionKey).ConfigureAwait(false);
         var lastVersion = DateTimeOffset.FromUnixTimeSeconds(lastUpdatedValue.HasValue && long.TryParse(lastUpdatedValue.ToString(), out var val) ? val : 0);
 #else
         // in debug mode, use minvalue to always perform fetch.
@@ -138,8 +141,7 @@ public class Worker : IHostedService
         _stopwatch.Stop();
         _logger.LogInformation("Worker update completed successfully (took {ts})", _stopwatch.Elapsed);
 
-        var redisPrefix = _config[RedisClientConfigurator.PrefixConfigKey] ?? RedisClientConfigurator.DefaultKeyPrefix;
-        await redis.StringSetAsync($"{redisPrefix}:{LastDatabaseVersionKey}", nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
+        await redis.StringSetAsync(databaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
 
     private List<GeneratorDescriptor> GetDescriptors(IConfiguration config)
