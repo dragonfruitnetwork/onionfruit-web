@@ -52,7 +52,7 @@ public class ConnectionStatusController(IRedisConnectionProvider redis, ILocatio
         return new ConnectionStatusResponse(ipAddress.ToString(), cloudflareEnabled && cloudflareCountry.ToString() is "T1" or "XX", countryCode, CountryMap.Instance.GetCountryName(countryCode) ?? countryName, asInfo?.Number, asInfo?.Name);
     }
 
-    private (string countryCode, string countryName, IDatabaseAS asInfo) GetConnectionInfo(ILocationDatabase x, IPAddress address, [CanBeNull] string countryCodeOverride)
+    private static (string countryCode, string countryName, IDatabaseAS asInfo) GetConnectionInfo(ILocationDatabase x, IPAddress address, [CanBeNull] string countryCodeOverride)
     {
         IDatabaseAS asInfo = null;
         IDatabaseCountry country = null;
