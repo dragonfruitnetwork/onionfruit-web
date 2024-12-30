@@ -81,6 +81,7 @@ public static class Program
         if (builder.Configuration["Server:UseBuiltInWorker"]?.Equals("false", StringComparison.OrdinalIgnoreCase) != true)
         {
             builder.Services.AddSingleton<LocalAssetStore>();
+            builder.Services.AddSingleton<IAssetStore>(s => s.GetRequiredService<LocalAssetStore>());
 
             builder.Services.AddSingleton<IDataExporter, LocalWorkerExporter>();
             builder.Services.AddSingleton<IRemoteAssetStore>(s => s.GetRequiredService<LocalAssetStore>());
