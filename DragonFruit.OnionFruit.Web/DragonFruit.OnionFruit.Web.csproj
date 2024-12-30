@@ -13,4 +13,11 @@
       <ProjectReference Include="..\DragonFruit.OnionFruit.Web.Worker\DragonFruit.OnionFruit.Web.Worker.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Remove="appsettings.json" />
+        <None Include="appsettings.json">
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>

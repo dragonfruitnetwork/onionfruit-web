@@ -36,4 +36,11 @@
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Remove="appsettings.json" />
+        <None Include="appsettings.json">
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>

@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Setup GitHub NuGet
         run: dotnet nuget update source dragonfruit --username USERNAME --password ${{ github.token }} --store-password-in-clear-text
