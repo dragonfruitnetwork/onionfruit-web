@@ -8,7 +8,7 @@ permissions:
   packages: read
 
 env:
-  DOTNET_TARGET_VER: 9.0
+  DOTNET_TARGET_VER: '9.0'
 
 jobs:
   docker-linux:
