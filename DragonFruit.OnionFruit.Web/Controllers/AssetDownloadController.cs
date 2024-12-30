@@ -16,7 +16,9 @@ namespace DragonFruit.OnionFruit.Web.Controllers;
 [EnableCors]
 public class AssetDownloadController(IRemoteAssetStore assetStore) : ControllerBase
 {
-    [HttpGet("~/assets/{*assetPath}")]
+    [HttpGet, HttpHead]
+    [ResponseCache(NoStore = true)]
+    [Route("~/assets/{*assetPath}")]
     public async Task<IActionResult> ResolveAssetPath(string assetPath)
     {
         assetPath = HttpUtility.UrlDecode(assetPath);
@@ -38,6 +40,9 @@ public class AssetDownloadController(IRemoteAssetStore assetStore) : ControllerB
 
         if (assetStore is not IAssetStore && versionedAsset.VersionedPath.StartsWith("http"))
         {
+            // The redirect _may_ be a different domain and due to browser security, the origin will be null when requesting the resource which breaks CORS.
+            // we're redirecting to a read-only S3 bucket with versioned paths so exposing the redirect is safe.
+            Response.Headers["X-Asset-Location"] = versionedAsset.VersionedPath;
             return Redirect(versionedAsset.VersionedPath);
         }
 

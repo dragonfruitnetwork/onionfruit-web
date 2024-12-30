@@ -19,10 +19,10 @@ namespace DragonFruit.OnionFruit.Web.Controllers;
 public record ConnectionStatusResponse(string IpAddress, bool IsTor, string CountryCode, string CountryName, int? ASNumber, string ASName);
 
 [EnableCors]
-[Route("connectionStatus")]
 public class ConnectionStatusController(IRedisConnectionProvider redis, ILocationDbAccessor libloc) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("~/connectionStatus")]
+    [ResponseCache(NoStore = true)]
     public async Task<ConnectionStatusResponse> GetConnectionStatus()
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress;
