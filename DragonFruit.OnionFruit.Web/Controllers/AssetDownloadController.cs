@@ -16,7 +16,7 @@ namespace DragonFruit.OnionFruit.Web.Controllers;
 [EnableCors("Assets")]
 public class AssetDownloadController(IRemoteAssetStore assetStore) : ControllerBase
 {
-    [HttpGet, HttpHead]
+    [HttpGet]
     [ResponseCache(NoStore = true)]
     [Route("~/assets/{*assetPath}")]
     public async Task<IActionResult> ResolveAssetPath(string assetPath)

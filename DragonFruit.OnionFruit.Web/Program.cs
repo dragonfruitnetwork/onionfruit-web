@@ -46,8 +46,9 @@ public static class Program
 
             cors.AddPolicy("Assets", policy =>
             {
-                policy.WithMethods("GET", "HEAD");
-                policy.WithExposedHeaders("X-Asset-Location");
+                policy.WithMethods("GET");
+                policy.WithHeaders("If-Modified-Since");
+                policy.WithExposedHeaders("ETag", "X-Asset-Location");
 
                 policy.SetIsOriginAllowed(IsValidOrigin);
                 policy.SetPreflightMaxAge(TimeSpan.FromHours(12));
