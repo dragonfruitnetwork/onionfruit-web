@@ -13,7 +13,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace DragonFruit.OnionFruit.Web.Controllers;
 
-[EnableCors]
+[EnableCors("Assets")]
 public class AssetDownloadController(IRemoteAssetStore assetStore) : ControllerBase
 {
     [HttpGet, HttpHead]

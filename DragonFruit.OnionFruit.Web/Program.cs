@@ -34,18 +34,34 @@ public static class Program
         Worker.Program.ConfigureLogging(builder.Logging, builder.Configuration, "Server");
 
         builder.Services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower);
-        builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy =>
+        builder.Services.AddCors(cors =>
         {
-            policy.WithMethods("GET");
-            policy.SetPreflightMaxAge(TimeSpan.FromHours(12));
+            cors.AddDefaultPolicy(policy =>
+            {
+                policy.WithMethods("GET");
 
-            policy.SetIsOriginAllowed(s =>
+                policy.SetIsOriginAllowed(IsValidOrigin);
+                policy.SetPreflightMaxAge(TimeSpan.FromHours(12));
+            });
+
+            cors.AddPolicy("Assets", policy =>
+            {
+                policy.WithMethods("GET", "HEAD");
+                policy.WithExposedHeaders("X-Asset-Location");
+
+                policy.SetIsOriginAllowed(IsValidOrigin);
+                policy.SetPreflightMaxAge(TimeSpan.FromHours(12));
+            });
+
+            return;
+
+            bool IsValidOrigin(string s)
             {
                 var uri = new Uri(s, UriKind.Absolute);
                 return uri.Host == "localhost" || uri.Host.Equals("dragonfruit.network", StringComparison.OrdinalIgnoreCase)
                                                || uri.Host.EndsWith(".dragonfruit.network", StringComparison.OrdinalIgnoreCase);
-            });
-        }));
+            }
+        });
 
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
