@@ -2,6 +2,9 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
+
+        <Title>OnionFruit™ Web Server</Title>
+        <Description>The main web-facing service for OnionFruit™.</Description>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,9 +18,7 @@
 
     <ItemGroup>
         <Content Remove="appsettings.json" />
-        <None Include="appsettings.json">
-            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </None>
+        <None Include="appsettings.json" CopyToPublishDirectory="Never"/>
     </ItemGroup>
 
 </Project>

@@ -7,40 +7,43 @@
         <ServerGarbageCollection>true</ServerGarbageCollection>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <Title>OnionFruit™ Web Worker</Title>
+        <Description>The data-fetching service part of OnionFruit™ Web.</Description>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(ServerPublish)' == 'true'">
         <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.S3" Version="4.0.5" />
-        <PackageReference Include="DnsClient" Version="1.8.0" />
-        <PackageReference Include="DragonFruit.Data" Version="4.1.2" />
-        <PackageReference Include="DragonFruit.Data.Roslyn" Version="4.1.2" />
-        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.3.1" />
-        <PackageReference Include="Google.Protobuf" Version="3.31.1" />
+        <PackageReference Include="AWSSDK.S3" Version="4.0.5"/>
+        <PackageReference Include="DnsClient" Version="1.8.0"/>
+        <PackageReference Include="DragonFruit.Data" Version="4.1.2"/>
+        <PackageReference Include="DragonFruit.Data.Roslyn" Version="4.1.2"/>
+        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.3.1"/>
+        <PackageReference Include="Google.Protobuf" Version="3.31.1"/>
         <PackageReference Include="Grpc.Tools" Version="2.72.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="IPAddressRange" Version="6.2.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
-        <PackageReference Include="libloc.Access" Version="2023.1220.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
-        <PackageReference Include="Redis.OM" Version="1.0.1" />
-        <PackageReference Include="Sentry.Extensions.Logging" Version="5.12.0" />
-        <PackageReference Include="StackExchange.Redis" Version="2.8.41" />
+        <PackageReference Include="IPAddressRange" Version="6.2.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0"/>
+        <PackageReference Include="libloc.Access" Version="2023.1220.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7"/>
+        <PackageReference Include="Redis.OM" Version="1.0.1"/>
+        <PackageReference Include="Sentry.Extensions.Logging" Version="5.12.0"/>
+        <PackageReference Include="StackExchange.Redis" Version="2.8.41"/>
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="country-descriptors.json" />
+        <EmbeddedResource Include="country-descriptors.json"/>
         <Protobuf Include="..\oniondb.proto" GrpcServices="Server"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Content Remove="appsettings.json" />
-        <None Include="appsettings.json">
-            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </None>
+        <Content Remove="appsettings.json"/>
+        <None Include="appsettings.json" CopyToPublishDirectory="Never"/>
     </ItemGroup>
 
 </Project>
