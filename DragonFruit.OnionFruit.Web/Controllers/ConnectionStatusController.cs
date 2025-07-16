@@ -15,7 +15,6 @@ using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Controllers;
 
-[UsedImplicitly]
 public record ConnectionStatusResponse(string IpAddress, bool IsTor, string CountryCode, string CountryName, int? ASNumber, string ASName);
 
 [EnableCors]

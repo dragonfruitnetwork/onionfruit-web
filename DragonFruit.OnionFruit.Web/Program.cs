@@ -1,9 +1,11 @@
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
+using DragonFruit.OnionFruit.Web.Controllers;
 using DragonFruit.OnionFruit.Web.Data;
 using DragonFruit.OnionFruit.Web.Worker;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
@@ -33,7 +35,7 @@ public static class Program
 
         Worker.Program.ConfigureLogging(builder.Logging, builder.Configuration, "Server");
 
-        builder.Services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower);
+        builder.Services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.TypeInfoResolverChain.Insert(0, ControllerSerializerContext.Default));
         builder.Services.AddCors(cors =>
         {
             cors.AddDefaultPolicy(policy =>
@@ -138,3 +140,7 @@ public static class Program
         await app.RunAsync().ConfigureAwait(false);
     }
 }
+
+[JsonSerializable(typeof(ConnectionStatusResponse))]
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower, WriteIndented = true)]
+internal partial class ControllerSerializerContext : JsonSerializerContext;
