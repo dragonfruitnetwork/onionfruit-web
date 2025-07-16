@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
@@ -42,9 +43,11 @@ public class S3StorageManager(IConfiguration configuration, IConnectionMultiplex
     {
         stream.Seek(0, SeekOrigin.Begin);
 
+        var checksum = await SHA256.HashDataAsync(stream);
         var request = new PutObjectRequest
         {
-            CalculateContentMD5Header = true,
+            ChecksumAlgorithm = ChecksumAlgorithm.SHA256,
+            ChecksumSHA256 = Convert.ToBase64String(checksum),
             DisablePayloadSigning = true,
             AutoCloseStream = false,
             BucketName = bucketName,
@@ -52,6 +55,7 @@ public class S3StorageManager(IConfiguration configuration, IConnectionMultiplex
             Key = $"{version}/{assetKey}"
         };
 
+        stream.Seek(0, SeekOrigin.Begin);
         await client.PutObjectAsync(request).ConfigureAwait(false);
 
         if (database == null)
