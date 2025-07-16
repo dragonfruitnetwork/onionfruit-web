@@ -12,7 +12,6 @@ using Amazon.S3;
 using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
-using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -122,8 +121,10 @@ public static class Program
 
             client.Serializers.Configure<ApiJsonSerializer>(json =>
             {
-                json.SerializerOptions = new JsonSerializerOptions();
-                json.SerializerOptions.Converters.Add(new DateTimeConverter());
+                json.SerializerOptions = new JsonSerializerOptions
+                {
+                    TypeInfoResolverChain = {WorkerSerializerContext.Default}
+                };
             });
 
             return client;

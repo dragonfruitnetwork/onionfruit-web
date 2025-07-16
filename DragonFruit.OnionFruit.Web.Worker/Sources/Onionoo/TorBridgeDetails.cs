@@ -17,9 +17,11 @@ public class TorBridgeDetails
     public string HashedFingerprint { get; set; }
 
     [JsonPropertyName("first_seen")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime FirstSeen { get; set; }
 
     [JsonPropertyName("last_seen")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime LastSeen { get; set; }
 
     /// <summary>
@@ -45,6 +47,7 @@ public class TorBridgeDetails
     /// UTC DateTime the server was last restarted
     /// </summary>
     [JsonPropertyName("last_restarted")]
+    [JsonConverter(typeof(DateTimeConverter))]
 
     public DateTime? LastRestarted { get; set; }
 

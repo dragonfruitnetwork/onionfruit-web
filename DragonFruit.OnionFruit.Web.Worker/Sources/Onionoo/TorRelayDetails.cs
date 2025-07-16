@@ -17,18 +17,22 @@ public class TorRelayDetails
     public string Fingerprint { get; set; }
 
     [JsonPropertyName("first_seen")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime FirstSeen { get; set; }
 
     [JsonPropertyName("last_seen")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime LastSeen { get; set; }
 
     [JsonPropertyName("last_changed_address_or_port")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime LastChangedAddressOrPort { get; set; }
 
     /// <summary>
     /// <see cref="DateTime"/> the server was last restarted
     /// </summary>
     [JsonPropertyName("last_restarted")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime? LastRestarted { get; set; }
 
     /// <summary>
@@ -40,6 +44,7 @@ public class TorRelayDetails
     /// <summary>
     /// Features the tor node has
     /// </summary>
+    [JsonIgnore]
     public TorNodeFlags Flags { get; set; }
 
     [JsonPropertyName("flags")]

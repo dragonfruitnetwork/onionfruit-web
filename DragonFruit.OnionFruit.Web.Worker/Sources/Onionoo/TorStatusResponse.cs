@@ -3,6 +3,7 @@
 
 using System;
 using System.Text.Json.Serialization;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
@@ -37,6 +38,7 @@ public class TorStatusResponse<TRelay, TBridge>
     /// Indicates how recent the relay objects in this document are.
     /// </remarks>
     [JsonPropertyName("relays_published")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime RelaysPublished { get; set; }
 
     /// <summary>
@@ -61,6 +63,7 @@ public class TorStatusResponse<TRelay, TBridge>
     /// Indicates how recent the relay objects in this document are.
     /// </remarks>
     [JsonPropertyName("bridges_published")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime BridgesPublished { get; set; }
 
     /// <summary>

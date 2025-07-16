@@ -6,10 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Generators;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -189,3 +192,8 @@ public class Worker : IHostedService
         return Task.CompletedTask;
     }
 }
+
+[JsonSerializable(typeof(CountryMap))]
+[JsonSerializable(typeof(TorStatusResponse<TorRelayDetails, TorBridgeDetails>))]
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
+public partial class WorkerSerializerContext : JsonSerializerContext;

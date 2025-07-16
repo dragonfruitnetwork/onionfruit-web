@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DragonFruit.Data;
-using DragonFruit.Data.Serializers;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources;
@@ -31,10 +31,8 @@ public class OnionooDataSource(ApiClient client) : IDataSource
                 return false;
 
             case HttpStatusCode.OK:
-                var serializer = (IAsyncSerializer)client.Serializers.Resolve<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(DataDirection.In);
-
                 var networkStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                var data = await serializer.DeserializeAsync<TorStatusResponse<TorRelayDetails, TorBridgeDetails>>(networkStream);
+                var data = await JsonSerializer.DeserializeAsync(networkStream, WorkerSerializerContext.Default.TorStatusResponseTorRelayDetailsTorBridgeDetails);
 
                 Relays = data.Relays;
                 DataLastModified = response.Content.Headers.LastModified?.UtcDateTime ?? DateTime.UtcNow;

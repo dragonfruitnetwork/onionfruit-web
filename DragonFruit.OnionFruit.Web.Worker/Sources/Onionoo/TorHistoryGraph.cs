@@ -5,15 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 
 public class TorHistoryGraph
 {
     [JsonPropertyName("first")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime Start { get; set; }
 
     [JsonPropertyName("last")]
+    [JsonConverter(typeof(DateTimeConverter))]
     public DateTime End { get; set; }
 
     [JsonPropertyName("interval")]
