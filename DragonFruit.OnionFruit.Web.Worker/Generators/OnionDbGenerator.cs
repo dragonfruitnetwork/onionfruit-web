@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
@@ -97,6 +99,14 @@ public class OnionDbGenerator(OnionooDataSource onionoo, LocationDbSource locati
     protected virtual void OnDatabaseGenerated(FileSink fileSink, OnionDb database)
     {
         // write onion.db to file
-        database.WriteTo(fileSink.CreateFile("onion.db"));
+        var dbStream = fileSink.CreateFile("onion.db");
+
+        database.WriteTo(dbStream);
+
+        // write brotli compressed version as well
+        using var compressionStream = new BrotliStream(fileSink.CreateFile("onion.db.br"), CompressionLevel.SmallestSize, true);
+
+        dbStream.Seek(0, SeekOrigin.Begin);
+        dbStream.CopyTo(compressionStream);
     }
 }
