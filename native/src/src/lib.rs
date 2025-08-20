@@ -22,8 +22,8 @@ struct NetworkInfo {
     country_code: [u8; 2]
 }
 
-#[no_mangle]
-pub extern "cdecl" fn sort_network_entries(ptr: *const c_void, length: usize, out: *mut InteropNetworkSortResult) {
+#[unsafe(no_mangle)]
+pub extern "C" fn sort_network_entries(ptr: *const c_void, length: usize, out: *mut InteropNetworkSortResult) {
     let mut data = Vec::<NetBlock>::with_capacity(length);
     let slice = unsafe { slice::from_raw_parts(ptr as *const InteropNetworkEntry, length) };
 
@@ -87,11 +87,14 @@ pub extern "cdecl" fn sort_network_entries(ptr: *const c_void, length: usize, ou
     mem::forget(v6results);
 }
 
-#[no_mangle]
-pub unsafe extern "cdecl" fn free_sort_result(ptr: *const InteropNetworkSortResult) {
-    let result = *ptr;
-    mem::drop(Vec::<InteropNetworkRange<u32>>::from_raw_parts(result.v4entries, result.v4count, result.v4capacity));
-    mem::drop(Vec::<InteropNetworkRange<u128>>::from_raw_parts(result.v6entries, result.v6count, result.v6capacity));
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn free_sort_result(ptr: *const InteropNetworkSortResult) {
+    let result = unsafe { *ptr };
+    let v4_vector = unsafe { Vec::<InteropNetworkRange<u32>>::from_raw_parts(result.v4entries, result.v4count, result.v4capacity) };
+    let v6_vector = unsafe { Vec::<InteropNetworkRange<u128>>::from_raw_parts(result.v6entries, result.v6count, result.v6capacity) };
+
+    mem::drop(v4_vector);
+    mem::drop(v6_vector);
 }
 
 fn create_network_list<T>(map: RangeInclusiveMap<T, NetworkInfo>, range_value_selector: fn(T) -> T) -> Vec::<InteropNetworkRange<T>> where T : Copy, T : Eq, T : PartialEq, T : Ord, T : PartialOrd, T : StepFns<T> {
