@@ -21,7 +21,7 @@
         <PackageReference Include="DnsClient" Version="1.8.0"/>
         <PackageReference Include="DragonFruit.Data" Version="4.1.2"/>
         <PackageReference Include="DragonFruit.Data.Roslyn" Version="4.1.2"/>
-        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="0.3.1"/>
+        <PackageReference Include="DragonFruit.OnionFruit.Web.Worker.Native" Version="1.0.1"/>
         <PackageReference Include="Google.Protobuf" Version="3.32.0"/>
         <PackageReference Include="Grpc.Tools" Version="2.72.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
