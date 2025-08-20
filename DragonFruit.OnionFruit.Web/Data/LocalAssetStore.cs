@@ -31,7 +31,7 @@ public class LocalAssetStore : IAssetStore, IHostedService, IDisposable
     {
         var root = configuration["Server:AssetRoot"];
 
-        _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(Path.GetTempPath(), "onionfruit-web-assets") : Path.GetFullPath(root);
+        _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(".", "onionfruit-web-assets") : Path.GetFullPath(root);
         _logger = logger;
 
         _accessibleFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
