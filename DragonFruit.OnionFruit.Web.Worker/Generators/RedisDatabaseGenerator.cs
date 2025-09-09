@@ -51,7 +51,7 @@ public class RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataS
             }
         }
 
-        foreach (var node in table.Where(x => x.DatabaseVersion > dbVersion))
+        foreach (var node in table.Where(x => x.DatabaseVersion < dbVersion))
         {
             await table.DeleteAsync(node).ConfigureAwait(false);
         }
