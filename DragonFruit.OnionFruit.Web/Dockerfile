@@ -1,6 +1,6 @@
 ﻿ARG IMAGEVARIANT="alpine"
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-${IMAGEVARIANT}
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-${IMAGEVARIANT}
 WORKDIR /app
 
 COPY . .
