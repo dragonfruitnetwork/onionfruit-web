@@ -42,8 +42,8 @@ jobs:
         with:
           images: dragonfruitdotnet/onionfruit-web
           tags: |
-            type=semver,pattern={{version}}${{ matrix.project.tag-prefix }}
-            type=raw,value=latest${{ matrix.project.tag-prefix }}
+            type=semver,pattern=${{ matrix.project.tag-prefix }}{{version}}
+            type=raw,value=${{ matrix.project.tag-prefix }}latest
 
       - name: Image build and push
         uses: docker/build-push-action@v6
