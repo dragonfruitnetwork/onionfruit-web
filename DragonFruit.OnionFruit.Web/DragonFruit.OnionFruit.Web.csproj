@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
 
         <Title>OnionFruit™ Web Server</Title>
         <Description>The main web-facing service for OnionFruit™.</Description>
@@ -9,11 +9,11 @@
 
     <ItemGroup>
         <PackageReference Include="libloc.Access" Version="2023.1220.0" />
-        <PackageReference Include="System.Text.Json" Version="9.0.9" />
+        <PackageReference Include="System.Text.Json" Version="10.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DragonFruit.OnionFruit.Web.Worker\DragonFruit.OnionFruit.Web.Worker.csproj" />
+        <ProjectReference Include="..\DragonFruit.OnionFruit.Web.Worker\DragonFruit.OnionFruit.Web.Worker.csproj" />
     </ItemGroup>
 
     <ItemGroup>

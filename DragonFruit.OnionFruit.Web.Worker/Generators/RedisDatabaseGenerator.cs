@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DragonFruit.OnionFruit.Web.Worker.Database;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
+using Redis.OM;
 using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Generators;
