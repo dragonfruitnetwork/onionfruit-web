@@ -47,6 +47,11 @@ public static class RedisClientConfigurator
             redisConfig.SocketManager = new SocketManager(workerCount: 2, options: SocketManager.SocketManagerOptions.UseThreadPool);
         }
 
+        if (config["Redis:DisableCertValidation"]?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true)
+        {
+            redisConfig.CertificateValidation += delegate { return true; };
+        }
+
         return ConnectionMultiplexer.Connect(redisConfig);
     }
 }
