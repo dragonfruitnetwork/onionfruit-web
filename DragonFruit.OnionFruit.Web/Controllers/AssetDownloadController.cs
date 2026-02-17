@@ -21,6 +21,11 @@ public class AssetDownloadController(IRemoteAssetStore assetStore) : ControllerB
     [Route("~/assets/{*assetPath}")]
     public async Task<IActionResult> ResolveAssetPath(string assetPath)
     {
+        if (string.IsNullOrWhiteSpace(assetPath))
+        {
+            return NotFound();
+        }
+
         assetPath = HttpUtility.UrlDecode(assetPath);
         var versionedAsset = await assetStore.GetAssetInfo(assetPath);
 
@@ -52,6 +57,11 @@ public class AssetDownloadController(IRemoteAssetStore assetStore) : ControllerB
     [HttpGet("~/asset-dl/{*versionedAssetPath}")]
     public IActionResult DownloadVersionedAsset(string versionedAssetPath)
     {
+        if (string.IsNullOrWhiteSpace(versionedAssetPath))
+        {
+            return NotFound();
+        }
+
         if (assetStore is not IAssetStore store)
         {
             return StatusCode(500);
