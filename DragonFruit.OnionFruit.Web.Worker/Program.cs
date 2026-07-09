@@ -12,6 +12,7 @@ using Amazon.S3;
 using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
+using DragonFruit.OnionFruit.Web.Worker.Configuration;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,6 +74,11 @@ public static class Program
 
     private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
     {
+        // configuration
+        services.AddRedisOptions(context.Configuration);
+        services.AddValidatedOptions<WorkerOptions>(context.Configuration, WorkerOptions.SectionName);
+        services.AddValidatedOptions<S3StorageOptions>(context.Configuration, S3StorageOptions.SectionName);
+
         // redis + redis.om
         services.AddSingleton(RedisClientConfigurator.CreateConnectionMultiplexer(context.Configuration, true));
         services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));

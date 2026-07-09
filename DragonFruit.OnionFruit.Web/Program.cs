@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
+using DragonFruit.OnionFruit.Web.Configuration;
 using DragonFruit.OnionFruit.Web.Controllers;
 using DragonFruit.OnionFruit.Web.Data;
 using DragonFruit.OnionFruit.Web.Worker;
+using DragonFruit.OnionFruit.Web.Worker.Configuration;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
 using libloc.Access;
@@ -67,6 +69,11 @@ public static class Program
             options.ForwardedProtoHeaderName = "X-Forwarded-Proto";
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
         });
+
+        // configuration
+        builder.Services.AddRedisOptions(builder.Configuration);
+        builder.Services.AddValidatedOptions<ServerOptions>(builder.Configuration, ServerOptions.SectionName);
+        builder.Services.AddValidatedOptions<WorkerOptions>(builder.Configuration, WorkerOptions.SectionName);
 
         // databases
         builder.Services.AddLocationDb();
