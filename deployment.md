@@ -69,7 +69,7 @@ The server can be deployed in a similar way, but with a slightly different confi
 }
 ```
 
-You can then use compose file to deploy the server:
+You can then use compose file to deploy the server, mounting the config file into the app directory:
 
 ```yaml
 services:
@@ -78,9 +78,9 @@ services:
     image: dragonfruitdotnet/onionfruit-web:latest # change latest to worker if you want to run the worker separately
     restart: always
     volumes:
-      - /path/to/config/dir:/onionfruit-config:ro
+      - /path/to/config/dir/appsettings.json:/app/appsettings.json:ro
     ports:
       - 80:80
-    environment:
-      CONFIG_FOLDER_PATH: /onionfruit-config
 ```
+
+Alternatively (or additionally), any setting can be provided as an environment variable or command line argument, which take priority over the config file. Use `__` as the section separator for environment variables (e.g. `Redis__ConnectionString`) and `:` for command line arguments (e.g. `--Redis:ConnectionString=localhost:6379`).

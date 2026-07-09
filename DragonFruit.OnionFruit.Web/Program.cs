@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Redis.OM;
 using Redis.OM.Contracts;
 using StackExchange.Redis;
@@ -26,12 +27,6 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        var configPathBase = Environment.GetEnvironmentVariable("CONFIG_FOLDER_PATH");
-
-        if (!string.IsNullOrEmpty(configPathBase))
-        {
-            builder.Configuration.SetBasePath(configPathBase).AddJsonFile("appsettings.json");
-        }
 
         Worker.Program.ConfigureLogging(builder.Logging, builder.Configuration, "Server");
 

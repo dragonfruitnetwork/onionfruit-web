@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Redis.OM;
 using Redis.OM.Contracts;
 using Redis.OM.Modeling;
@@ -29,7 +30,6 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var host = Host.CreateDefaultBuilder(args)
-            .ConfigureHostConfiguration(ConfigureHost)
             .ConfigureLogging((host, logging) => ConfigureLogging(logging, host.Configuration, "Worker"))
             .ConfigureServices(ConfigureServices)
             .Build();
@@ -40,22 +40,6 @@ public static class Program
         }
 
         await host.RunAsync().ConfigureAwait(false);
-    }
-
-    private static void ConfigureHost(IConfigurationBuilder host)
-    {
-        // windows containers don't allow file mounts, so we allow setting an environment var to the config file path
-        var configBase = Environment.GetEnvironmentVariable("CONFIG_FOLDER_PATH");
-        if (string.IsNullOrEmpty(configBase))
-        {
-            return;
-        }
-
-        var fullConfigBasePath = Path.GetFullPath(configBase);
-        if (Directory.Exists(fullConfigBasePath))
-        {
-            host.SetBasePath(fullConfigBasePath).AddJsonFile("appsettings.json");
-        }
     }
 
     public static void ConfigureLogging(ILoggingBuilder logging, IConfiguration config, string dsnType)
