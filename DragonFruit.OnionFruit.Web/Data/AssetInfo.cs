@@ -4,8 +4,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace DragonFruit.OnionFruit.Web.Data
-{
-    [UsedImplicitly]
-    public record AssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt, string ETag);
-}
+namespace DragonFruit.OnionFruit.Web.Data;
+
+[UsedImplicitly]
+public record AssetInfo(string Name, string VersionedPath, DateTimeOffset CreatedAt, string ETag);

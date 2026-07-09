@@ -4,10 +4,9 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace DragonFruit.OnionFruit.Web.Data
+namespace DragonFruit.OnionFruit.Web.Data;
+
+public interface IAssetStoreRevision
 {
-    public interface IAssetStoreRevision
-    {
-        Task AddFile(string fileName, Stream input);
-    }
+    Task AddFile(string fileName, Stream input);
 }
