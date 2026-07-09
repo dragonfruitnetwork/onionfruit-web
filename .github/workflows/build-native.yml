@@ -18,13 +18,13 @@ jobs:
     runs-on: macos-latest
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Build
         run: chmod +x ./native/nuget/scripts/build_macos.sh && ./native/nuget/scripts/build_macos.sh
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: macos
           path: native/src/target/universal-release/*.dylib
@@ -39,7 +39,7 @@ jobs:
         arch: [x86_64, aarch64]
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Prepare Build Target
         run: rustup target add ${{ matrix.arch }}-pc-windows-msvc
@@ -49,7 +49,7 @@ jobs:
         working-directory: native/src
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: windows-${{ matrix.arch }}
           path: native/src/target/${{ matrix.arch }}-pc-windows-msvc/release/*.dll
@@ -68,7 +68,7 @@ jobs:
       RUST_TARGET: ${{ matrix.arch }}-unknown-linux-${{ matrix.vendor }}
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       # cross-rs is needed if the arch being built isn't the same as the host (linux only)
       - name: Install Cross
@@ -88,7 +88,7 @@ jobs:
           RUSTFLAGS: ${{ matrix.vendor == 'musl' && '-C target-feature=-crt-static' || '' }}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: linux-${{ matrix.vendor }}-${{ matrix.arch }}
           path: native/src/target/${{ env.RUST_TARGET }}/release/*.so
@@ -103,39 +103,39 @@ jobs:
       - build-linux
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: macos
           path: native/nuget/runtimes/osx/native
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: windows-x86_64
           path: native/nuget/runtimes/win-x64/native
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: windows-aarch64
           path: native/nuget/runtimes/win-arm64/native
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: linux-musl-x86_64
           path: native/nuget/runtimes/linux-musl-x64/native
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: linux-musl-aarch64
           path: native/nuget/runtimes/linux-musl-arm64/native
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: linux-gnu-x86_64
           path: native/nuget/runtimes/linux-x64/native
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: linux-gnu-aarch64
           path: native/nuget/runtimes/linux-arm64/native
