@@ -77,7 +77,7 @@ public static class Program
 
         // databases
         builder.Services.AddLocationDb();
-        builder.Services.AddSingleton(_ => RedisClientConfigurator.CreateConnectionMultiplexer(builder.Configuration, false));
+        builder.Services.AddSingleton(s => RedisClientConfigurator.CreateConnectionMultiplexer(s.GetRequiredService<IOptions<RedisOptions>>().Value, false));
         builder.Services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
 
         // api clients
@@ -99,7 +99,8 @@ public static class Program
         });
 
         // register worker if running in integrated mode, using the local asset store for file management
-        if (builder.Configuration["Server:UseBuiltInWorker"]?.Equals("false", StringComparison.OrdinalIgnoreCase) != true)
+        var serverOptions = builder.Configuration.GetSection(ServerOptions.SectionName).Get<ServerOptions>() ?? new ServerOptions();
+        if (serverOptions.UseBuiltInWorker)
         {
             builder.Services.AddSingleton<LocalAssetStore>();
             builder.Services.AddSingleton<IAssetStore>(s => s.GetRequiredService<LocalAssetStore>());
@@ -135,11 +136,11 @@ public static class Program
             // if worker is enabled, run redis migrations
             if (scope.ServiceProvider.GetService<Worker.Worker>() != null)
             {
-                await Worker.Program.ValidateRedisStructures(scope.ServiceProvider).ConfigureAwait(false);
+                await Worker.Program.ValidateRedisStructures(scope.ServiceProvider);
             }
         }
 
-        await app.RunAsync().ConfigureAwait(false);
+        await app.RunAsync();
     }
 }
 

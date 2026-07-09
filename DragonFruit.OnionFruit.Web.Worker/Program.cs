@@ -2,7 +2,6 @@
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
@@ -80,24 +79,27 @@ public static class Program
         services.AddValidatedOptions<S3StorageOptions>(context.Configuration, S3StorageOptions.SectionName);
 
         // redis + redis.om
-        services.AddSingleton(RedisClientConfigurator.CreateConnectionMultiplexer(context.Configuration, true));
+        services.AddSingleton(s => RedisClientConfigurator.CreateConnectionMultiplexer(s.GetRequiredService<IOptions<RedisOptions>>().Value, true));
         services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
 
-        var clientConfig = new AmazonS3Config();
-
-        if (context.Configuration["S3:Region"] is { } region)
+        services.AddSingleton(s =>
         {
-            clientConfig.RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region);
-        }
-        else if (context.Configuration["S3:Endpoint"] is { } endpoint)
-        {
-            clientConfig.ServiceURL = endpoint;
-        }
+            var storageOptions = s.GetRequiredService<IOptions<S3StorageOptions>>().Value;
+            var clientConfig = new AmazonS3Config();
 
-        var authentication = new BasicAWSCredentials(context.Configuration["S3:AccessKey"], context.Configuration["S3:SecretKey"]);
-        services.AddSingleton(new AmazonS3Client(authentication, clientConfig));
+            if (!string.IsNullOrEmpty(storageOptions.Region))
+            {
+                clientConfig.RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(storageOptions.Region);
+            }
+            else if (!string.IsNullOrEmpty(storageOptions.Endpoint))
+            {
+                clientConfig.ServiceURL = storageOptions.Endpoint;
+            }
 
-        services.AddSingleton<IDataExporter>(s => ActivatorUtilities.CreateInstance<S3StorageManager>(s, context.Configuration["S3:BucketName"]));
+            return new AmazonS3Client(new BasicAWSCredentials(storageOptions.AccessKey, storageOptions.SecretKey), clientConfig);
+        });
+
+        services.AddSingleton<IDataExporter, S3StorageManager>();
         services.AddHostedService(s => (S3StorageManager)s.GetRequiredService<IDataExporter>());
 
         // api
@@ -125,12 +127,12 @@ public static class Program
 
     public static async Task ValidateRedisStructures(IServiceProvider services)
     {
-        var config = services.GetRequiredService<IConfiguration>();
         var redis = services.GetRequiredService<IRedisConnectionProvider>();
         var logger = services.GetRequiredService<ILogger<IRedisConnectionProvider>>();
+        var redisOptions = services.GetRequiredService<IOptions<RedisOptions>>().Value;
 
-        var createNewIndexes = config["REDIS_CREATE_INDEXES"]?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? true;
-        var regenExistingIndexes = config["REDIS_REGEN_INDEXES"]?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
+        var createNewIndexes = redisOptions.CreateIndexes;
+        var regenExistingIndexes = redisOptions.RegenIndexes;
 
         var documentSourceAssemblies = new[]
         {

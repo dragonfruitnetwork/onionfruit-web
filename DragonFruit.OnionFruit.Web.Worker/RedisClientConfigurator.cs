@@ -1,41 +1,36 @@
 // OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
-using System;
-using Microsoft.Extensions.Configuration;
+using DragonFruit.OnionFruit.Web.Worker.Configuration;
 using StackExchange.Redis;
 
 namespace DragonFruit.OnionFruit.Web.Worker;
 
 public static class RedisClientConfigurator
 {
-    public const string DefaultKeyPrefix = "onionfruit-web-worker";
-    public const string PrefixConfigKey = "Redis:KeyPrefix";
-
     /// <summary>
-    /// Creates a <see cref="IConnectionMultiplexer"/> from the provided <see cref="IConfiguration"/>.
+    /// Creates a <see cref="IConnectionMultiplexer"/> from the provided <see cref="RedisOptions"/>.
     /// Further applying socket-related settings based on whether it is in worker mode.
     /// </summary>
-    public static IConnectionMultiplexer CreateConnectionMultiplexer(IConfiguration config, bool workerMode)
+    public static IConnectionMultiplexer CreateConnectionMultiplexer(RedisOptions options, bool workerMode)
     {
-        var connectionString = config["Redis:ConnectionString"];
         ConfigurationOptions redisConfig;
 
-        if (!string.IsNullOrEmpty(connectionString))
+        if (!string.IsNullOrEmpty(options.ConnectionString))
         {
-            redisConfig = ConfigurationOptions.Parse(connectionString);
+            redisConfig = ConfigurationOptions.Parse(options.ConnectionString);
         }
         else
         {
             redisConfig = new ConfigurationOptions
             {
-                User = config["Redis:User"],
-                Password = config["Redis:Pass"],
-                Ssl = config["Redis:Ssl"]?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true,
+                User = options.User,
+                Password = options.Pass,
+                Ssl = options.Ssl,
                 EndPoints =
                 {
                     {
-                        config["Redis:Host"] ?? "localhost", int.TryParse(config["Redis:Port"], out var p) ? p : 6379
+                        options.Host, options.Port
                     }
                 }
             };
@@ -47,7 +42,7 @@ public static class RedisClientConfigurator
             redisConfig.SocketManager = new SocketManager(workerCount: 2, options: SocketManager.SocketManagerOptions.UseThreadPool);
         }
 
-        if (config["Redis:DisableCertValidation"]?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true)
+        if (options.DisableCertValidation)
         {
             redisConfig.CertificateValidation += delegate { return true; };
         }

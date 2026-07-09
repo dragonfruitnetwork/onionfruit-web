@@ -10,14 +10,15 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using DragonFruit.OnionFruit.Web.Worker.Configuration;
 using DragonFruit.OnionFruit.Web.Worker.Generators;
 using DragonFruit.OnionFruit.Web.Worker.Sources;
 using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo;
 using DragonFruit.OnionFruit.Web.Worker.Storage;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace DragonFruit.OnionFruit.Web.Worker;
@@ -27,7 +28,7 @@ public class Worker : IHostedService
     private record GeneratorDescriptor(Type OutputFormat, IReadOnlyList<Type> SourceTypes);
 
     private readonly Stopwatch _stopwatch;
-    private readonly IConfiguration _config;
+    private readonly RedisOptions _redisOptions;
     private readonly ILogger<Worker> _logger;
     private readonly IDataExporter _exporter;
     private readonly IServiceScopeFactory _ssf;
@@ -37,14 +38,14 @@ public class Worker : IHostedService
 
     private const string LastDatabaseVersionKey = "dbversion";
 
-    public Worker(IServiceScopeFactory ssf, IConfiguration config, IDataExporter exporter, ILogger<Worker> logger)
+    public Worker(IServiceScopeFactory ssf, IOptions<RedisOptions> redisOptions, IOptions<WorkerOptions> workerOptions, IDataExporter exporter, ILogger<Worker> logger)
     {
         _ssf = ssf;
-        _config = config;
         _logger = logger;
         _exporter = exporter;
+        _redisOptions = redisOptions.Value;
         _stopwatch = new Stopwatch();
-        _descriptors = GetDescriptors(config);
+        _descriptors = GetDescriptors(workerOptions.Value);
     }
 
     private async Task PerformUpdate()
@@ -55,7 +56,7 @@ public class Worker : IHostedService
         var sourceInstances = new Dictionary<Type, IDataSource>();
 
         var redis = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase();
-        var keyPrefix = _config[RedisClientConfigurator.PrefixConfigKey] ?? RedisClientConfigurator.DefaultKeyPrefix;
+        var keyPrefix = _redisOptions.KeyPrefix;
 
         var databaseVersionKey = new RedisKey($"{keyPrefix}:{LastDatabaseVersionKey}");
         var nextVersion = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -147,21 +148,20 @@ public class Worker : IHostedService
         await redis.StringSetAsync(databaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
     }
 
-    private List<GeneratorDescriptor> GetDescriptors(IConfiguration config)
+    private List<GeneratorDescriptor> GetDescriptors(WorkerOptions options)
     {
         var listing = new List<GeneratorDescriptor>();
 
         // get all file generators, determine what generators need what types
         foreach (var fileGeneratorType in GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo(typeof(IDatabaseGenerator))))
         {
-            if (config.GetSection("Worker:EnabledGenerators").GetValue<string>(fileGeneratorType.Name)?.Equals("false", StringComparison.OrdinalIgnoreCase) == true)
+            if (options.EnabledGenerators.TryGetValue(fileGeneratorType.Name, out var generatorEnabled) && !generatorEnabled)
             {
                 _logger.LogInformation("{gen} was disabled by configuration", fileGeneratorType.Name);
                 continue;
             }
 
             var ctor = fileGeneratorType.GetConstructors().SingleOrDefault();
-
             if (ctor == null)
             {
                 // IDatabaseGenerators must have a single constructor. if they don't, ignore it.

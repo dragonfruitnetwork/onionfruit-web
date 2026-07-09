@@ -9,30 +9,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Microsoft.Extensions.Configuration;
+using DragonFruit.OnionFruit.Web.Worker.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace DragonFruit.OnionFruit.Web.Worker.Storage;
 
-public class S3StorageManager(IConfiguration configuration, IConnectionMultiplexer redis, AmazonS3Client client, string bucketName) : IDataExporter, IHostedService
+public class S3StorageManager(IOptions<S3StorageOptions> storageOptions, IOptions<RedisOptions> redisOptions, IConnectionMultiplexer redis, AmazonS3Client client) : IDataExporter, IHostedService
 {
     public const string VersionedAssetMapName = "versioned-assets";
     private const string ExpiryQueueName = "versioned-assets-expiry-queue";
 
     private Timer _purgeCheckTimer;
 
-    /// <summary>
-    /// Expiry time, in days, to request removal of old assets
-    /// </summary>
-    public double ExpireOldAssetsAfter { get; set; } = int.TryParse(configuration["S3:ExpireOldAssetsAfter"], out var val) ? val : 30;
-
     public Task PerformUpload(IUploadFileSource source)
     {
         var version = source.Version;
         var database = redis?.GetDatabase();
 
-        var keyPrefix = configuration[RedisClientConfigurator.PrefixConfigKey] ?? RedisClientConfigurator.DefaultKeyPrefix;
+        var keyPrefix = redisOptions.Value.KeyPrefix;
         var assetMapKey = new RedisKey($"{keyPrefix}:{VersionedAssetMapName}");
         var expiryQueueKey = new RedisKey($"{keyPrefix}:{ExpiryQueueName}");
 
@@ -50,7 +46,7 @@ public class S3StorageManager(IConfiguration configuration, IConnectionMultiplex
             ChecksumSHA256 = Convert.ToBase64String(checksum),
             DisablePayloadSigning = true,
             AutoCloseStream = false,
-            BucketName = bucketName,
+            BucketName = storageOptions.Value.BucketName,
             InputStream = stream,
             Key = $"{version}/{assetKey}"
         };
@@ -76,8 +72,8 @@ public class S3StorageManager(IConfiguration configuration, IConnectionMultiplex
 
     private async Task PerformPurgeCheck()
     {
-        var keyPrefix = configuration[RedisClientConfigurator.PrefixConfigKey] ?? RedisClientConfigurator.DefaultKeyPrefix;
-        var maxRemovalAge = DateTimeOffset.UtcNow.AddDays(-ExpireOldAssetsAfter).ToUnixTimeSeconds();
+        var keyPrefix = redisOptions.Value.KeyPrefix;
+        var maxRemovalAge = DateTimeOffset.UtcNow.AddDays(-storageOptions.Value.ExpireOldAssetsAfter).ToUnixTimeSeconds();
         var queueKey = new RedisKey($"{keyPrefix}:{ExpiryQueueName}");
         var database = redis.GetDatabase();
 
@@ -89,7 +85,7 @@ public class S3StorageManager(IConfiguration configuration, IConnectionMultiplex
 
         var removalRequest = new DeleteObjectsRequest
         {
-            BucketName = bucketName,
+            BucketName = storageOptions.Value.BucketName,
             Objects = markedAssets.Select(x => new KeyVersion
             {
                 Key = x.Element.ToString()

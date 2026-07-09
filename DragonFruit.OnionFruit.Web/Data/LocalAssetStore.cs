@@ -9,9 +9,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using DragonFruit.OnionFruit.Web.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DragonFruit.OnionFruit.Web.Data;
 
@@ -27,11 +28,9 @@ public class LocalAssetStore : IAssetStore, IHostedService, IDisposable
 
     private Timer _assetRootOrphanTimer;
 
-    public LocalAssetStore(IConfiguration configuration, ILogger<LocalAssetStore> logger)
+    public LocalAssetStore(IOptions<ServerOptions> serverOptions, ILogger<LocalAssetStore> logger)
     {
-        var root = configuration["Server:AssetRoot"];
-
-        _assetRoot = string.IsNullOrEmpty(root) ? Path.Combine(".", "onionfruit-web-assets") : Path.GetFullPath(root);
+        _assetRoot = Path.GetFullPath(serverOptions.Value.AssetRoot);
         _logger = logger;
 
         _accessibleFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
