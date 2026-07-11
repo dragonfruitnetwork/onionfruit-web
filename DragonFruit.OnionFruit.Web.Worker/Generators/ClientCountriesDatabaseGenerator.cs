@@ -23,7 +23,7 @@ public class ClientCountriesDatabaseGenerator(OnionooDataSource torInfo) : IData
             ["out"] = CountriesWithFlag(torInfo.Countries, TorNodeFlags.Exit)
         };
 
-        await fileSink.CreateFile("legacy/countries.json").WriteAsync(JsonSerializer.SerializeToUtf8Bytes(clientData)).ConfigureAwait(false);
+        await fileSink.CreateFile("legacy/countries.json").WriteAsync(JsonSerializer.SerializeToUtf8Bytes(clientData));
     }
 
     private static IEnumerable<string> CountriesWithFlag(IEnumerable<IGrouping<string, TorRelayDetails>> info, TorNodeFlags flag)

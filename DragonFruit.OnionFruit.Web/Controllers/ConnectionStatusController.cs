@@ -39,14 +39,14 @@ public class ConnectionStatusController(IRedisConnectionProvider redis, ILocatio
         }
 
         // check internal redis database of known nodes
-        var nodeInfo = await redis.RedisCollection<OnionFruitNodeInfo>().SingleOrDefaultAsync(x => x.IpAddress == connectionIpAddress).ConfigureAwait(false);
+        var nodeInfo = await redis.RedisCollection<OnionFruitNodeInfo>().SingleOrDefaultAsync(x => x.IpAddress == connectionIpAddress);
         if (nodeInfo != null)
         {
             return new ConnectionStatusResponse(ipAddress.ToString(), true, nodeInfo.CountryCode, nodeInfo.CountryName, nodeInfo.ProviderNumber, nodeInfo.ProviderName);
         }
 
         var cloudflareEnabled = HttpContext.Request.Headers.TryGetValue("CF-IPCountry", out var cloudflareCountry);
-        var (countryCode, countryName, asInfo) = await libloc.PerformAsync(db => GetConnectionInfo(db, ipAddress, cloudflareEnabled ? cloudflareCountry.ToString() : null)).ConfigureAwait(false);
+        var (countryCode, countryName, asInfo) = await libloc.PerformAsync(db => GetConnectionInfo(db, ipAddress, cloudflareEnabled ? cloudflareCountry.ToString() : null));
 
         return new ConnectionStatusResponse(ipAddress.ToString(), cloudflareEnabled && cloudflareCountry.ToString() is "T1" or "XX", countryCode, CountryMap.Instance.GetCountryName(countryCode) ?? countryName, asInfo?.Number, asInfo?.Name);
     }

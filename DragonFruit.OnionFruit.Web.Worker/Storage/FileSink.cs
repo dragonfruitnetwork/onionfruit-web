@@ -42,7 +42,7 @@ public class FileSink(string version) : IUploadFileSource, IDisposable
         foreach (var (name, stream) in _files)
         {
             stream.Seek(0, SeekOrigin.Begin);
-            await iterator.Invoke(name, stream).ConfigureAwait(false);
+            await iterator.Invoke(name, stream);
         }
     }
 
@@ -53,7 +53,7 @@ public class FileSink(string version) : IUploadFileSource, IDisposable
             await using var entry = streamSelector.Invoke(name);
 
             content.Seek(0, SeekOrigin.Begin);
-            await content.CopyToAsync(entry).ConfigureAwait(false);
+            await content.CopyToAsync(entry);
         }
     }
 

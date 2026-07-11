@@ -48,13 +48,13 @@ public class RedisDatabaseGenerator(IRedisConnectionProvider redis, OnionooDataS
                 var addressInfo = info.Clone();
                 addressInfo.IpAddress = address;
 
-                await table.InsertAsync(addressInfo).ConfigureAwait(false);
+                await table.InsertAsync(addressInfo);
             }
         }
 
         foreach (var node in table.Where(x => x.DatabaseVersion < dbVersion))
         {
-            await table.DeleteAsync(node).ConfigureAwait(false);
+            await table.DeleteAsync(node);
         }
     }
 }

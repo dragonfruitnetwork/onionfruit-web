@@ -14,6 +14,6 @@ internal class LocalWorkerExporter(IAssetStore localStore) : IDataExporter
     public async Task PerformUpload(IUploadFileSource source)
     {
         var versionedStore = localStore.CreateAssetStoreRevision(source.Version);
-        await source.IterateAllStreams((name, stream) => versionedStore.AddFile(name, stream)).ConfigureAwait(false);
+        await source.IterateAllStreams((name, stream) => versionedStore.AddFile(name, stream));
     }
 }

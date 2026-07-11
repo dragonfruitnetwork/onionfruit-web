@@ -23,7 +23,7 @@ public class OnionooDataSource(ApiClient client) : IDataSource
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
         var request = new TorStatusRequest {LastModified = lastVersionDate};
-        using var response = await client.PerformAsync(request).ConfigureAwait(false);
+        using var response = await client.PerformAsync(request);
 
         switch (response.StatusCode)
         {
@@ -31,7 +31,7 @@ public class OnionooDataSource(ApiClient client) : IDataSource
                 return false;
 
             case HttpStatusCode.OK:
-                var networkStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                var networkStream = await response.Content.ReadAsStreamAsync();
                 var data = await JsonSerializer.DeserializeAsync(networkStream, WorkerSerializerContext.Default.TorStatusResponseTorRelayDetailsTorBridgeDetails);
 
                 Relays = data.Relays;

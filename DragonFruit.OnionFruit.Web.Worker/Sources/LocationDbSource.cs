@@ -40,7 +40,7 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
 
     public async Task<bool> HasDataChanged(DateTimeOffset lastVersionDate)
     {
-        var records = await dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT).ConfigureAwait(false);
+        var records = await dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT);
         var date = records.Answers.OfType<TxtRecord>().SingleOrDefault()?.Text.First();
 
         if (string.IsNullOrEmpty(date))
@@ -55,10 +55,10 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
     {
         var dbFileStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan | FileOptions.DeleteOnClose);
 
-        await using (var downloadStream = await apiClient.PerformAsync<FileStream>(new LocationDbDownloadRequest()).ConfigureAwait(false))
+        await using (var downloadStream = await apiClient.PerformAsync<FileStream>(new LocationDbDownloadRequest()))
         await using (var xzStream = new XZStream(downloadStream))
         {
-            await xzStream.CopyToAsync(dbFileStream).ConfigureAwait(false);
+            await xzStream.CopyToAsync(dbFileStream);
         }
 
         Database = DatabaseLoader.LoadFromStream(dbFileStream);
@@ -85,8 +85,8 @@ public class LocationDbSource(ILookupClient dnsClient, ApiClient apiClient) : ID
             var v4AddressProcess = Task.Factory.StartNew(() => GetIPv4AddressRanges(networkSortResult.v4Entries, networkSortResult.v4Count), TaskCreationOptions.LongRunning);
             var v6AddressProcess = Task.Factory.StartNew(() => GetIPv6AddressRanges(networkSortResult.v6Entries, networkSortResult.v6Count), TaskCreationOptions.LongRunning);
 
-            IPv4AddressRanges = await v4AddressProcess.ConfigureAwait(false);
-            IPv6AddressRanges = await v6AddressProcess.ConfigureAwait(false);
+            IPv4AddressRanges = await v4AddressProcess;
+            IPv6AddressRanges = await v6AddressProcess;
 
             IPv4CountryAddressRanges = IPv4AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);
             IPv6CountryAddressRanges = IPv6AddressRanges.ToLookup(x => x.CountryCode, x => x.Network, StringComparer.OrdinalIgnoreCase);

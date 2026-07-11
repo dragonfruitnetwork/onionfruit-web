@@ -62,7 +62,7 @@ public class Worker : IHostedService
         var nextVersion = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
 #if !DEBUG
-        var lastUpdatedValue = await redis.StringGetAsync(databaseVersionKey).ConfigureAwait(false);
+        var lastUpdatedValue = await redis.StringGetAsync(databaseVersionKey);
         var lastVersion = DateTimeOffset.FromUnixTimeSeconds(lastUpdatedValue.HasValue && long.TryParse(lastUpdatedValue.ToString(), out var val) ? val : 0);
 #else
         // in debug mode, use minvalue to always perform fetch.
@@ -79,7 +79,7 @@ public class Worker : IHostedService
             _logger.LogInformation("Checking if {source} has been updated", sourceType.Name);
 
             sourceInstances[sourceType] = source;
-            dataSourceUpdated |= await source.HasDataChanged(lastVersion).ConfigureAwait(false);
+            dataSourceUpdated |= await source.HasDataChanged(lastVersion);
         }
 
         if (!dataSourceUpdated)
@@ -91,7 +91,7 @@ public class Worker : IHostedService
 
         // fetch all data sources
         _logger.LogInformation("Waiting for {count} sources to be fetched...", sourceInstances.Count);
-        await Task.WhenAll(sourceInstances.Select(x => x.Value.CollectData())).ConfigureAwait(false);
+        await Task.WhenAll(sourceInstances.Select(x => x.Value.CollectData()));
 
         // file sink used to store static-generated assets for uploading to s3 or saving to a local path
         using var fileSink = new FileSink(nextVersion.ToString(CultureInfo.InvariantCulture));
@@ -109,7 +109,7 @@ public class Worker : IHostedService
 
                 disposableGeneratorInstance = generatorInstance as IDisposable;
 
-                await generatorInstance.GenerateDatabase(fileSink).ConfigureAwait(false);
+                await generatorInstance.GenerateDatabase(fileSink);
                 _logger.LogInformation("{name} finished successfully", generatorDescriptor.OutputFormat.Name);
             }
             catch (Exception e)
@@ -134,7 +134,7 @@ public class Worker : IHostedService
             try
             {
                 _logger.LogInformation("Uploading files to storage...");
-                await _exporter.PerformUpload(fileSink).ConfigureAwait(false);
+                await _exporter.PerformUpload(fileSink);
             }
             catch (Exception e)
             {
@@ -145,7 +145,7 @@ public class Worker : IHostedService
         _stopwatch.Stop();
         _logger.LogInformation("Worker update completed successfully (took {ts})", _stopwatch.Elapsed);
 
-        await redis.StringSetAsync(databaseVersionKey, nextVersion, TimeSpan.FromDays(1)).ConfigureAwait(false);
+        await redis.StringSetAsync(databaseVersionKey, nextVersion, TimeSpan.FromDays(1));
     }
 
     private List<GeneratorDescriptor> GetDescriptors(WorkerOptions options)

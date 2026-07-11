@@ -52,7 +52,7 @@ public class S3StorageManager(IOptions<S3StorageOptions> storageOptions, IOption
         };
 
         stream.Seek(0, SeekOrigin.Begin);
-        await client.PutObjectAsync(request).ConfigureAwait(false);
+        await client.PutObjectAsync(request);
 
         if (database == null)
         {
@@ -60,9 +60,9 @@ public class S3StorageManager(IOptions<S3StorageOptions> storageOptions, IOption
         }
 
         // update version map, add old one to expiry queue
-        var oldVersion = await database.HashGetAsync(versionedAssetMapKey, assetKey).ConfigureAwait(false);
+        var oldVersion = await database.HashGetAsync(versionedAssetMapKey, assetKey);
 
-        await database.HashSetAsync(versionedAssetMapKey, assetKey, version).ConfigureAwait(false);
+        await database.HashSetAsync(versionedAssetMapKey, assetKey, version);
 
         if (oldVersion.HasValue)
         {
@@ -77,7 +77,7 @@ public class S3StorageManager(IOptions<S3StorageOptions> storageOptions, IOption
         var queueKey = new RedisKey($"{keyPrefix}:{ExpiryQueueName}");
         var database = redis.GetDatabase();
 
-        var markedAssets = await database.SortedSetRangeByScoreWithScoresAsync(queueKey, stop: maxRemovalAge).ConfigureAwait(false);
+        var markedAssets = await database.SortedSetRangeByScoreWithScoresAsync(queueKey, stop: maxRemovalAge);
         if (markedAssets.Length == 0)
         {
             return;
@@ -92,8 +92,8 @@ public class S3StorageManager(IOptions<S3StorageOptions> storageOptions, IOption
             }).ToList()
         };
 
-        await client.DeleteObjectsAsync(removalRequest).ConfigureAwait(false);
-        await database.SortedSetRemoveRangeByScoreAsync(queueKey, 0, maxRemovalAge).ConfigureAwait(false);
+        await client.DeleteObjectsAsync(removalRequest);
+        await database.SortedSetRemoveRangeByScoreAsync(queueKey, 0, maxRemovalAge);
     }
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)

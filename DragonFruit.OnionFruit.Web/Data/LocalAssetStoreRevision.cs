@@ -30,7 +30,7 @@ public class LocalAssetStoreRevision(string basePath, Action<string> promoteItem
                 input.Seek(0, SeekOrigin.Begin);
             }
 
-            await input.CopyToAsync(file).ConfigureAwait(false);
+            await input.CopyToAsync(file);
         }
 
         promoteItemCallback.Invoke(fileName);

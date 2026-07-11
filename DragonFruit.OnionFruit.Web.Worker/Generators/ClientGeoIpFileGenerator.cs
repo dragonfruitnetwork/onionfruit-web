@@ -20,7 +20,7 @@ public class ClientGeoIpFileGenerator(LocationDbSource locationDbSource) : IData
     {
         await using (var ip4FileStream = new StreamWriter(fileSink.CreateFile("legacy/geoip"), Encoding.ASCII, leaveOpen: true))
         {
-            await WriteHeaderAsync(ip4FileStream, 4).ConfigureAwait(false);
+            await WriteHeaderAsync(ip4FileStream, 4);
             foreach (var entry in locationDbSource.IPv4AddressRanges)
             {
                 if (entry.CountryCode.Any(x => !char.IsAsciiLetterUpper(x)))
@@ -33,13 +33,13 @@ public class ClientGeoIpFileGenerator(LocationDbSource locationDbSource) : IData
                 var endAddr = (uint)IPAddress.HostToNetworkOrder((int)entry.Network.End.Address);
 #pragma warning restore CS0618 // Type or member is obsolete
 
-                await ip4FileStream.WriteLineAsync($"{startAddr},{endAddr},{entry.CountryCode}").ConfigureAwait(false);
+                await ip4FileStream.WriteLineAsync($"{startAddr},{endAddr},{entry.CountryCode}");
             }
         }
 
         await using (var ip6FileStream = new StreamWriter(fileSink.CreateFile("legacy/geoip6"), Encoding.ASCII, leaveOpen: true))
         {
-            await WriteHeaderAsync(ip6FileStream, 6).ConfigureAwait(false);
+            await WriteHeaderAsync(ip6FileStream, 6);
             foreach (var entry in locationDbSource.IPv6AddressRanges)
             {
                 if (entry.CountryCode.Any(x => !char.IsAsciiLetterUpper(x)))
@@ -47,13 +47,13 @@ public class ClientGeoIpFileGenerator(LocationDbSource locationDbSource) : IData
                     continue;
                 }
 
-                await ip6FileStream.WriteLineAsync($"{entry.Network.Begin},{entry.Network.End},{entry.CountryCode}").ConfigureAwait(false);
+                await ip6FileStream.WriteLineAsync($"{entry.Network.Begin},{entry.Network.End},{entry.CountryCode}");
             }
         }
     }
 
     private async Task WriteHeaderAsync(TextWriter writer, int addressVersion)
     {
-        await writer.WriteLineAsync($"# OnionFruit GeoIP File (IPv{addressVersion}). Generated using IPFire's location.db licenced under {locationDbSource.Database.License}.").ConfigureAwait(false);
+        await writer.WriteLineAsync($"# OnionFruit GeoIP File (IPv{addressVersion}). Generated using IPFire's location.db licenced under {locationDbSource.Database.License}.");
     }
 }
