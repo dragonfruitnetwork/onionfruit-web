@@ -36,10 +36,10 @@ public static class Program
 
         using (var scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
-            await ValidateRedisStructures(scope.ServiceProvider).ConfigureAwait(false);
+            await ValidateRedisStructures(scope.ServiceProvider);
         }
 
-        await host.RunAsync().ConfigureAwait(false);
+        await host.RunAsync();
     }
 
     public static void ConfigureLogging(ILoggingBuilder logging, IConfiguration config, string dsnType)
@@ -51,14 +51,6 @@ public static class Program
             o.IncludeScopes = false;
             o.TimestampFormat = $"[dd/MM/yyyy hh:mm:ss] ({dsnType}) ";
         });
-
-#if WINDOWS
-        logging.AddEventLog(o =>
-        {
-            o.Filter = (_, level) => level >= LogLevel.Information;
-            o.SourceName = $"OnionFruit-Web-{dsnType}/v{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}";
-        });
-#endif
 
         logging.AddSentry(o =>
         {
@@ -145,14 +137,14 @@ public static class Program
             if (regenExistingIndexes)
             {
                 logger.LogInformation("Dropping index for type {t}", type.Name);
-                await redis.Connection.DropIndexAsync(type).ConfigureAwait(false);
+                await redis.Connection.DropIndexAsync(type);
             }
 
             // create if enabled OR the index is being regenerated
             if (regenExistingIndexes || createNewIndexes)
             {
                 logger.LogInformation("Initialising index for type {t} (if not already present)", type.Name);
-                await redis.Connection.CreateIndexAsync(type).ConfigureAwait(false);
+                await redis.Connection.CreateIndexAsync(type);
             }
         }
     }
