@@ -10,6 +10,7 @@ permissions:
 jobs:
   docker-linux:
     runs-on: ubuntu-latest
+    name: Build ${{ matrix.project.name }}
     
     strategy:
       matrix:
