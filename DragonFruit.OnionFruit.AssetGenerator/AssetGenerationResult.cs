@@ -3,12 +3,20 @@
 
 namespace DragonFruit.OnionFruit.AssetGenerator;
 
+public enum AssetGenerationSkipReason
+{
+    None,
+    NoGeneratorsEnabled,
+    NoSourceChanges
+}
+
 public sealed record AssetGenerationResult(
     DateTimeOffset Version,
     bool SourcesChanged,
     string WorkspaceRoot,
     IReadOnlyList<GeneratorRunResult> Generators,
-    IReadOnlyList<Exception> Errors)
+    IReadOnlyList<Exception> Errors,
+    AssetGenerationSkipReason SkipReason = AssetGenerationSkipReason.None)
 {
     public bool Succeeded => Errors.Count == 0;
 }

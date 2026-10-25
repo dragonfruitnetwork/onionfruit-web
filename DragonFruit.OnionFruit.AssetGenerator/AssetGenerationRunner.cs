@@ -31,8 +31,8 @@ public sealed class AssetGenerationRunner(
 
         if (enabledGenerators.Count == 0)
         {
-            logger.LogInformation("No asset generators are enabled");
-            return new AssetGenerationResult(runVersion, false, string.Empty, [], []);
+            logger.LogDebug("No asset generators are enabled");
+            return new AssetGenerationResult(runVersion, false, string.Empty, [], [], AssetGenerationSkipReason.NoGeneratorsEnabled);
         }
 
         var changedSources = new List<ISource>();
@@ -53,8 +53,8 @@ public sealed class AssetGenerationRunner(
 
         if (changedSources.Count == 0)
         {
-            logger.LogInformation("No source data has changed; generator execution skipped");
-            return new AssetGenerationResult(runVersion, false, string.Empty, [], []);
+            logger.LogDebug("No source data has changed since the last run");
+            return new AssetGenerationResult(runVersion, false, string.Empty, [], [], AssetGenerationSkipReason.NoSourceChanges);
         }
 
         logger.LogInformation("Fetching {count} sources after detecting changes in {changed}", requiredSources.Count, string.Join(", ", changedSources.Select(source => source.Name)));

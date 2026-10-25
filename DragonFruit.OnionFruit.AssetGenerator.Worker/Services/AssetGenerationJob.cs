@@ -9,14 +9,24 @@ public sealed class AssetGenerationJob(AssetGenerationRunner runner, ILogger<Ass
 {
     public async Task Invoke()
     {
+        logger.LogInformation("Asset generation run requested");
+
         try
         {
             var result = await runner.RunAsync();
 
-            if (result.SourcesChanged)
+            switch (result.SkipReason)
             {
-                logger.LogInformation("Asset generation finished with {count} generator(s), {errors} error(s)", result.Generators.Count, result.Errors.Count);
+                case AssetGenerationSkipReason.NoSourceChanges:
+                    logger.LogInformation("Asset generation run skipped: no data source changes detected");
+                    return;
+
+                case AssetGenerationSkipReason.NoGeneratorsEnabled:
+                    logger.LogInformation("Asset generation run skipped: no asset generators are enabled");
+                    return;
             }
+
+            logger.LogInformation("Asset generation finished with {count} generator(s), {errors} error(s)", result.Generators.Count, result.Errors.Count);
         }
         catch (Exception exception)
         {
