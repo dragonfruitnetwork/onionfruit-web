@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 namespace RangeMap.Tests;
 
 [TestFixture]
@@ -55,7 +58,7 @@ public class RangeTreeTests
 
     private static void AssertFound(bool found, RangeTree<int, int>.Cursor cursor, int? expectedStart)
     {
-        Assert.That(found ? cursor.Start : (int?)null, Is.EqualTo(expectedStart));
+        Assert.That(found ? cursor.Start : null, Is.EqualTo(expectedStart));
     }
 
     [TestCase(1, 50, 4_000)]
@@ -110,9 +113,9 @@ public class RangeTreeTests
         IEnumerable<int> EvensThenOdds() => Ascending().Where(i => i % 2 == 0).Concat(Ascending().Where(i => i % 2 == 1));
         IEnumerable<int> MiddleOut() => Ascending().OrderBy(i => Math.Abs(i - n / 2));
 
-        foreach (var insertOrder in new[] { Ascending(), Descending() })
+        foreach (var insertOrder in new[] {Ascending(), Descending()})
         {
-            foreach (var removeOrder in new[] { Ascending(), Descending(), EvensThenOdds(), MiddleOut() })
+            foreach (var removeOrder in new[] {Ascending(), Descending(), EvensThenOdds(), MiddleOut()})
             {
                 var tree = new RangeTree<int, int>();
                 var model = new Model();
@@ -165,7 +168,7 @@ public class RangeTreeTests
         var tree = new RangeTree<int, int>();
         Assert.That(tree.Insert(5, 10, 1), Is.True);
         Assert.That(tree.Insert(5, 7, 2), Is.False);
-        Assert.That(Forward(tree), Is.EqualTo(new[] { (5, 7, 2) }));
+        Assert.That(Forward(tree), Is.EqualTo(new[] {(5, 7, 2)}));
     }
 
     [Test]
@@ -227,7 +230,7 @@ public class RangeTreeTests
         // Alternate ends; the two ends should meet without skipping or repeating anything.
         var entries = new RangeTree<int, int>.EntryRange(tree, front, back);
         var seen = new List<int>();
-        for (var i = 0; ; i++)
+        for (var i = 0;; i++)
         {
             if (!(i % 3 == 0 ? entries.MoveNextBack() : entries.MoveNext()))
             {

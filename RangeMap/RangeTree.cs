@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 namespace RangeMap;
 
 internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
@@ -54,19 +57,18 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
         private Cursor _front;
         private Cursor _back;
         private bool _remaining;
-        private Cursor _current;
 
         public EntryRange(RangeTree<TKey, TValue> tree, Cursor front, Cursor back)
         {
             _tree = tree;
-            _version = tree._version;
+            _version = tree.Version;
             _front = front;
             _back = back;
             _remaining = true;
-            _current = default;
+            Current = default;
         }
 
-        public readonly Cursor Current => _current;
+        public Cursor Current { get; private set; }
 
         public bool MoveNext()
         {
@@ -76,7 +78,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
             }
 
             _tree!.CheckVersion(_version);
-            _current = _front;
+            Current = _front;
 
             if (_front.SamePositionAs(_back))
             {
@@ -98,7 +100,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
             }
 
             _tree!.CheckVersion(_version);
-            _current = _back;
+            Current = _back;
 
             if (_front.SamePositionAs(_back))
             {
@@ -115,19 +117,19 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
 
     private Node? _root;
     private Leaf? _first;
+
     private Leaf? _last;
+
     // Number of branch levels above the leaves.
     private int _height;
-    private int _count;
-    private int _version;
 
-    public int Count => _count;
+    public int Count { get; private set; }
 
-    public int Version => _version;
+    public int Version { get; private set; }
 
     public void CheckVersion(int version)
     {
-        if (version != _version)
+        if (version != Version)
         {
             throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
         }
@@ -139,8 +141,8 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
         _first = null;
         _last = null;
         _height = 0;
-        _count = 0;
-        _version++;
+        Count = 0;
+        Version++;
     }
 
     public EntryRange All()
@@ -150,7 +152,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
 
     public bool TryGetFirst(out Cursor cursor)
     {
-        if (_count == 0)
+        if (Count == 0)
         {
             cursor = default;
             return false;
@@ -162,7 +164,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
 
     public bool TryGetLast(out Cursor cursor)
     {
-        if (_count == 0)
+        if (Count == 0)
         {
             cursor = default;
             return false;
@@ -342,7 +344,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
     public void SetEnd(Cursor cursor, TKey end)
     {
         cursor.Leaf.Ends[cursor.Index] = end;
-        _version++;
+        Version++;
     }
 
     /// <summary>
@@ -351,7 +353,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
     /// </summary>
     public bool Insert(TKey start, TKey end, TValue value)
     {
-        _version++;
+        Version++;
         if (_root is null)
         {
             var leaf = new Leaf();
@@ -382,7 +384,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
 
         if (added)
         {
-            _count++;
+            Count++;
         }
 
         return added;
@@ -509,8 +511,8 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
             return false;
         }
 
-        _version++;
-        _count--;
+        Version++;
+        Count--;
 
         if (_height > 0 && _root.Count == 1)
         {
@@ -733,7 +735,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
         clone._root = CloneNode(_root, _height, clone, ref previousLeaf);
         clone._last = previousLeaf;
         clone._height = _height;
-        clone._count = _count;
+        clone.Count = Count;
         return clone;
     }
 
@@ -742,7 +744,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
         if (height == 0)
         {
             var leaf = (Leaf)node;
-            var copy = new Leaf { Count = leaf.Count, Prev = previousLeaf };
+            var copy = new Leaf {Count = leaf.Count, Prev = previousLeaf};
 
             Array.Copy(leaf.Starts, copy.Starts, leaf.Count);
             Array.Copy(leaf.Ends, copy.Ends, leaf.Count);
@@ -762,7 +764,7 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
         }
 
         var branch = (Branch)node;
-        var branchCopy = new Branch { Count = branch.Count };
+        var branchCopy = new Branch {Count = branch.Count};
         Array.Copy(branch.Keys, branchCopy.Keys, branch.Count - 1);
 
         for (var i = 0; i < branch.Count; i++)
@@ -777,14 +779,14 @@ internal sealed class RangeTree<TKey, TValue> where TKey : IComparable<TKey>
     {
         if (_root is null)
         {
-            Check(_count == 0 && _height == 0 && _first is null && _last is null, "empty tree has stale state");
+            Check(Count == 0 && _height == 0 && _first is null && _last is null, "empty tree has stale state");
             return;
         }
 
         var leaves = new List<Leaf>();
         var count = ValidateNode(_root, _height, default!, false, default!, false, true, leaves);
 
-        Check(count == _count, $"count is {_count} but tree holds {count} entries");
+        Check(count == Count, $"count is {Count} but tree holds {count} entries");
         Check(_first == leaves[0], "first leaf pointer is wrong");
         Check(_last == leaves[^1], "last leaf pointer is wrong");
 

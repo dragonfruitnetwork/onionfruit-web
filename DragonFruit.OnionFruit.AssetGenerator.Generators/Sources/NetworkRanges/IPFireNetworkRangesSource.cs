@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
@@ -23,12 +26,10 @@ internal sealed class IPFireNetworkRangeMapSource(ILookupClient dnsClient, ApiCl
         SourceOutputNames.LocationDbIpv6
     };
 
-    private IReadOnlyDictionary<string, ISourceOutput> _outputs = new Dictionary<string, ISourceOutput>();
-
     public string Name => "location-db";
 
     public IReadOnlySet<string> OutputNames => ProducedOutputNames;
-    public IReadOnlyDictionary<string, ISourceOutput> Outputs => _outputs;
+    public IReadOnlyDictionary<string, ISourceOutput> Outputs { get; private set; } = new Dictionary<string, ISourceOutput>();
 
     public async Task<bool> HasDataChangedAsync(DateTimeOffset lastVersionDate, CancellationToken ct)
     {
@@ -46,7 +47,7 @@ internal sealed class IPFireNetworkRangeMapSource(ILookupClient dnsClient, ApiCl
     public async Task FetchAsync(CancellationToken ct)
     {
         await using var dbFileStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan | FileOptions.DeleteOnClose);
-        
+
         await using (var downloadStream = await apiClient.PerformAsync<FileStream>(new LocationDbDownloadRequest(), ct))
         await using (var xzStream = new XZStream(downloadStream))
         {
@@ -62,7 +63,7 @@ internal sealed class IPFireNetworkRangeMapSource(ILookupClient dnsClient, ApiCl
         var ipv6Builder = new NetworkRangeMapBuilder<UInt128>();
         AddNetworks(ipv6Builder, database, AddressFamily.InterNetworkV6, AddressKeyConverter.ToUInt128);
 
-        _outputs = new Dictionary<string, ISourceOutput>(2)
+        Outputs = new Dictionary<string, ISourceOutput>(2)
         {
             [SourceOutputNames.LocationDbIpv4] = ipv4Builder.Build(SourceOutputNames.LocationDbIpv4, AddressFamily.InterNetwork, database.CreatedAt, database.License),
             [SourceOutputNames.LocationDbIpv6] = ipv6Builder.Build(SourceOutputNames.LocationDbIpv6, AddressFamily.InterNetworkV6, database.CreatedAt, database.License),

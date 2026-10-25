@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
@@ -12,7 +15,7 @@ public sealed class GenerationContext : IReadOnlyDictionary<string, ISourceOutpu
         : this(sources.SelectMany(source => source.Outputs), workspace)
     {
     }
-    
+
     public GenerationContext(IEnumerable<KeyValuePair<string, ISourceOutput>> outputs, IWorkspace workspace)
     {
         _outputs = outputs.ToDictionary(kv => kv.Key, kv => kv.Value);

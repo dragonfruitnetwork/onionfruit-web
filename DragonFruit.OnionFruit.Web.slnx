@@ -1,9 +1,9 @@
 <Solution>
-  <Project Path="DragonFruit.OnionFruit.AssetGenerator/DragonFruit.OnionFruit.AssetGenerator.csproj" />
-  <Project Path="DragonFruit.OnionFruit.AssetGenerator.Worker/DragonFruit.OnionFruit.AssetGenerator.Worker.csproj" />
-  <Folder Name="/RangeMap/">
-    <Project Path="RangeMap.Tests/RangeMap.Tests.csproj" />
-    <Project Path="RangeMap/RangeMap.csproj" />
-  </Folder>
-  <Project Path="DragonFruit.OnionFruit.AssetGenerator.Generators/DragonFruit.OnionFruit.AssetGenerator.Generators.csproj" />
+    <Folder Name="/RangeMap/">
+        <Project Path="RangeMap.Tests/RangeMap.Tests.csproj"/>
+        <Project Path="RangeMap/RangeMap.csproj"/>
+    </Folder>
+    <Project Path="DragonFruit.OnionFruit.AssetGenerator/DragonFruit.OnionFruit.AssetGenerator.csproj"/>
+    <Project Path="DragonFruit.OnionFruit.AssetGenerator.Worker/DragonFruit.OnionFruit.AssetGenerator.Worker.csproj"/>
+    <Project Path="DragonFruit.OnionFruit.AssetGenerator.Generators/DragonFruit.OnionFruit.AssetGenerator.Generators.csproj"/>
 </Solution>

@@ -7,20 +7,19 @@ namespace DragonFruit.OnionFruit.AssetGenerator.Workspace;
 
 public sealed class DirectoryWorkspace : IWorkspace, IDisposable
 {
-    private readonly string _root;
     private readonly bool _deleteOnDispose;
 
     private DirectoryWorkspace(string root, bool deleteOnDispose)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(root);
 
-        _root = Path.GetFullPath(root);
+        RootPath = Path.GetFullPath(root);
         _deleteOnDispose = deleteOnDispose;
 
-        Directory.CreateDirectory(_root);
+        Directory.CreateDirectory(RootPath);
     }
 
-    public string RootPath => _root;
+    public string RootPath { get; }
 
     /// <summary>
     /// Creates a workspace in a uniquely-named directory, optionally beneath <paramref name="parentDirectory"/>.
@@ -40,14 +39,14 @@ public sealed class DirectoryWorkspace : IWorkspace, IDisposable
 
     public void Dispose()
     {
-        if (!_deleteOnDispose || !Directory.Exists(_root))
+        if (!_deleteOnDispose || !Directory.Exists(RootPath))
         {
             return;
         }
 
         try
         {
-            Directory.Delete(_root, recursive: true);
+            Directory.Delete(RootPath, recursive: true);
         }
         catch
         {
@@ -71,7 +70,7 @@ public sealed class DirectoryWorkspace : IWorkspace, IDisposable
         var path = ResolvePath(key);
         var directory = Path.GetDirectoryName(path)!;
         var temporaryPath = Path.Combine(directory, $".{Path.GetFileName(path)}.{Guid.NewGuid():N}.tmp");
-        
+
         Directory.CreateDirectory(directory);
 
         return Task.FromResult<FileStream>(new StagedFileStream(temporaryPath, path));
@@ -90,8 +89,8 @@ public sealed class DirectoryWorkspace : IWorkspace, IDisposable
             throw new ArgumentException($"Workspace keys must be relative paths to a file (got '{key}').", nameof(key));
         }
 
-        var path = Path.GetFullPath(Path.Combine(_root, relativePath));
-        var rootPrefix = _root.EndsWith(Path.DirectorySeparatorChar) ? _root : _root + Path.DirectorySeparatorChar;
+        var path = Path.GetFullPath(Path.Combine(RootPath, relativePath));
+        var rootPrefix = RootPath.EndsWith(Path.DirectorySeparatorChar) ? RootPath : RootPath + Path.DirectorySeparatorChar;
         var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
         if (!path.StartsWith(rootPrefix, comparison))

@@ -16,4 +16,3 @@ public interface IAssetPublisher
 {
     Task PublishAsync(AssetPublishContext context, CancellationToken ct);
 }
-

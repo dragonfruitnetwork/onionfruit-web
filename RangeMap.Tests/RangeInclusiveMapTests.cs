@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using static RangeMap.Tests.TestHelpers;
 
 namespace RangeMap.Tests;
@@ -24,8 +27,8 @@ public class RangeInclusiveMapTests
         map.Insert((200, 300), "world");
         var expected = new RangeInclusiveMap<int, string>
         {
-            { (0, 100), "hello" },
-            { (200, 300), "world" },
+            {(0, 100), "hello"},
+            {(200, 300), "world"},
         };
         Assert.That(map, Is.EqualTo(expected));
     }
@@ -35,7 +38,7 @@ public class RangeInclusiveMapTests
     {
         Assert.That(new RangeInclusiveMap<long, long>([]), Is.EqualTo(new RangeInclusiveMap<long, long>()));
         Assert.That(
-            new RangeInclusiveMap<int, string> { { (0, 100), "abc" }, { (100, 200), "def" }, { (200, 300), "ghi" } },
+            new RangeInclusiveMap<int, string> {{(0, 100), "abc"}, {(100, 200), "def"}, {(200, 300), "ghi"}},
             Is.EqualTo(new RangeInclusiveMap<int, string>([
                 Entry(new RangeInclusive<int>(0, 100), "abc"),
                 Entry(new RangeInclusive<int>(100, 200), "def"),
@@ -314,7 +317,7 @@ public class RangeInclusiveMapTests
         map.Insert(ByteRange(1, 1), true);
         map.Insert(ByteRange(0, 0), true);
         map.ValidateInvariants();
-        Assert.That(map.ToTuples(), Is.EqualTo(new[] { (ByteRange(0, 1), true), (ByteRange(254, 254), true), (ByteRange(255, 255), false) }));
+        Assert.That(map.ToTuples(), Is.EqualTo(new[] {(ByteRange(0, 1), true), (ByteRange(254, 254), true), (ByteRange(255, 255), false)}));
     }
 
     #endregion
@@ -506,8 +509,8 @@ public class RangeInclusiveMapTests
         // items at extremes.
         map = new RangeInclusiveMap<byte, bool>();
         map.Insert(ByteRange(1, 254), false);
-        Assert.That(map.GetGaps(ByteRange(0, 5)), Is.EqualTo(new[] { ByteRange(0, 0) }));
-        Assert.That(map.GetGaps(ByteRange(250, 255)), Is.EqualTo(new[] { ByteRange(255, 255) }));
+        Assert.That(map.GetGaps(ByteRange(0, 5)), Is.EqualTo(new[] {ByteRange(0, 0)}));
+        Assert.That(map.GetGaps(ByteRange(250, 255)), Is.EqualTo(new[] {ByteRange(255, 255)}));
     }
 
     [Test]
@@ -619,16 +622,16 @@ public class RangeInclusiveMapTests
     [Test]
     public void MapsWithDifferentRangeEndsAreNotEqual()
     {
-        var a = new RangeInclusiveMap<uint, string> { { UIntRange(0, 5), "a" } };
-        var b = new RangeInclusiveMap<uint, string> { { UIntRange(0, 2), "a" } };
+        var a = new RangeInclusiveMap<uint, string> {{UIntRange(0, 5), "a"}};
+        var b = new RangeInclusiveMap<uint, string> {{UIntRange(0, 2), "a"}};
         Assert.That(a, Is.Not.EqualTo(b));
     }
 
     [Test]
     public void MapsWithIdenticalRangesAreEqual()
     {
-        var a = new RangeInclusiveMap<uint, string> { { UIntRange(0, 5), "a" } };
-        var b = new RangeInclusiveMap<uint, string> { { UIntRange(0, 5), "a" } };
+        var a = new RangeInclusiveMap<uint, string> {{UIntRange(0, 5), "a"}};
+        var b = new RangeInclusiveMap<uint, string> {{UIntRange(0, 5), "a"}};
         Assert.That(a, Is.EqualTo(b));
         Assert.That(a == b, Is.True);
         Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
@@ -638,10 +641,10 @@ public class RangeInclusiveMapTests
     [Test]
     public void CloneIsIndependent()
     {
-        var map = new RangeInclusiveMap<uint, int> { { UIntRange(0, 10), 1 } };
+        var map = new RangeInclusiveMap<uint, int> {{UIntRange(0, 10), 1}};
         var clone = map.Clone();
         map.Insert(UIntRange(5, 6), 2);
-        Assert.That(clone.ToTuples(), Is.EqualTo(new[] { (UIntRange(0, 10), 1) }));
+        Assert.That(clone.ToTuples(), Is.EqualTo(new[] {(UIntRange(0, 10), 1)}));
     }
 
     #endregion
@@ -669,7 +672,7 @@ public class RangeInclusiveMapTests
         Assert.That(map.ContainsKey(big + 20u), Is.False);
         Assert.That(
             map.GetGaps(UInt128Range(big - 1u, big + 20u)),
-            Is.EqualTo(new[] { UInt128Range(big - 1u, big - 1u), UInt128Range(big + 20u, big + 20u) }));
+            Is.EqualTo(new[] {UInt128Range(big - 1u, big - 1u), UInt128Range(big + 20u, big + 20u)}));
     }
 
     [Test]
@@ -693,7 +696,7 @@ public class RangeInclusiveMapTests
             (UInt128Range(max - 10u, max - 6u), true),
             (UInt128Range(max, max), false),
         }));
-        Assert.That(map.GetGaps(UInt128Range(UInt128.Zero, max)), Is.EqualTo(new[] { UInt128Range(1u, 5u), UInt128Range(max - 5u, max - 1u) }));
+        Assert.That(map.GetGaps(UInt128Range(UInt128.Zero, max)), Is.EqualTo(new[] {UInt128Range(1u, 5u), UInt128Range(max - 5u, max - 1u)}));
     }
 
     #endregion

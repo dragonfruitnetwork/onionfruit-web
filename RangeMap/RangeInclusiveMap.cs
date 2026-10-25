@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -542,11 +545,12 @@ public sealed class RangeInclusiveMap<TKey, TValue> :
     {
         // Stored ranges from the first one ending at or after the start of the outer range.
         private RangeTree<TKey, TValue>.EntryRange _stored;
+
         private readonly TKey _outerEnd;
+
         // The first key that may start the next gap.
         private TKey _gapStart;
         private bool _done;
-        private RangeInclusive<TKey> _current;
 
         internal GapEnumerator(RangeTree<TKey, TValue>.EntryRange stored, RangeInclusive<TKey> outerRange)
         {
@@ -554,10 +558,10 @@ public sealed class RangeInclusiveMap<TKey, TValue> :
             _outerEnd = outerRange.End;
             _gapStart = outerRange.Start;
             _done = outerRange.Start > outerRange.End;
-            _current = default;
+            Current = default;
         }
 
-        public readonly RangeInclusive<TKey> Current => _current;
+        public RangeInclusive<TKey> Current { get; private set; }
 
         object IEnumerator.Current => Current;
 
@@ -581,7 +585,7 @@ public sealed class RangeInclusiveMap<TKey, TValue> :
                 if (_gapStart < stored.Start)
                 {
                     // The gap ends just before this stored range.
-                    _current = new RangeInclusive<TKey>(_gapStart, SubOne(stored.Start));
+                    Current = new RangeInclusive<TKey>(_gapStart, SubOne(stored.Start));
                     SkipPast(stored.End);
                     return true;
                 }
@@ -597,7 +601,7 @@ public sealed class RangeInclusiveMap<TKey, TValue> :
             // There are no more stored ranges within the outer range,
             // so the rest of it is the last gap.
             _done = true;
-            _current = new RangeInclusive<TKey>(_gapStart, _outerEnd);
+            Current = new RangeInclusive<TKey>(_gapStart, _outerEnd);
             return true;
         }
 

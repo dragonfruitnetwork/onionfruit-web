@@ -71,7 +71,7 @@ internal sealed class OnionooSource(ApiClient client) : ISource
 
     private Task<HttpResponseMessage> PerformRequestAsync(DateTimeOffset? ifModifiedSince, CancellationToken ct)
     {
-        return client.PerformAsync(new TorStatusRequest { LastModified = ifModifiedSince }, ct);
+        return client.PerformAsync(new TorStatusRequest {LastModified = ifModifiedSince}, ct);
     }
 
     private async Task<bool> PublishDataAsync(HttpResponseMessage response, CancellationToken ct)

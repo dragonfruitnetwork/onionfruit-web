@@ -1,3 +1,6 @@
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
 using System.Numerics;
 
 namespace RangeMap.Tests;
@@ -43,6 +46,7 @@ internal static class Permutations
                 var j = i % 2 == 0 ? 0 : c[i];
                 (a[j], a[i]) = (a[i], a[j]);
                 yield return (T[])a.Clone();
+
                 c[i]++;
                 i = 0;
             }

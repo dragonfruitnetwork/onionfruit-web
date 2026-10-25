@@ -18,7 +18,7 @@ public static class AssetGeneratorServiceCollectionExtensions
     {
         services.TryAddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
         services.TryAddSingleton<ILookupClient, LookupClient>();
-        
+
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISource, IPFireNetworkRangeMapSource>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISource, OnionooSource>());
 
