@@ -57,8 +57,33 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
+        set -e
+
         aws --endpoint-url http://rustfs:9000 s3api head-bucket --bucket onionfruit-dev 2>/dev/null ||
         aws --endpoint-url http://rustfs:9000 s3api create-bucket --bucket onionfruit-dev
+
+        aws --endpoint-url http://rustfs:9000 s3api put-public-access-block \
+          --bucket onionfruit-dev \
+          --public-access-block-configuration BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false
+
+        cat >/tmp/onionfruit-dev-policy.json <<'EOF'
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "PublicReadAssets",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": ["s3:GetObject"],
+              "Resource": ["arn:aws:s3:::onionfruit-dev/*"]
+            }
+          ]
+        }
+        EOF
+
+        aws --endpoint-url http://rustfs:9000 s3api put-bucket-policy \
+          --bucket onionfruit-dev \
+          --policy file:///tmp/onionfruit-dev-policy.json
     restart: "no"
 
 volumes:
