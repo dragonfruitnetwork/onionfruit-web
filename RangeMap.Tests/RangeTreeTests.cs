@@ -58,7 +58,8 @@ public class RangeTreeTests
 
     private static void AssertFound(bool found, RangeTree<int, int>.Cursor cursor, int? expectedStart)
     {
-        Assert.That(found ? cursor.Start : null, Is.EqualTo(expectedStart));
+        int? actualStart = found ? cursor.Start : null;
+        Assert.That(actualStart, Is.EqualTo(expectedStart));
     }
 
     [TestCase(1, 50, 4_000)]
