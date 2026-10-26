@@ -45,6 +45,7 @@ public static class Program
         builder.Services.AddSingleton<IConnectionStatusService, ConnectionStatusService>();
 
         builder.Services.AddControllers();
+        builder.Services.AddProblemDetails();
         builder.Services.AddCors(cors =>
         {
             cors.AddDefaultPolicy(policy =>
@@ -89,11 +90,6 @@ public static class Program
         });
 
         var app = builder.Build();
-
-        if (!builder.Environment.IsDevelopment())
-        {
-            app.UseForwardedHeaders();
-        }
 
         app.UseExceptionHandler();
         app.UseHttpLogging();
