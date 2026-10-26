@@ -2,7 +2,7 @@
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using System.Reflection;
-using DragonFruit.OnionFruit.AssetGenerator.Generators.RedisDb;
+using DragonFruit.OnionFruit.Redis.Nodes;
 using DragonFruit.OnionFruit.AssetGenerator.Worker.Configuration;
 using Microsoft.Extensions.Options;
 using Redis.OM;
@@ -25,7 +25,7 @@ public static class RedisIndexInitializer
         var redis = services.GetRequiredService<IRedisConnectionProvider>();
         var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(RedisIndexInitializer));
 
-        foreach (var type in typeof(RedisDbRelayInfo).Assembly.ExportedTypes.Where(type => type.GetCustomAttribute<DocumentAttribute>() != null))
+        foreach (var type in typeof(OnionFruitNodeInfo).Assembly.ExportedTypes.Where(type => type.GetCustomAttribute<DocumentAttribute>() != null))
         {
             ct.ThrowIfCancellationRequested();
 

@@ -11,10 +11,8 @@ using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources;
 using DragonFruit.OnionFruit.AssetGenerator.Publishing;
 using DragonFruit.OnionFruit.AssetGenerator.Worker.Configuration;
 using DragonFruit.OnionFruit.AssetGenerator.Worker.Services;
+using DragonFruit.OnionFruit.Redis;
 using Microsoft.Extensions.Options;
-using Redis.OM;
-using Redis.OM.Contracts;
-using StackExchange.Redis;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Worker;
 
@@ -42,25 +40,15 @@ public static class Program
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        builder.Services.AddOptions<RedisStateStoreOptions>()
-            .Bind(builder.Configuration.GetSection(RedisStateStoreOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+        builder.Services.AddOptions<RedisOptions>()
+            .Bind(builder.Configuration.GetSection(RedisOptions.SectionName));
 
         builder.Services.AddOptions<S3AssetPublisherOptions>()
             .Bind(builder.Configuration.GetSection(S3AssetPublisherOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        builder.Services.AddSingleton<IConnectionMultiplexer>(services =>
-        {
-            var options = services.GetRequiredService<IOptions<RedisStateStoreOptions>>().Value;
-            var configuration = ConfigurationOptions.Parse(options.ConnectionString);
-
-            return ConnectionMultiplexer.Connect(configuration);
-        });
-
-        builder.Services.AddSingleton<IRedisConnectionProvider>(services => new RedisConnectionProvider(services.GetRequiredService<IConnectionMultiplexer>()));
+        builder.Services.AddOnionFruitRedis();
         builder.Services.AddSingleton<IAssetGenerationStateStore, RedisAssetGenerationStateStore>();
 
         builder.Services.AddSingleton<IAmazonS3>(services =>
@@ -78,6 +66,7 @@ public static class Program
         });
 
         builder.Services.AddSingleton<IAssetPublisher, S3AssetPublisher>();
+        builder.Services.AddSingleton<IAssetPublisher, RedisAssetIndexPublisher>();
         builder.Services.AddTransient<AssetGenerationJob>();
 
         builder.Services.AddScheduler();

@@ -1,13 +1,12 @@
 // OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
-using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models.Enums;
 using Redis.OM.Modeling;
 
-namespace DragonFruit.OnionFruit.AssetGenerator.Generators.RedisDb;
+namespace DragonFruit.OnionFruit.Redis.Nodes;
 
 [Document(Prefixes = ["onionfruit-web:nodes"], IndexName = "onionfruit-web:node-idx", StorageType = StorageType.Json)]
-public class RedisDbRelayInfo
+public class OnionFruitNodeInfo
 {
     [Indexed]
     [RedisIdField]
@@ -24,5 +23,5 @@ public class RedisDbRelayInfo
 
     public TorNodeFlags Flags { get; set; }
 
-    internal RedisDbRelayInfo Clone() => (RedisDbRelayInfo)MemberwiseClone();
+    public OnionFruitNodeInfo Clone() => (OnionFruitNodeInfo)MemberwiseClone();
 }

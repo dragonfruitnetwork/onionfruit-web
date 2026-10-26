@@ -10,6 +10,7 @@
     <ItemGroup>
         <ProjectReference Include="..\DragonFruit.OnionFruit.AssetGenerator\DragonFruit.OnionFruit.AssetGenerator.csproj"/>
         <ProjectReference Include="..\DragonFruit.OnionFruit.AssetGenerator.Generators\DragonFruit.OnionFruit.AssetGenerator.Generators.csproj"/>
+        <ProjectReference Include="..\DragonFruit.OnionFruit.Redis\DragonFruit.OnionFruit.Redis.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

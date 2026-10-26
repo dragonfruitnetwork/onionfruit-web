@@ -7,6 +7,7 @@ using DragonFruit.OnionFruit.AssetGenerator.Generators.Core;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing;
+using DragonFruit.OnionFruit.Redis.Nodes;
 using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Generators.RedisDb;
@@ -25,7 +26,7 @@ public class RedisDatabaseGenerator(IRedisConnectionProvider redis) : IGenerator
     public async Task GenerateAsync(GenerationContext context, CancellationToken ct)
     {
         var relays = context.GetOutput<ITorRelayStatusOutput>(SourceOutputNames.OnionooRelays);
-        var table = redis.RedisCollection<RedisDbRelayInfo>();
+        var table = redis.RedisCollection<OnionFruitNodeInfo>();
         var databaseVersion = relays.Published.ToUnixTimeSeconds();
 
         foreach (var relay in relays.Relays)
@@ -40,7 +41,7 @@ public class RedisDatabaseGenerator(IRedisConnectionProvider redis) : IGenerator
                 ipAddresses = ipAddresses.Concat(relay.ExitAddresses);
             }
 
-            var info = new RedisDbRelayInfo
+            var info = new OnionFruitNodeInfo
             {
                 IpAddress = string.Empty,
                 DatabaseVersion = databaseVersion,

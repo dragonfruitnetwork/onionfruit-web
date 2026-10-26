@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models.Converters;
-using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models.Enums;
+using DragonFruit.OnionFruit.Redis.Nodes;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models;
 
