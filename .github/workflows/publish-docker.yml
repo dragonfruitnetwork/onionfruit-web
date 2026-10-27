@@ -1,0 +1,61 @@
+name: Publish Docker Images
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+env:
+  RELEASE_TAG: ${{ github.event.release.tag_name || '0.0.0-dev' }}
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    name: Build ${{ matrix.name }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: web
+            project: DragonFruit.OnionFruit.Web
+            tags: |
+              type=semver,pattern={{version}}
+              type=raw,value=latest
+          - name: worker
+            project: DragonFruit.OnionFruit.AssetGenerator.Worker
+            tags: |
+              type=semver,pattern=worker-{{version}}
+              type=raw,value=worker
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
+      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish
+        run: dotnet publish -c Release -p:UseAppHost=false -p:ContinuousIntegrationBuild=true -p:Version=$RELEASE_TAG ${{ matrix.project }}
+
+      - name: Docker tag metadata
+        id: meta
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
+        with:
+          images: dragonfruitdotnet/onionfruit-web
+          tags: ${{ matrix.tags }}
+
+      - name: Image build and push
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
+        with:
+          context: ${{ matrix.project }}/bin/Release/net10.0/publish
+          file: ${{ matrix.project }}/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/arm64,linux/amd64
+          push: true
