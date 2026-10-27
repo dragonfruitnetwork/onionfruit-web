@@ -19,6 +19,7 @@
         <PackageReference Include="Microsoft.Extensions.Hosting"/>
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations"/>
         <PackageReference Include="Redis.OM"/>
+        <PackageReference Include="Sentry.Extensions.Logging" />
         <PackageReference Include="StackExchange.Redis"/>
     </ItemGroup>
 

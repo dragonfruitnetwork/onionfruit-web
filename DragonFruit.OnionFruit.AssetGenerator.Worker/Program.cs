@@ -1,6 +1,7 @@
 // OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
+using System.Reflection;
 using Amazon.Runtime;
 using Amazon.S3;
 using Coravel;
@@ -29,6 +30,16 @@ public static class Program
                 o.SingleLine = true;
                 o.IncludeScopes = false;
                 o.TimestampFormat = "[dd/MM/yyyy hh:mm:ss] ";
+            })
+            .AddSentry(o =>
+            {
+                o.Dsn = builder.Configuration.GetSection("Sentry").Get<WorkerSentryConfig>()?.Dsn ?? string.Empty;
+
+                o.MaxBreadcrumbs = 50;
+                o.MinimumEventLevel = LogLevel.Error;
+                o.MinimumBreadcrumbLevel = LogLevel.Debug;
+
+                o.Release = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1";
             });
 
         builder.Services.AddAssetGeneration(options => builder.Configuration.GetSection("AssetGeneration").Bind(options));

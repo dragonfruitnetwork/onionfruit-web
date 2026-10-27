@@ -1,6 +1,7 @@
 // OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
+using System.Reflection;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
 using DragonFruit.OnionFruit.Redis;
@@ -25,6 +26,16 @@ public static class Program
                 o.SingleLine = true;
                 o.IncludeScopes = false;
                 o.TimestampFormat = "[dd/MM/yyyy hh:mm:ss] ";
+            })
+            .AddSentry(o =>
+            {
+                o.Dsn = builder.Configuration.GetSection("Sentry").Get<WebSentryConfig>()?.Dsn ?? string.Empty;
+
+                o.MaxBreadcrumbs = 50;
+                o.MinimumEventLevel = LogLevel.Error;
+                o.MinimumBreadcrumbLevel = LogLevel.Debug;
+
+                o.Release = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1";
             });
 
         builder.Services.AddOptions<RedisOptions>()
