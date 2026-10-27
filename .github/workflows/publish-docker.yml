@@ -38,6 +38,7 @@ jobs:
       - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
       - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
         with:
+          registry: lhr.ocir.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
@@ -48,7 +49,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
         with:
-          images: dragonfruitdotnet/onionfruit-web
+          images: lhr.ocir.io/lrhdo0i9vwyu/onionfruit-web
           tags: ${{ matrix.tags }}
 
       - name: Image build and push
