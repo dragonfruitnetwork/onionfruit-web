@@ -8,5 +8,5 @@ public sealed record ConnectionStatus(
     bool IsTor,
     string CountryCode,
     string CountryName,
-    int? ProviderNumber,
-    string? ProviderName);
+    int? AsNumber,
+    string? AsName);
