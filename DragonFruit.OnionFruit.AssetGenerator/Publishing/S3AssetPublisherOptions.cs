@@ -36,4 +36,11 @@ public sealed class S3AssetPublisherOptions
     /// Disable for S3-compatible providers that do not support checksum headers.
     /// </summary>
     public bool UseChecksum { get; set; } = true;
+
+    /// <summary>
+    /// Number of days an asset version must be older than before the expiry purge job can remove it from storage.
+    /// The currently referenced version of each asset is never removed, regardless of age.
+    /// </summary>
+    [Range(1, 3650)]
+    public int ExpireOldAssetsAfter { get; set; } = 30;
 }

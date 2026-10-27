@@ -14,6 +14,11 @@ public interface IAssetIndex
     Task<string?> GetLatestVersionAsync(string assetPath, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets every recorded asset-to-version mapping.
+    /// </summary>
+    Task<IReadOnlyDictionary<string, string>> GetAllVersionsAsync(CancellationToken ct = default);
+
+    /// <summary>
     /// Records the latest version of an asset.
     /// </summary>
     Task SetLatestVersionAsync(string assetPath, string version, CancellationToken ct = default);

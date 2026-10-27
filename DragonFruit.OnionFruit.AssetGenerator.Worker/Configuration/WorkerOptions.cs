@@ -8,22 +8,22 @@ public sealed class WorkerOptions
     public const string SectionName = "Worker";
 
     /// <summary>
-    /// Cron expression used to schedule generation runs.
-    /// </summary>
-    public string CronSchedule { get; set; } = "0 */12 * * *";
-
-    /// <summary>
     /// Whether a generation run should be queued immediately after startup.
     /// </summary>
     public bool RunOnStartup { get; set; } = true;
 
     /// <summary>
-    /// Whether missing Redis.OM document indexes should be created at startup.
+    /// Whether the expired-asset purge job should be run
+    /// </summary>
+    public bool PurgeExpiredAssets { get; set; } = true;
+
+    /// <summary>
+    /// Whether missing Redis document indexes should be created at startup.
     /// </summary>
     public bool CreateIndexes { get; set; } = true;
 
     /// <summary>
-    /// Whether existing Redis.OM document indexes should be dropped and recreated at startup.
+    /// Whether existing Redis document indexes should be dropped and recreated at startup.
     /// </summary>
     public bool RegenIndexes { get; set; }
 }

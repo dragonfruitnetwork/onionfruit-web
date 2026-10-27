@@ -68,6 +68,7 @@ public static class Program
         builder.Services.AddSingleton<IAssetPublisher, S3AssetPublisher>();
         builder.Services.AddSingleton<IAssetPublisher, RedisAssetIndexPublisher>();
         builder.Services.AddTransient<AssetGenerationJob>();
+        builder.Services.AddTransient<AssetExpiryPurgeJob>();
 
         builder.Services.AddScheduler();
 
@@ -79,11 +80,16 @@ public static class Program
         {
             (s as ISchedulerConfiguration)?.OnError(exception => schedulerLogger.LogError(exception, "Scheduled asset generation failed"));
 
-            var job = s.Schedule<AssetGenerationJob>().Cron(workerOptions.CronSchedule).PreventOverlapping("asset-generation");
+            var assetGeneratorJob = s.Schedule<AssetGenerationJob>().DailyAtHour(4).PreventOverlapping("asset-generation");
 
             if (workerOptions.RunOnStartup)
             {
-                job.RunOnceAtStart();
+                assetGeneratorJob.RunOnceAtStart();
+            }
+
+            if (workerOptions.PurgeExpiredAssets)
+            {
+                s.Schedule<AssetExpiryPurgeJob>().Cron("0 1 * * 5").PreventOverlapping("asset-expiry-purge").RunOnceAtStart();
             }
         });
 

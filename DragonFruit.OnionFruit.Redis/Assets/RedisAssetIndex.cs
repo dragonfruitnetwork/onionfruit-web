@@ -23,6 +23,13 @@ public sealed class RedisAssetIndex(IConnectionMultiplexer redis, IOptions<Redis
         return value.HasValue ? value.ToString() : null;
     }
 
+    public async Task<IReadOnlyDictionary<string, string>> GetAllVersionsAsync(CancellationToken ct = default)
+    {
+        var entries = await redis.GetDatabase().HashGetAllAsync(IndexKey).WaitAsync(ct);
+
+        return entries.ToDictionary(entry => entry.Name.ToString(), entry => entry.Value.ToString(), StringComparer.Ordinal);
+    }
+
     public Task SetLatestVersionAsync(string assetPath, string version, CancellationToken ct = default)
     {
         var path = AssetPath.Normalize(assetPath);
