@@ -47,7 +47,7 @@ public class OnionDbGenerator : IGenerator
         var relays = context.GetOutput<ITorRelayStatusOutput>(SourceOutputNames.OnionooRelays);
         var relaysByCountry = relays.Relays
             .Where(relay => !string.IsNullOrWhiteSpace(relay.CountryCode))
-            .GroupBy(relay => relay.CountryCode, StringComparer.OrdinalIgnoreCase)
+            .GroupBy(relay => relay.CountryCode!, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(group => group.Key, group => (IReadOnlyList<TorRelayDetails>)group.ToList(), StringComparer.OrdinalIgnoreCase);
 
         var ipv4 = context.TryGetOutput<INetworkRangeDatabase<uint>>(SourceOutputNames.LocationDbIpv4, out var v4Database) ? v4Database : null;
