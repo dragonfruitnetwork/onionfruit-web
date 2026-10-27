@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
+    <Import Project=" ../DragonFruit.OnionFruit.Web.props"/>
+
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <ServerGarbageCollection>true</ServerGarbageCollection>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
