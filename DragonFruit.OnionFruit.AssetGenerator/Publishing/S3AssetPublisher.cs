@@ -35,6 +35,7 @@ public sealed class S3AssetPublisher(IAmazonS3 client, IOptions<S3AssetPublisher
             {
                 AutoCloseStream = false,
                 BucketName = options.Value.BucketName,
+                DisablePayloadSigning = !options.Value.PayloadSigning,
                 InputStream = stream,
                 Key = key
             };
@@ -46,7 +47,6 @@ public sealed class S3AssetPublisher(IAmazonS3 client, IOptions<S3AssetPublisher
 
                 request.ChecksumAlgorithm = ChecksumAlgorithm.SHA256;
                 request.ChecksumSHA256 = Convert.ToBase64String(checksum);
-                request.DisablePayloadSigning = options.Value.Endpoint?.StartsWith("https://", StringComparison.OrdinalIgnoreCase) == true;
             }
             else
             {

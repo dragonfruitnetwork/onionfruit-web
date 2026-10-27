@@ -38,6 +38,11 @@ public sealed class S3AssetPublisherOptions
     public bool UseChecksum { get; set; } = true;
 
     /// <summary>
+    /// Whether to enable payload signing. Set to <c>false</c> for providers that don't support it (i.e. Cloudflare R2)
+    /// </summary>
+    public bool PayloadSigning { get; set; } = true;
+
+    /// <summary>
     /// Number of days an asset version must be older than before the expiry purge job can remove it from storage.
     /// The currently referenced version of each asset is never removed, regardless of age.
     /// </summary>
