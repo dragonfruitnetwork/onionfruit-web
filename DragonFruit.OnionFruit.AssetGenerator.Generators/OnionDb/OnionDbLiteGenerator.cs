@@ -3,6 +3,7 @@
 
 using System.Collections.ObjectModel;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core;
+using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.CountryMapping;
 using Google.Protobuf;
 using RangeMap;
 using OnionDbMessage = OnionDb;
@@ -13,7 +14,7 @@ namespace DragonFruit.OnionFruit.AssetGenerator.Generators.OnionDb;
 /// <summary>
 /// A variant of the onion.db file without address ranges. Used by the DragonFruit website.
 /// </summary>
-public class OnionDbLiteGenerator : OnionDbGenerator
+public class OnionDbLiteGenerator(CountryNameMap countryNames) : OnionDbGenerator(countryNames)
 {
     internal const string LiteDatabaseOutputKey = "onion.lite.db";
 

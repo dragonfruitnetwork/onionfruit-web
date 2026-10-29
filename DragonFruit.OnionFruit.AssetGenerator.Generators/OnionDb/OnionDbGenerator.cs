@@ -9,6 +9,7 @@ using DragonFruit.OnionFruit.AssetGenerator.Generators.Core;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Networks;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources;
+using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.CountryMapping;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models;
 using DragonFruit.OnionFruit.Redis.Nodes;
@@ -20,7 +21,7 @@ using AddressRangeMessage = AddressRange;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Generators.OnionDb;
 
-public class OnionDbGenerator : IGenerator
+public class OnionDbGenerator(CountryNameMap countryNames) : IGenerator
 {
     internal const string DatabaseOutputKey = "onion.db";
     internal const string CompressedDatabaseOutputKey = "onion.db.br";
@@ -86,7 +87,9 @@ public class OnionDbGenerator : IGenerator
             var countryData = new OnionDbCountryMessage
             {
                 CountryCode = countryCode,
-                CountryName = nodes.Select(relay => relay.CountryName).FirstOrDefault(name => !string.IsNullOrWhiteSpace(name)) ?? string.Empty
+                CountryName = countryNames.TryGetValue(countryCode, out var mappedName)
+                    ? mappedName
+                    : nodes.Select(relay => relay.CountryName).FirstOrDefault(name => !string.IsNullOrWhiteSpace(name)) ?? string.Empty
             };
 
             // calculate total node counts

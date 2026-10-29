@@ -5,6 +5,7 @@ using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
+using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.CountryMapping;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.NetworkRanges;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ public static class AssetGeneratorServiceCollectionExtensions
     {
         services.TryAddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
         services.TryAddSingleton<ILookupClient, LookupClient>();
+        services.TryAddSingleton<CountryNameMap>();
 
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISource, IPFireNetworkRangeMapSource>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISource, OnionooSource>());
