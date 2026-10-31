@@ -75,7 +75,7 @@ public class OnionDbGenerator(CountryNameMap countryNames) : IGenerator
             countryCodes.UnionWith(relaysByCountry.Keys);
         }
 
-        foreach (var countryCode in countryCodes.OrderBy(code => code, StringComparer.OrdinalIgnoreCase))
+        foreach (var countryCode in countryCodes.Order(StringComparer.OrdinalIgnoreCase))
         {
             ct.ThrowIfCancellationRequested();
 
