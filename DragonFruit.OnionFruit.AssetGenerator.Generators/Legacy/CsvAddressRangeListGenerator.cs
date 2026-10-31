@@ -72,8 +72,13 @@ internal sealed class CsvAddressRangeListGenerator : IGenerator
             NewLine = "\r\n"
         }, leaveOpen: true);
 
-        foreach (var (country, ranges) in database.OrderBy(x => x.Key))
+        foreach (var (country, ranges) in database.OrderBy(x => x.Key, StringComparer.Ordinal))
         {
+            if (string.IsNullOrWhiteSpace(country) || !country.All(char.IsAsciiLetter))
+            {
+                continue;
+            }
+
             foreach (var range in ranges.OrderBy(r => r.Start))
             {
                 ct.ThrowIfCancellationRequested();

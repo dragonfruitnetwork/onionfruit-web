@@ -79,6 +79,11 @@ public class OnionDbGenerator(CountryNameMap countryNames) : IGenerator
         {
             ct.ThrowIfCancellationRequested();
 
+            if (!countryCode.All(char.IsAsciiLetter))
+            {
+                continue;
+            }
+
             if (!relaysByCountry.TryGetValue(countryCode, out var nodes))
             {
                 continue;
