@@ -12,6 +12,14 @@ public sealed class RedisOptions
     [Required]
     public string ConnectionString { get; set; } = "localhost:6379";
 
+    public bool DisableCertificateValidation { get; set; } = false;
+
+    /// <summary>
+    /// If set, the TLS certificate must match the thumbprint set here.
+    /// This should be a hexadecimal string representing the SHA-1 value.
+    /// </summary>
+    public string? PinnedCertificateThumbprint { get; set; }
+
     /// <summary>
     /// Optional prefix applied to every key owned by OnionFruit.
     /// </summary>
