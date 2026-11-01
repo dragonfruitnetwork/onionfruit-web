@@ -3,12 +3,10 @@
 
 using System.Buffers.Binary;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Net;
 using System.Numerics;
 using System.Text;
 using CsvHelper;
-using CsvHelper.Configuration;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Networks;
@@ -66,28 +64,25 @@ internal sealed class CsvAddressRangeListGenerator : IGenerator
 
         await textWriter.WriteAsync($"{comment}\r\n".AsMemory(), ct);
 
-        await using var csv = new CsvWriter(textWriter, new CsvConfiguration(CultureInfo.InvariantCulture)
+        await using (var csv = CsvWriter.Create(textWriter, leaveOpen: true))
         {
-            HasHeaderRecord = false,
-            NewLine = "\r\n"
-        }, leaveOpen: true);
-
-        foreach (var (country, ranges) in database.OrderBy(x => x.Key, StringComparer.Ordinal))
-        {
-            if (string.IsNullOrWhiteSpace(country) || !country.All(char.IsAsciiLetter))
+            foreach (var (country, ranges) in database.OrderBy(x => x.Key, StringComparer.Ordinal))
             {
-                continue;
-            }
+                if (string.IsNullOrWhiteSpace(country) || !country.All(char.IsAsciiLetter))
+                {
+                    continue;
+                }
 
-            foreach (var range in ranges.OrderBy(r => r.Start))
-            {
-                ct.ThrowIfCancellationRequested();
+                foreach (var range in ranges.OrderBy(r => r.Start))
+                {
+                    ct.ThrowIfCancellationRequested();
 
-                csv.WriteField(formatAddress(range.Start));
-                csv.WriteField(formatAddress(range.End));
-                csv.WriteField(country);
+                    csv.WriteField(formatAddress(range.Start));
+                    csv.WriteField(formatAddress(range.End));
+                    csv.WriteField(country);
 
-                await csv.NextRecordAsync();
+                    await csv.EndRecordAsync(ct);
+                }
             }
         }
 
