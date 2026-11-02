@@ -15,6 +15,8 @@ namespace DragonFruit.OnionFruit.Web;
 
 public static class Program
 {
+    internal static string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1";
+
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -35,7 +37,7 @@ public static class Program
                 o.MinimumEventLevel = LogLevel.Error;
                 o.MinimumBreadcrumbLevel = LogLevel.Debug;
 
-                o.Release = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1";
+                o.Release = Version;
             });
 
         builder.Services.AddOptions<RedisOptions>()
