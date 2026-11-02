@@ -231,3 +231,6 @@ MSBuild_Logs/
 
 # macOS
 .DS_Store
+
+# location databases
+location*.db
