@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="OnionFruit Web + AssetGenerator" type="CompoundRunConfigurationType">
+    <toRun name="OnionFruit AssetGenerator" type="DotNetProject" />
+    <toRun name="OnionFruit Web" type="DotNetProject" />
+    <toRun name="Services" type="docker-deploy" />
+    <method v="2" />
+  </configuration>
+</component>

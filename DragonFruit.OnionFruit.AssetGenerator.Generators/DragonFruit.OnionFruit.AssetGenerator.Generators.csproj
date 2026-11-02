@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project=" ../DragonFruit.OnionFruit.Web.props"/>
+
+    <ItemGroup>
+        <ProjectReference Include="..\DragonFruit.OnionFruit.Redis\DragonFruit.OnionFruit.Redis.csproj"/>
+        <ProjectReference Include="..\RangeMap\RangeMap.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CsvHelper"/>
+        <PackageReference Include="DnsClient"/>
+        <PackageReference Include="DragonFruit.Data"/>
+        <PackageReference Include="Google.Protobuf"/>
+        <PackageReference Include="Grpc.Core.Api"/>
+        <PackageReference Include="Grpc.Net.Common"/>
+        <PackageReference Include="Grpc.Tools">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="libloc"/>
+        <PackageReference Include="libloc.Access"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+        <PackageReference Include="Redis.OM"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="OnionDb/oniondb.proto" GrpcServices="Server"/>
+        <EmbeddedResource Include="Sources/CountryMapping/country-names.json" />
+    </ItemGroup>
+
+</Project>

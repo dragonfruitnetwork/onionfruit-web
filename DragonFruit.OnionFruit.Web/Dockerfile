@@ -1,7 +1,11 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine
+﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled
+
+ENV ASPNETCORE_HTTP_PORTS=8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+
 WORKDIR /app
-
 COPY . .
-ARG ASPNETCORE_ENVIRONMENT=Production
 
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "DragonFruit.OnionFruit.Web.dll"]

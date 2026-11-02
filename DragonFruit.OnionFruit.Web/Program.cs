@@ -1,38 +1,64 @@
-using System;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using DnsClient;
+// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
+// Licensed under Apache-2. Refer to the LICENSE file for more info
+
+using System.Reflection;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
+using DragonFruit.OnionFruit.Redis;
 using DragonFruit.OnionFruit.Web.Configuration;
-using DragonFruit.OnionFruit.Web.Controllers;
-using DragonFruit.OnionFruit.Web.Data;
-using DragonFruit.OnionFruit.Web.Worker;
-using DragonFruit.OnionFruit.Web.Worker.Configuration;
-using DragonFruit.OnionFruit.Web.Worker.Sources.Onionoo.Converters;
-using DragonFruit.OnionFruit.Web.Worker.Storage;
+using DragonFruit.OnionFruit.Web.Services;
 using libloc.Access;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Redis.OM;
-using Redis.OM.Contracts;
-using StackExchange.Redis;
 
 namespace DragonFruit.OnionFruit.Web;
 
 public static class Program
 {
+    internal static string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1";
+
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        Worker.Program.ConfigureLogging(builder.Logging, builder.Configuration, "Server");
+        builder.Logging
+            .ClearProviders()
+            .AddSimpleConsole(o =>
+            {
+                o.SingleLine = true;
+                o.IncludeScopes = false;
+                o.TimestampFormat = "[dd/MM/yyyy hh:mm:ss] ";
+            })
+            .AddSentry(o =>
+            {
+                o.Dsn = builder.Configuration.GetSection("Sentry").Get<WebSentryConfig>()?.Dsn ?? string.Empty;
 
-        builder.Services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.TypeInfoResolverChain.Insert(0, ControllerSerializerContext.Default));
+                o.MaxBreadcrumbs = 50;
+                o.MinimumEventLevel = LogLevel.Error;
+                o.MinimumBreadcrumbLevel = LogLevel.Debug;
+
+                o.Release = Version;
+            });
+
+        builder.Services.AddOptions<RedisOptions>()
+            .Bind(builder.Configuration.GetSection(RedisOptions.SectionName));
+
+        builder.Services.AddOptions<AssetDeliveryOptions>()
+            .Bind(builder.Configuration.GetSection(AssetDeliveryOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        builder.Services.AddMemoryCache(options => options.SizeLimit = 10_000);
+        builder.Services.AddOnionFruitRedis();
+
+        builder.Services.AddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
+        builder.Services.AddLocationDb();
+
+        builder.Services.AddSingleton<IAssetRedirectService, AssetRedirectService>();
+        builder.Services.AddSingleton<IConnectionStatusService, ConnectionStatusService>();
+
+        builder.Services.AddControllers();
+        builder.Services.AddProblemDetails();
         builder.Services.AddCors(cors =>
         {
             cors.AddDefaultPolicy(policy =>
@@ -63,6 +89,12 @@ public static class Program
             }
         });
 
+        builder.Services.AddHttpLogging(o =>
+        {
+            o.CombineLogs = true;
+            o.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.RequestPath | HttpLoggingFields.ResponseStatusCode | HttpLoggingFields.Duration;
+        });
+
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedForHeaderName = "CF-Connecting-IP";
@@ -70,80 +102,14 @@ public static class Program
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
         });
 
-        // configuration
-        builder.Services.AddRedisOptions(builder.Configuration);
-        builder.Services.AddValidatedOptions<ServerOptions>(builder.Configuration, ServerOptions.SectionName);
-        builder.Services.AddValidatedOptions<WorkerOptions>(builder.Configuration, WorkerOptions.SectionName);
-
-        // databases
-        builder.Services.AddLocationDb();
-        builder.Services.AddSingleton(s => RedisClientConfigurator.CreateConnectionMultiplexer(s.GetRequiredService<IOptions<RedisOptions>>().Value, false));
-        builder.Services.AddSingleton<IRedisConnectionProvider>(s => new RedisConnectionProvider(s.GetRequiredService<IConnectionMultiplexer>()));
-
-        // api clients
-        builder.Services.AddSingleton<ILookupClient, LookupClient>();
-        builder.Services.AddSingleton<ApiClient>(_ =>
-        {
-            var client = new ApiClient<ApiJsonSerializer>
-            {
-                UserAgent = $"OnionFruit-Web-Worker/{typeof(Program).Assembly.GetName().Version?.ToString(3)}"
-            };
-
-            client.Serializers.Configure<ApiJsonSerializer>(json =>
-            {
-                json.SerializerOptions = new JsonSerializerOptions();
-                json.SerializerOptions.Converters.Add(new DateTimeConverter());
-            });
-
-            return client;
-        });
-
-        // register worker if running in integrated mode, using the local asset store for file management
-        var serverOptions = builder.Configuration.GetSection(ServerOptions.SectionName).Get<ServerOptions>() ?? new ServerOptions();
-        if (serverOptions.UseBuiltInWorker)
-        {
-            builder.Services.AddSingleton<LocalAssetStore>();
-            builder.Services.AddSingleton<IAssetStore>(s => s.GetRequiredService<LocalAssetStore>());
-
-            builder.Services.AddSingleton<IDataExporter, LocalWorkerExporter>();
-            builder.Services.AddSingleton<IRemoteAssetStore>(s => s.GetRequiredService<LocalAssetStore>());
-
-            builder.Services.AddSingleton<Worker.Worker>();
-
-            builder.Services.AddHostedService(s => s.GetRequiredService<Worker.Worker>());
-            builder.Services.AddHostedService(s => s.GetRequiredService<LocalAssetStore>());
-        }
-        else
-        {
-            builder.Services.AddSingleton<IRemoteAssetStore, RemoteAssetStore>();
-        }
-
         var app = builder.Build();
 
-#if !DEBUG
+        app.UseExceptionHandler();
+        app.UseHttpLogging();
         app.UseForwardedHeaders();
-#else
-        app.UseDeveloperExceptionPage();
-#endif
-
-        app.UseRouting();
         app.UseCors();
-
         app.MapControllers();
-
-        using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-        {
-            // if worker is enabled, run redis migrations
-            if (scope.ServiceProvider.GetService<Worker.Worker>() != null)
-            {
-                await Worker.Program.ValidateRedisStructures(scope.ServiceProvider);
-            }
-        }
 
         await app.RunAsync();
     }
 }
-
-[JsonSerializable(typeof(ConnectionStatusResponse))]
-[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower, WriteIndented = true)]
-internal partial class ControllerSerializerContext : JsonSerializerContext;

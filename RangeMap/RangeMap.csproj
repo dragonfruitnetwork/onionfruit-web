@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project=" ../DragonFruit.OnionFruit.Web.props"/>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="RangeMap.Tests"/>
+    </ItemGroup>
+
+</Project>

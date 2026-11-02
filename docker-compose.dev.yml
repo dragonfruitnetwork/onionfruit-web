@@ -1,0 +1,91 @@
+name: onionfruit-web-dev-stack
+
+services:
+  redis:
+    image: redis:8.10-alpine
+    container_name: onionfruit-web-redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  rustfs:
+    image: rustfs/rustfs:1.0.4
+    container_name: onionfruit-web-rustfs
+    command: ["/data"]
+    security_opt:
+      - "no-new-privileges:true"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS: "*"
+      RUSTFS_ACCESS_KEY: "ONIONFRUITDEV"
+      RUSTFS_SECRET_KEY: "onionfruit-dev-secret"
+      RUSTFS_OBS_LOGGER_LEVEL: "info"
+      RUSTFS_OBS_LOG_DIRECTORY: "/var/log/rustfs/"
+    volumes:
+      - rustfs-data:/data
+      - rustfs-logs:/var/log/rustfs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9000/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    restart: unless-stopped
+
+  rustfs-init:
+    image: amazon/aws-cli:2.38.5
+    container_name: onionfruit-web-rustfs-init
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: "ONIONFRUITDEV"
+      AWS_SECRET_ACCESS_KEY: "onionfruit-dev-secret"
+      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_PAGER: ""
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+
+        aws --endpoint-url http://rustfs:9000 s3api head-bucket --bucket onionfruit-dev 2>/dev/null ||
+        aws --endpoint-url http://rustfs:9000 s3api create-bucket --bucket onionfruit-dev
+
+        aws --endpoint-url http://rustfs:9000 s3api put-public-access-block \
+          --bucket onionfruit-dev \
+          --public-access-block-configuration BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false
+
+        cat >/tmp/onionfruit-dev-policy.json <<'EOF'
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "PublicReadAssets",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": ["s3:GetObject"],
+              "Resource": ["arn:aws:s3:::onionfruit-dev/*"]
+            }
+          ]
+        }
+        EOF
+
+        aws --endpoint-url http://rustfs:9000 s3api put-bucket-policy \
+          --bucket onionfruit-dev \
+          --policy file:///tmp/onionfruit-dev-policy.json
+    restart: "no"
+
+volumes:
+  rustfs-data:
+  rustfs-logs:

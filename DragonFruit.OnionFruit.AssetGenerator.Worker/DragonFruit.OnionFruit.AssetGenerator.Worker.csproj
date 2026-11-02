@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <Import Project=" ../DragonFruit.OnionFruit.Web.props"/>
+
+    <PropertyGroup>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\DragonFruit.OnionFruit.AssetGenerator\DragonFruit.OnionFruit.AssetGenerator.csproj"/>
+        <ProjectReference Include="..\DragonFruit.OnionFruit.AssetGenerator.Generators\DragonFruit.OnionFruit.AssetGenerator.Generators.csproj"/>
+        <ProjectReference Include="..\DragonFruit.OnionFruit.Redis\DragonFruit.OnionFruit.Redis.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AWSSDK.S3"/>
+        <PackageReference Include="Coravel"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting"/>
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations"/>
+        <PackageReference Include="Redis.OM"/>
+        <PackageReference Include="Sentry.Extensions.Logging" />
+        <PackageReference Include="StackExchange.Redis"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Remove="appsettings.json"/>
+        <None Include="appsettings.json" CopyToPublishDirectory="Never"/>
+    </ItemGroup>
+
+</Project>
