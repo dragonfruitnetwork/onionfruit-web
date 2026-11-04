@@ -26,7 +26,6 @@
 
     <ItemGroup>
         <Protobuf Include="OnionDb/oniondb.proto" GrpcServices="Server"/>
-        <EmbeddedResource Include="Sources/CountryMapping/country-names.json" />
     </ItemGroup>
 
 </Project>
