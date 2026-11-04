@@ -9,9 +9,9 @@ using DragonFruit.OnionFruit.AssetGenerator.Generators.Core;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Networks;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources;
-using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.CountryMapping;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models;
+using DragonFruit.OnionFruit.Web.Shared;
 using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 using Google.Protobuf;
 using RangeMap;
@@ -21,7 +21,7 @@ using AddressRangeMessage = AddressRange;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Generators.OnionDb;
 
-public class OnionDbGenerator(CountryNameMap countryNames) : IGenerator
+public class OnionDbGenerator : IGenerator
 {
     internal const string DatabaseOutputKey = "onion.db";
     internal const string CompressedDatabaseOutputKey = "onion.db.br";
@@ -92,7 +92,7 @@ public class OnionDbGenerator(CountryNameMap countryNames) : IGenerator
             var countryData = new OnionDbCountryMessage
             {
                 CountryCode = countryCode,
-                CountryName = countryNames.TryGetValue(countryCode, out var mappedName)
+                CountryName = CountryNames.CountryNameMapping.TryGetValue(countryCode, out var mappedName)
                     ? mappedName
                     : nodes.Select(relay => relay.CountryName).FirstOrDefault(name => !string.IsNullOrWhiteSpace(name)) ?? string.Empty
             };
