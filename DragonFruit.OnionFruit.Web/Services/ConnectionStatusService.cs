@@ -1,11 +1,11 @@
 // OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
-using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 using DragonFruit.OnionFruit.Web.Models;
+using DragonFruit.OnionFruit.Web.Shared;
 using libloc.Abstractions;
 using libloc.Access;
 using Redis.OM.Contracts;
@@ -15,8 +15,7 @@ namespace DragonFruit.OnionFruit.Web.Services;
 internal sealed class ConnectionStatusService(IRedisConnectionProvider redis, ILocationDbAccessor locationDb) : IConnectionStatusService
 {
     private const string UnknownCountryCode = "XX";
-    private const string UnknownCountryName = "Unknown Country";
-    private const string UnknownProviderName = "Unknown AS";
+    private const string UnknownCountryName = "Unknown";
 
     public async Task<ConnectionStatus> GetStatusAsync(IPAddress? address, string? cloudflareCountry, CancellationToken ct = default)
     {
@@ -40,30 +39,36 @@ internal sealed class ConnectionStatusService(IRedisConnectionProvider redis, IL
 
         ct.ThrowIfCancellationRequested();
 
-        // check the internal Redis database of known Tor nodes first
-        var nodeInfo = await redis.RedisCollection<OnionFruitNodeInfo>().SingleOrDefaultAsync(x => x.IpAddress == connectionIpAddress);
+        ConnectionStatus connectionStatus;
 
+        var nodeInfo = await redis.RedisCollection<OnionFruitNodeInfo>().SingleOrDefaultAsync(x => x.IpAddress == connectionIpAddress);
         if (nodeInfo is not null)
         {
-            return new ConnectionStatus(
+            var countryCode = nodeInfo.CountryCode ?? UnknownCountryCode;
+            var countryName = CountryNames.CountryNameMapping.GetValueOrDefault(countryCode, nodeInfo.CountryName ?? UnknownCountryName);
+
+            connectionStatus = new ConnectionStatus(
                 address.ToString(),
                 true,
-                nodeInfo.CountryCode ?? UnknownCountryCode,
-                nodeInfo.CountryName ?? "Unknown",
+                countryCode,
+                countryName,
                 nodeInfo.ProviderNumber,
                 nodeInfo.ProviderName);
         }
+        else
+        {
+            var (countryCode, countryName, asInfo) = await locationDb.PerformAsync(database => GetConnectionInfo(database, address, cloudflareCountry));
 
-        var cloudflareEnabled = cloudflareCountry is not null;
-        var (countryCode, countryName, asInfo) = await locationDb.PerformAsync(database => GetConnectionInfo(database, address, cloudflareCountry));
+            connectionStatus = new ConnectionStatus(
+                address.ToString(),
+                cloudflareCountry is "T1",
+                countryCode,
+                CountryNames.CountryNameMapping.GetValueOrDefault(countryCode, countryName),
+                asInfo?.Number,
+                asInfo?.Name);
+        }
 
-        return new ConnectionStatus(
-            address.ToString(),
-            cloudflareEnabled && cloudflareCountry is "T1" or "XX",
-            countryCode,
-            GetCountryName(countryCode) ?? countryName,
-            asInfo?.Number,
-            asInfo?.Name);
+        return connectionStatus;
     }
 
     private static (string CountryCode, string CountryName, IDatabaseAS? AsInfo) GetConnectionInfo(ILocationDatabase database, IPAddress address, string? countryCodeOverride)
@@ -89,25 +94,8 @@ internal sealed class ConnectionStatusService(IRedisConnectionProvider redis, IL
         return (country?.Code ?? UnknownCountryCode, country?.Name ?? UnknownCountryName, asInfo);
     }
 
-    private static string? GetCountryName(string countryCode)
-    {
-        if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length != 2)
-        {
-            return null;
-        }
-
-        try
-        {
-            return new RegionInfo(countryCode.ToUpperInvariant()).EnglishName;
-        }
-        catch (ArgumentException)
-        {
-            return null;
-        }
-    }
-
     private static ConnectionStatus Unknown()
     {
-        return new ConnectionStatus(string.Empty, false, UnknownCountryCode, "Unknown", 0, UnknownProviderName);
+        return new ConnectionStatus(string.Empty, false, UnknownCountryCode, UnknownCountryName, null, null);
     }
 }
