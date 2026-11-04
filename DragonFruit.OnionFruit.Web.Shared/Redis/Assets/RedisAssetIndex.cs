@@ -4,7 +4,7 @@
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace DragonFruit.OnionFruit.Redis.Assets;
+namespace DragonFruit.OnionFruit.Web.Shared.Redis.Assets;
 
 public sealed class RedisAssetIndex(IConnectionMultiplexer redis, IOptions<RedisOptions> options) : IAssetIndex
 {

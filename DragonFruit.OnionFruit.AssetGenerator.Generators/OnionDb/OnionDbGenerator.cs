@@ -12,7 +12,7 @@ using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.CountryMapping;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models;
-using DragonFruit.OnionFruit.Redis.Nodes;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 using Google.Protobuf;
 using RangeMap;
 using OnionDbMessage = OnionDb;

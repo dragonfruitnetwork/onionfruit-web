@@ -4,7 +4,7 @@
 using System.Reflection;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
-using DragonFruit.OnionFruit.Redis;
+using DragonFruit.OnionFruit.Web.Shared.Redis;
 using DragonFruit.OnionFruit.Web.Configuration;
 using DragonFruit.OnionFruit.Web.Services;
 using libloc.Access;

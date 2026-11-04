@@ -3,7 +3,7 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
-using DragonFruit.OnionFruit.Redis.Assets;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Assets;
 using DragonFruit.OnionFruit.Web.Configuration;
 using DragonFruit.OnionFruit.Web.Models;
 using Microsoft.Extensions.Caching.Memory;

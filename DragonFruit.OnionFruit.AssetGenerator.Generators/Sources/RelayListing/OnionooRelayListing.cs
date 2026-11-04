@@ -10,7 +10,7 @@ using DragonFruit.Data;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Countries;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models;
-using DragonFruit.OnionFruit.Redis.Nodes;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing;
 

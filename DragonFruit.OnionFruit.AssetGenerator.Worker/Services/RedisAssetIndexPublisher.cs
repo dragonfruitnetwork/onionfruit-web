@@ -2,7 +2,7 @@
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using DragonFruit.OnionFruit.AssetGenerator.Abstractions;
-using DragonFruit.OnionFruit.Redis.Assets;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Assets;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Worker.Services;
 

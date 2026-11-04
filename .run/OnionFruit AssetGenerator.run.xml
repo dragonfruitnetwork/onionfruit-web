@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="OnionFruit AssetGenerator" type="DotNetProject" factoryName=".NET Project">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/DragonFruit.OnionFruit.AssetGenerator.Worker/bin/Debug/net10.0/DragonFruit.OnionFruit.AssetGenerator.Worker" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/DragonFruit.OnionFruit.AssetGenerator.Worker/bin/Debug/net10.0/DragonFruit.OnionFruit.AssetGenerator.Worker.exe" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/DragonFruit.OnionFruit.AssetGenerator.Worker" />
     <option name="PASS_PARENT_ENVS" value="1" />

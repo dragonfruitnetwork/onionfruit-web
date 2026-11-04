@@ -2,7 +2,7 @@
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using System.Security.Cryptography;
-using DragonFruit.OnionFruit.Redis.Assets;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Assets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -10,7 +10,7 @@ using Redis.OM;
 using Redis.OM.Contracts;
 using StackExchange.Redis;
 
-namespace DragonFruit.OnionFruit.Redis;
+namespace DragonFruit.OnionFruit.Web.Shared.Redis;
 
 public static class RedisServiceCollectionExtensions
 {

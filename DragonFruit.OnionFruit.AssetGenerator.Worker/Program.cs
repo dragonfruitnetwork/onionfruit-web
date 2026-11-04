@@ -12,7 +12,7 @@ using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources;
 using DragonFruit.OnionFruit.AssetGenerator.Publishing;
 using DragonFruit.OnionFruit.AssetGenerator.Worker.Configuration;
 using DragonFruit.OnionFruit.AssetGenerator.Worker.Services;
-using DragonFruit.OnionFruit.Redis;
+using DragonFruit.OnionFruit.Web.Shared.Redis;
 using Microsoft.Extensions.Options;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Worker;

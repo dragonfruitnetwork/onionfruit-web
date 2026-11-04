@@ -6,7 +6,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Coravel.Invocable;
 using DragonFruit.OnionFruit.AssetGenerator.Publishing;
-using DragonFruit.OnionFruit.Redis.Assets;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Assets;
 using Microsoft.Extensions.Options;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Worker.Services;

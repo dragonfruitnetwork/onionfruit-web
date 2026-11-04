@@ -2,8 +2,8 @@
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
 using System.Reflection;
-using DragonFruit.OnionFruit.Redis.Nodes;
 using DragonFruit.OnionFruit.AssetGenerator.Worker.Configuration;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 using Microsoft.Extensions.Options;
 using Redis.OM;
 using Redis.OM.Contracts;

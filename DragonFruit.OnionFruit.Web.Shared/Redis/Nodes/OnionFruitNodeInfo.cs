@@ -3,7 +3,7 @@
 
 using Redis.OM.Modeling;
 
-namespace DragonFruit.OnionFruit.Redis.Nodes;
+namespace DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 
 [Document(Prefixes = ["onionfruit-web:nodes"], IndexName = "onionfruit-web:node-idx", StorageType = StorageType.Json)]
 public class OnionFruitNodeInfo

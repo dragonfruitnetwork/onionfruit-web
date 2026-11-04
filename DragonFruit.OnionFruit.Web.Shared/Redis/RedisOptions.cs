@@ -3,7 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace DragonFruit.OnionFruit.Redis;
+namespace DragonFruit.OnionFruit.Web.Shared.Redis;
 
 public sealed class RedisOptions
 {

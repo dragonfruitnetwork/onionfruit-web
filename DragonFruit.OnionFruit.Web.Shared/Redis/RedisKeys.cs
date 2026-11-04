@@ -3,7 +3,7 @@
 
 using StackExchange.Redis;
 
-namespace DragonFruit.OnionFruit.Redis;
+namespace DragonFruit.OnionFruit.Web.Shared.Redis;
 
 public static class RedisKeys
 {

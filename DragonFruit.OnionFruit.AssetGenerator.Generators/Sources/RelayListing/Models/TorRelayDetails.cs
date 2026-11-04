@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models.Converters;
-using DragonFruit.OnionFruit.Redis.Nodes;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.RelayListing.Models;
 

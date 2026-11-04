@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\DragonFruit.OnionFruit.Redis\DragonFruit.OnionFruit.Redis.csproj"/>
+        <ProjectReference Include="..\DragonFruit.OnionFruit.Web.Shared\DragonFruit.OnionFruit.Web.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

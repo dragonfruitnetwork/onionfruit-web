@@ -4,7 +4,7 @@
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-using DragonFruit.OnionFruit.Redis.Nodes;
+using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 using DragonFruit.OnionFruit.Web.Models;
 using libloc.Abstractions;
 using libloc.Access;
