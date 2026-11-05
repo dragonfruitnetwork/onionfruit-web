@@ -55,6 +55,7 @@ public static class Program
         builder.Services.AddLocationDb();
 
         builder.Services.AddSingleton<IAssetRedirectService, AssetRedirectService>();
+        builder.Services.AddSingleton<INodeLookupService, NodeLookupService>();
         builder.Services.AddSingleton<IConnectionStatusService, ConnectionStatusService>();
 
         builder.Services.AddControllers();

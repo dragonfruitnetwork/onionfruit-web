@@ -3,16 +3,14 @@
 
 using System.Net;
 using System.Net.Sockets;
-using DragonFruit.OnionFruit.Web.Shared.Redis.Nodes;
 using DragonFruit.OnionFruit.Web.Models;
 using DragonFruit.OnionFruit.Web.Shared;
 using libloc.Abstractions;
 using libloc.Access;
-using Redis.OM.Contracts;
 
 namespace DragonFruit.OnionFruit.Web.Services;
 
-internal sealed class ConnectionStatusService(IRedisConnectionProvider redis, ILocationDbAccessor locationDb) : IConnectionStatusService
+internal sealed class ConnectionStatusService(INodeLookupService nodeLookup, ILocationDbAccessor locationDb) : IConnectionStatusService
 {
     private const string UnknownCountryCode = "XX";
     private const string UnknownCountryName = "Unknown";
@@ -41,7 +39,7 @@ internal sealed class ConnectionStatusService(IRedisConnectionProvider redis, IL
 
         ConnectionStatus connectionStatus;
 
-        var nodeInfo = await redis.RedisCollection<OnionFruitNodeInfo>().SingleOrDefaultAsync(x => x.IpAddress == connectionIpAddress);
+        var nodeInfo = await nodeLookup.GetByIpAddressAsync(connectionIpAddress, ct);
         if (nodeInfo is not null)
         {
             var countryCode = nodeInfo.CountryCode ?? UnknownCountryCode;
