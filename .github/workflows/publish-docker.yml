@@ -54,7 +54,7 @@ jobs:
       - name: Image build and push
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f
         with:
-          context: ${{ matrix.project }}/bin/Release/net10.0/publish
+          context: ${{ matrix.project }}/bin/Release/net11.0/publish
           file: ${{ matrix.project }}/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           platforms: linux/arm64,linux/amd64
