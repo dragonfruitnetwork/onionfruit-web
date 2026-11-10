@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:10.0-noble-chiseled
+﻿FROM mcr.microsoft.com/dotnet/runtime:11.0-resolute-chiseled
 
 ENV ASPNETCORE_ENVIRONMENT=Production
 
