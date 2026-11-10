@@ -9,7 +9,6 @@ namespace DragonFruit.OnionFruit.Web.Controllers;
 [ApiController, Route("~/")]
 public class DefaultController : ControllerBase
 {
-    // The OnionFruit logo: wifi arcs over a padlock (kept as-is from the original)
     private static readonly string[] Logo =
     [
         "",
