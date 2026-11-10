@@ -1,7 +1,6 @@
 ﻿// OnionFruit™ Web Copyright DragonFruit Network <inbox@dragonfruit.network>
 // Licensed under Apache-2. Refer to the LICENSE file for more info
 
-using DnsClient;
 using DragonFruit.Data;
 using DragonFruit.Data.Serializers;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
@@ -17,7 +16,6 @@ public static class AssetGeneratorServiceCollectionExtensions
     public static IServiceCollection AddAssetGeneratorSources(this IServiceCollection services)
     {
         services.TryAddSingleton<ApiClient, ApiClient<ApiJsonSerializer>>();
-        services.TryAddSingleton<ILookupClient, LookupClient>();
 
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISource, IPFireNetworkRangeMapSource>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<ISource, OnionooSource>());

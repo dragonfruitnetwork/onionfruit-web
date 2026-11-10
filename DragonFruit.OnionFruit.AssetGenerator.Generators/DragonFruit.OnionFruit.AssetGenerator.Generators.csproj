@@ -9,7 +9,6 @@
 
     <ItemGroup>
         <PackageReference Include="CsvHelper"/>
-        <PackageReference Include="DnsClient"/>
         <PackageReference Include="DragonFruit.Data"/>
         <PackageReference Include="Google.Protobuf"/>
         <PackageReference Include="Grpc.Core.Api"/>

@@ -5,8 +5,6 @@ using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
-using DnsClient;
-using DnsClient.Protocol;
 using DragonFruit.Data;
 using DragonFruit.OnionFruit.AssetGenerator.Generators.Core.Abstractions;
 using libloc;
@@ -16,7 +14,7 @@ using SharpCompress.Compressors.Xz;
 
 namespace DragonFruit.OnionFruit.AssetGenerator.Generators.Sources.NetworkRanges;
 
-internal sealed class IPFireNetworkRangeMapSource(ILookupClient dnsClient, ApiClient apiClient) : ISource
+internal sealed class IPFireNetworkRangeMapSource(ApiClient apiClient) : ISource
 {
     private const string LastUpdateRecordAddress = "_v1._db.location.ipfire.org";
 
@@ -33,8 +31,8 @@ internal sealed class IPFireNetworkRangeMapSource(ILookupClient dnsClient, ApiCl
 
     public async Task<bool> HasDataChangedAsync(DateTimeOffset lastVersionDate, CancellationToken ct)
     {
-        var records = await dnsClient.QueryAsync(LastUpdateRecordAddress, QueryType.TXT, cancellationToken: ct);
-        var date = records.Answers.OfType<TxtRecord>().SingleOrDefault()?.Text.First();
+        var records = await Dns.ResolveTxtAsync(LastUpdateRecordAddress, ct);
+        var date = records.Records.SingleOrDefault().Values?[0];
 
         if (string.IsNullOrEmpty(date))
         {
